@@ -8,9 +8,9 @@ import java.awt.event.FocusListener;
 
 public class TimePaneFactory implements FocusListener {
 	
-	private BatGUI batGui_ = null;
+	private BatGUISlicer batGui_ = null;
 	
-	public TimePaneFactory (BatGUI batGui) {
+	public TimePaneFactory (BatGUISlicer batGui) {
 		batGui_ = batGui;
 	}
 	

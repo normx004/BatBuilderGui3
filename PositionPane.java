@@ -5,9 +5,9 @@ import java.awt.*;
 //
 // Defines 'x - and -y position' panel (couple of text boxes)
 public class PositionPane {
-	BatGUI batGui_ = null;
+	BatGUISlicer batGui_ = null;
 	
-	public PositionPane ( BatGUI bg) {
+	public PositionPane ( BatGUISlicer bg) {
 		batGui_ = bg;
 	}
 	

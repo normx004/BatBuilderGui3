@@ -5,9 +5,9 @@ import javax.swing.*;
 import java.awt.*;
 
 public class WindowSizePane {
-	BatGUI batGui_ = null;
+	BatGUISlicer batGui_ = null;
 	
-	public WindowSizePane ( BatGUI bg) {
+	public WindowSizePane ( BatGUISlicer bg) {
 		batGui_ = bg;
 	}
 	

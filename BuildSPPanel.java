@@ -10,8 +10,8 @@ import java.awt.*;
 // maybe i'll make it the speed panel!
 //
 public class BuildSPPanel {
-    private BatGUI batGui_ = null;
-	public BuildSPPanel (BatGUI bg) {
+    private BatGUISlicer batGui_ = null;
+	public BuildSPPanel (BatGUISlicer bg) {
 		batGui_ = bg;
 	}
 	private JRadioButton spbut1 = new JRadioButton("slow"  , false);

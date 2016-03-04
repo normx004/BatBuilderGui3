@@ -1,0 +1,25 @@
+package batboy;
+
+public class BatGUIFactory {
+
+	public BatGUIFactory() {
+		// TODO Auto-generated constructor stub
+	}
+    public BatGUI getBatGUI(String[] args) {
+    	//if type is slicer, get an xspf file generator gui
+    	//if type is html,   get a  page generator gui
+    	String type = args[1];
+    	if (type.compareTo("slicer")==0) {
+    		System.out.println("Initializing SLICER");
+    		BatGUI b = new BatGUISlicer(args);
+    		return b;
+    	}
+    	if (type.compareTo("html")==0) {
+    		System.out.println("Initializing HTML");
+    		BatGUI b = new BatGUIHtml(args);
+    		return b;
+    	}
+    	System.err.println("Wrong factory request, was " + type + ", but should be 'slicer' or 'html'");
+    	return null;
+    }
+}

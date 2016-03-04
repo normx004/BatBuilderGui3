@@ -9,11 +9,11 @@ public class MakeQuadrantPanel extends MakeArbitraryPanel {
     
 	private String[] buttLabels = new String[4];
 	private String   borderTitle = new String("Screen Position");
-	private BatGUI  bg = null;
+	private BatGUISlicer  bg = null;
 	private GenericButtonPanelFactory grp = null;
 	private JPanel p = null;
 	
-	public MakeQuadrantPanel(BatGUI b) {
+	public MakeQuadrantPanel(BatGUISlicer b) {
 	    grp = new GenericButtonPanelFactory(this);
 		bg = b;
 		buttLabels[0] = new String("upper  left");

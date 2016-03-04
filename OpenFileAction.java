@@ -13,9 +13,9 @@ import javax.swing.JFrame;
     public class OpenFileAction extends AbstractAction {
         JFrame frame;
         JFileChooser chooser;
-        BatGUI bg_ = null;
+        BatGUISlicer bg_ = null;
     
-        OpenFileAction(JFrame frame, JFileChooser chooser, BatGUI bg) {
+        OpenFileAction(JFrame frame, JFileChooser chooser, BatGUISlicer bg) {
             super("Open...");
             bg_ = bg;
             this.chooser = chooser;

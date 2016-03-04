@@ -15,9 +15,9 @@ package batboy;
 	    public class GetVlcFileAction extends AbstractAction {
 	        JFrame frame;
 	        JFileChooser chooser;
-	        BatGUI bg_ = null;
+	        BatGUISlicer bg_ = null;
 	    
-	        GetVlcFileAction(JFrame frame, JFileChooser chooser, BatGUI bg) {
+	        GetVlcFileAction(JFrame frame, JFileChooser chooser, BatGUISlicer bg) {
 	            super("Open...");
 	            bg_ = bg;
 	            this.chooser = chooser;

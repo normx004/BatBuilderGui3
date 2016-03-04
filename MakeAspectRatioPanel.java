@@ -8,11 +8,11 @@ public class MakeAspectRatioPanel extends MakeArbitraryPanel {
     
 	private String[] buttLabels = new String[2];
 	private String   borderTitle = new String("AspectRatio");
-	private BatGUI  bg = null;
+	private BatGUISlicer  bg = null;
 	private GenericButtonPanelFactory grp = null;
 	private JPanel p = null;
 	
-	public MakeAspectRatioPanel(BatGUI b) {
+	public MakeAspectRatioPanel(BatGUISlicer b) {
 	    grp = new GenericButtonPanelFactory(this);
 		bg = b;
 		buttLabels[0] = new String("auto");

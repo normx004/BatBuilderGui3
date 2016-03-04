@@ -11,9 +11,9 @@ import java.awt.dnd.*;
 import java.awt.datatransfer.*;
 
 public class FileActionFactory {
-	BatGUI   batGui_ = null;
+	BatGUISlicer   batGui_ = null;
 	
-	FileActionFactory (BatGUI bg) {
+	FileActionFactory (BatGUISlicer bg) {
 		batGui_ = bg;
 	}
 	public JPanel buildFileActionPane(String type) {

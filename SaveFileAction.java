@@ -11,9 +11,9 @@ import javax.swing.JFrame;
     public class SaveFileAction extends AbstractAction {
         JFileChooser chooser;
         JFrame frame;
-        BatGUI bg_ = null;
+        BatGUISlicer bg_ = null;
     
-        SaveFileAction(JFrame frame, JFileChooser chooser, BatGUI bg) {
+        SaveFileAction(JFrame frame, JFileChooser chooser, BatGUISlicer bg) {
             super("Save As...");
             bg_ = bg;
             this.chooser = chooser;
