@@ -86,7 +86,7 @@ public class FileActionFactory {
 	}
 	//--------------Build File Action Pane for HTML version-----------------------------
 	public //JPanel
-	         void buildFileActionPane(VideoFilePointer vPtr) {
+	       void buildFileActionPane(VideoFilePointer vPtr) {
 		 vPtr.setVideoFilePane(new JPanel());
 		 //File lastDir         = getLastDirUsed();
 		 vPtr.setJfc(new JFileChooser(/*lastDir*/));
@@ -105,13 +105,18 @@ public class FileActionFactory {
 	     vPtr.getVideoFilePane().setDropTarget(new DropTarget() {
 	         public synchronized void drop(DropTargetDropEvent evt) {
 	        	 out("DROP DROP DROP EVENT!!!! "+ evt.toString());
-	             try {
+	        	 DropTargetContext ctx = evt.getDropTargetContext();
+	        	 Component comp = ctx.getComponent();
+	        	 Class o = comp.getClass();
+	        	 out("Component is "+o.getCanonicalName());
+	        	 try {
 	                 evt.acceptDrop(DnDConstants.ACTION_COPY);
 	                 //List<File> droppedFiles = (List<File>)
 	                Object droppedFiles = 
 	                     evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 	                 for (File file : (java.util.List<File>)droppedFiles) {
-	                     System.out.println("DROPPPED FILE ON THIS BUTTON(Name):"+file.getPath());
+	                     System.out.println("DROPPPED FILE ON THIS BUTTON(FileName):"+file.getPath());
+	                     String actCmd = ((JButton)(evt.getSource())).getActionCommand();
 	                     batGui_.setVideoFile(file);
 	                 }
 	             } catch (Exception ex) {

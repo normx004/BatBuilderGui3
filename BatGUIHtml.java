@@ -17,6 +17,7 @@ import javax.swing.JFrame;
 
  
 import java.awt.event.KeyEvent;
+import java.io.File;
 
 public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
 	protected JLabel j = null;
@@ -44,6 +45,8 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
         buts[2] = new String("4");
         buts[3] = new String("6");
         buts[4] = new String("8");
+        
+        out("Buts length is "+buts.length);
         		
         //public JPanel getButtons(String borderTitle, String[] labels) {
         MakeArbitraryPanel mapa      = new MakeArbitraryPanel(this);
@@ -63,6 +66,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     protected void buildMultifileActionPanel () {
     	int k = 0;
     	int howMany           = this.getFileCount();
+    	out("build Multi File Action Panel. howMany is "+howMany);
     	vidFiles              = new VideoFilePointer[howMany];
     	FileActionFactory faf = new FileActionFactory(this);
     	JPanel manyFiles      = new JPanel();
@@ -88,6 +92,12 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     	
     	frame.setVisible(true);
     }
+    public  void setVideoFile(File f) {
+		   videoFile_  = f;
+		   String path = videoFile_.getPath();
+		   out("in batgui video file is "+ path);
+		   whatVideoFile.setText(path);
+	   }
     public void actionPerformed(ActionEvent e) {
     	PageBuilder pb = new PageBuilder(vidFiles);
         if ("doit".equals(e.getActionCommand())) {

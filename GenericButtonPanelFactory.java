@@ -22,11 +22,20 @@ public class GenericButtonPanelFactory {
 	//---------------getButtons-------(radio)--------------------
 	public JPanel getButtons(String borderTitle, String[] labels) {
        int nButtons = labels.length;
+       out("in getButtons in GBPF, length is "+nButtons);
 	
 	   buttons = new JRadioButton[nButtons];
+	   int  howMany[] = new int[nButtons];
+	   int nb = 0;
+	   while(nb < nButtons) {
+		   howMany[nb] = nb*2;
+		   nb += 1;
+	   }
 	   int i=0;
 	   while (i < nButtons) {
               buttons[i]   = new JRadioButton( labels[i] , true);
+              Integer ii = new Integer(howMany[i]);
+              buttons[i].setActionCommand(ii.toString());
               i += 1;
 	   }
  
