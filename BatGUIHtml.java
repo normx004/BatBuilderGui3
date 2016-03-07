@@ -46,8 +46,6 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
         buts[3] = new String("6");
         buts[4] = new String("8");
         
-        out("Buts length is "+buts.length);
-        		
         //public JPanel getButtons(String borderTitle, String[] labels) {
         MakeArbitraryPanel mapa      = new MakeArbitraryPanel(this);
         GenericButtonPanelFactory gb = new GenericButtonPanelFactory(mapa);
@@ -64,26 +62,35 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
         frame.setVisible(true);
     }
     protected void buildMultifileActionPanel () {
+    	// the problem here is with 2 or 4 or whatever drop targets in the same JPanel,
+    	// it seems drag and drop doesn't distinguish between what button you are dropping
+    	// onto...at least, I can't see how to do that. So I'll make 'n' separate panels...
     	int k = 0;
     	int howMany           = this.getFileCount();
     	out("build Multi File Action Panel. howMany is "+howMany);
+    	
     	vidFiles              = new VideoFilePointer[howMany];
-    	FileActionFactory faf = new FileActionFactory(this);
-    	JPanel manyFiles      = new JPanel();
-    	FlowLayout fl         = new FlowLayout();
-    	manyFiles.setLayout(fl);
-    	int height            = 45 * howMany; // 45 pixels per row
-    	Dimension dim         = new Dimension(800,height);
-    	manyFiles.setPreferredSize(dim);
     	
     	while (k < howMany) {
+    		
+    		FileActionFactory faf = new FileActionFactory(this);
+    		JPanel manyFiles      = new JPanel();
+    		FlowLayout fl         = new FlowLayout();
+    		manyFiles.setLayout(fl);
+    		//int height            = 45 * howMany; // 45 pixels per row
+    		int height            = 45 ; // 45 pixels per row
+    		Dimension dim         = new Dimension(800,height);
+    		manyFiles.setPreferredSize(dim);
+    	
     		vidFiles[k] = new VideoFilePointer();
     		vidFiles[k].setIndex(k);
     		faf.buildFileActionPane(vidFiles[k]);
     		manyFiles.add(vidFiles[k].getVideoFilePane());
     		k+=1;
+    		
+    		frame.add(manyFiles);
     	}
-    	frame.add(manyFiles);
+    	
     	
     	JButton doitButton = new JButton("Do it");
     	doitButton.setActionCommand("doit");	

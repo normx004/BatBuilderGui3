@@ -85,6 +85,7 @@ public class BatGUI {
 		  protected void setArgs(String[] x) {
 			  myArgs = x;
 		  }
+		  //-------------------------INIT-------------------------------------
 		  Boolean gotProps=new Boolean(false);
 		  public void init() {
 			  //this method must be overridden!
@@ -233,7 +234,7 @@ public class BatGUI {
 		  BatGUISlicer.setDebug(true);
 		  BatGUIHtml.setDebug(true);
 		  
-		  System.out.println("java -jar <the jar> <propsfilepath> <slicer|html");
+		  System.out.println("java -jar <the jar> <propsfilepath> <slicer|html>");
 		
 		  BatGUIFactory f = new BatGUIFactory();
 		  BatGUI sc = f.getBatGUI(args);
@@ -241,5 +242,11 @@ public class BatGUI {
 		  sc.getProps(args[0]);
 		  sc.sleep(10000);
 	}
+		public JFrame getFrame() {
+			return frame;
+		}
+		public void setFrame(JFrame frame) {
+			this.frame = frame;
+		}
 }
 

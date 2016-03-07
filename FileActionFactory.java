@@ -99,6 +99,7 @@ public class FileActionFactory {
 	     
 	     openButton.setText("videofile");
 	     vPtr.getVideoFilePane().add(openButton);
+	     // get waht video file returns a "JLabel"
 	     vPtr.getVideoFilePane().add(vPtr.getWhatVideoFile());
 	     
 	    //-----------------watch for dropped files!=---------------------
@@ -109,15 +110,29 @@ public class FileActionFactory {
 	        	 Component comp = ctx.getComponent();
 	        	 Class o = comp.getClass();
 	        	 out("Component is "+o.getCanonicalName());
+	        	 JPanel jp = (JPanel)comp;
 	        	 try {
 	                 evt.acceptDrop(DnDConstants.ACTION_COPY);
 	                 //List<File> droppedFiles = (List<File>)
 	                Object droppedFiles = 
 	                     evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 	                 for (File file : (java.util.List<File>)droppedFiles) {
-	                     System.out.println("DROPPPED FILE ON THIS BUTTON(FileName):"+file.getPath());
-	                     String actCmd = ((JButton)(evt.getSource())).getActionCommand();
-	                     batGui_.setVideoFile(file);
+	                     System.out.println("DROPPPED FILE ON BUTTON(FileName):"+file.getPath());
+	                     //got to replace "set video file" with access to the text field in the Jpanel
+	                     Component[] components = jp.getComponents(); 
+	                     Component component = null; 
+	                     for (int ci = 0; ci < components.length; ci++) 
+	                     { 
+	                        component = components[ci]; 
+	                        if (component instanceof JLabel) 
+	                        {   
+	                           //out("YES! its a JLabel");
+	                           JLabel x =  ((JLabel)(component));
+	                           x.setText(file.getPath());
+	                           JFrame frame = batGui_.getFrame();
+	                           frame.invalidate();
+	                        }
+	                     }
 	                 }
 	             } catch (Exception ex) {
 	                 ex.printStackTrace();

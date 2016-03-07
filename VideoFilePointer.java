@@ -89,9 +89,9 @@ public class VideoFilePointer {
 		this.index = index;
 	}
 	public File getVideoFile() {
-		return videoFile;
+		return new File(whatVideoFile.getText());
 	}
 	public void setVideoFile(File videoFile) {
-		this.videoFile = videoFile;
+		this.whatVideoFile.setText(videoFile.getPath());
 	}
 }

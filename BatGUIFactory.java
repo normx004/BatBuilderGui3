@@ -22,6 +22,13 @@ public class BatGUIFactory {
     		return b;
     	}
     	System.err.println("Wrong factory request, was " + type + ", but should be 'slicer' or 'html'");
+    	if (args[0] != null ) {
+        	System.err.println("Arg 0: "+ args[0]);   		
+    	}
+    	if (args[1] != null){
+    		System.err.println("Arg 1: "+ args[1]);
+    	}
+    	
     	return null;
     }
 }
