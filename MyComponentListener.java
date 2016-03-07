@@ -4,8 +4,11 @@ import java.awt.event.*;
 import java.awt.event.ComponentEvent;
 
 public class MyComponentListener implements ComponentListener {
+	   private boolean debug = false;
 	   private void out(String s) {
-		   System.out.println(s);
+		   if (debug){
+		       System.out.println(s);
+		   }
 	   }
 	   public void componentHidden(ComponentEvent e) {
 	         out(e.getComponent().getClass().getName() + " --- Hidden");

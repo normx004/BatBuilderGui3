@@ -133,7 +133,7 @@ import java.util.logging.*;
 		
 	   //------------------------------------------------------------
 	   
-	   private JFileChooser videoFileChooser_ = null;
+	  
 	   private JFileChooser fc2_ = null;
 	   private JFileChooser vlcFileChooser_ = null;
 	   private JFileChooser batFileSaveChooser_ = null;
@@ -143,8 +143,7 @@ import java.util.logging.*;
 	   public String       getVlcFileName() { return vlcFileName_;}
 	   public void         setVlcFileName(String s) { vlcFileName_ = s;}
 	   
-	   public void         setVideoFileChooser(JFileChooser j) { videoFileChooser_ = j;}
-	   public JFileChooser getVideoFileChooser() { return videoFileChooser_;}
+	  
 	   
 	   TableModel dataModel_ =  null; //new TableModel();
        JTable table_         = null; //new JTable(dataModel);
@@ -206,18 +205,7 @@ import java.util.logging.*;
 	   
 	   private JLabel   vlcFileLabel_ = new JLabel(vlcname);                             
 	   private String   vlcFileName_  = new String(vlcname); 
-	   //--------VIDEO file display
-	   private JLabel whatVideoFile = null;
-	   
-	   public JLabel getWhatVideoFile() {
-		return whatVideoFile;
-	   }
-       public void setWhatVideoFile(JLabel whatVideoFile) {
-		this.whatVideoFile = whatVideoFile;
-	   }
-       public File getVideoFile() {
-		   return videoFile_;
-	   }
+	   //--------VIDEO file display (overrides superclass version, adds cmd file/bat file code)	 
        public  void setVideoFile(File f) {
 		   videoFile_  = f;
 		   String path = videoFile_.getPath();
@@ -512,16 +500,7 @@ import java.util.logging.*;
 		    }
 		  
 		
-		  public void focusGained(FocusEvent e) {
-				//calcSec();
-				out("(unused arbitrary method: ) Focus " + displayFocusMessage("gained" , e));
-		  }	
-		  
-		  public void focusLost(FocusEvent e) {
-		    	//calcSec();
-		    	out("(unused arbitrary method: )Focus " + displayFocusMessage("lost" , e));
-		    }
-		
+		 
 		  //
 		  //
 		  //  ---some utility routines-------
@@ -592,41 +571,19 @@ import java.util.logging.*;
 
 		 
 
-		  public String displayFocusMessage(String prefix, FocusEvent e) {
-			    StringBuffer stb = new StringBuffer();
-				stb.append(prefix
-			                       + (e.isTemporary() ? " (temporary):" : ":")
-			                       +  e.getComponent().getClass().getName()
-			                       + "; Opposite component: " 
-			                       + (e.getOppositeComponent() != null ?
-			                          e.getOppositeComponent().getClass().getName() : "null"));
-					       //+ newline); 
-				return new String(stb);
-			    }
-
-			    
+		 
 			
 
 
 
 	 //----------------CONSTRUCTOR---------------------------
+     protected String[] myArgs = null;
 	 public BatGUISlicer (String[] args) {
-		     logr.log(Level.INFO, "who hooooo");
-		     // create frame
-		     Boolean gotProps=new Boolean(false);
-		     System.out.println("starting BatGUI constructor. if props file supplied, s/b first arg or -Dprops=file");
-		     if ( args.length > 0 && args[0] != null) {
-		    	 out("props expected in "+args[0]);
-		    	 getProps(args[0]);
-		    	 gotProps=new Boolean(true);
-		     }
-		     if ( args.length == 0 ) {
-		    	 String prop = System.getProperties().getProperty("props");
-		    	 if (prop != null ) {
-		    		 getProps(prop);
-		    		 gotProps=new Boolean(true);
-		    	 }
-		     }
+		 myArgs = args;
+	 }
+	 public void init() {
+		     super.init();
+		     Boolean gotProps = super.gotProps;
 		     if (gotProps.booleanValue()) {
 		    	 String xinc=System.getProperty("xinc");
 		    	 String yinc=System.getProperty("yinc");
@@ -647,10 +604,33 @@ import java.util.logging.*;
 		    	 }
 		    	 
 		     }
-		     initWindow();
+		     String title = "Video Slicer";
+		     initWindow(title);
 	 }
 	 
-	 
+	//-----------------Select alternate VLC program---------------------------   
+		public JPanel buildVLCActionPane() {
+		     JPanel vlcPane = new JPanel();
+		     vlcPane.setLayout(new BoxLayout(vlcPane, BoxLayout.LINE_AXIS));
+		     this.setVlcFileChooser( new JFileChooser("select vlc file"));
+		     
+		     JFrame jf3 = new JFrame();
+		     Action  vlcAction = new GetVlcFileAction(jf3, this.getVlcFileChooser(), this);
+		     JButton vlcButton = new JButton(vlcAction);
+		     vlcButton.setText("VLC File");
+		     vlcPane.add(vlcButton);
+		     
+		     Component  vLabel = new Label("VLC File: ");
+		     vLabel.setBackground(Color.YELLOW);	     
+		     vlcPane.add(vLabel);
+		     //final  String DEFAULTVLC = "C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe";
+		     final  String DEFAULTVLC = this.getVlcFileName();
+		     out("got vlc file name from batgui, it is "+DEFAULTVLC);
+		     this.setVlcFileLabel( new JLabel(DEFAULTVLC + "                           "));
+		     vlcPane.add(this.getVlcFileLabel());
+		     return vlcPane;
+			
+		}
 	
 
 	//--------------------------INIT WINDOW-----------------------	 
@@ -660,76 +640,10 @@ import java.util.logging.*;
 	//--------------------------INIT WINDOW-----------------------	 
 	//--------------------------INIT WINDOW-----------------------	 
 	  @SuppressWarnings("deprecation")
-	 private void initWindow() {
-	     String title = "Video Slicer";
+	 private void initWindow(String title) {
 	    
-	     //JFrame frame = new JFrame(title);
-	     ImageIcon ic = new ImageIcon("q:\\temp\\v24.jpg");
-	     JFrame frame = new BackgroundImageJFrame(ic);
-	     frame.setTitle(title);
+	     initWindowStart(title);
 	     
-	     frame.setBackground(Color.CYAN);
-	    
-	     // Add a listener for the close event
-	     frame.addWindowListener(new WindowAdapter() {
-	         public void windowClosing(WindowEvent evt) {
-	             Frame frame = (Frame)evt.getSource();
-	    
-	             // Hide the frame
-	             frame.setVisible(false);
-	    
-	             // If the frame is no longer needed, call dispose
-	             frame.dispose();
-	         }
-	     });
-	     // Add a listener for the close event
-	     frame.addWindowListener(new WindowAdapter() {
-	         public void windowClosing(WindowEvent evt) {
-	             // Exit the application
-	             System.exit(0);
-	         }
-	     });
-	     
-	  
-	     // is there a resize event? i bet there is!
-	     frame.addWindowListener(new WindowAdapter() {
-	         public void windowResize(WindowEvent evt) {
-	        	 int xsize = 0;
-	        	 int ysize = 0; 
-	        	 out("window resize evt: " + evt.toString());
-	        	 out("window size is x=" + xsize + ", ysize="+ysize);
-	         }
-	     });
-	     MyComponentListener lister = new MyComponentListener();
-	     frame.addComponentListener(lister);
-         // ----try to put an image in the background--------
-	     /*
-	     BufferedImage duke = null;
-	     try {
-	         duke = ImageIO.read(new File("c:\\tmp\\v24.jpg"));
-	     } catch (IOException e) {
-	     }
-	     
-	     
-	     BackgroundPanel bkpanel =
-	    		    new BackgroundPanel(duke, BackgroundPanel.ACTUAL, 1.0f, 0.5f);
-	    		GradientPaint paint =
-	    		    new GradientPaint(0, 0, Color.BLUE, 600, 0, Color.RED);
-	    		bkpanel.setPaint(paint);
-	     */		
-	     // -------------END of trying to put an image in the background------------------
-	     // Create a container 
-	     // with a flow layout, it arranges its children horizontally
-	     
-	     // A container can also be created with a other layouts
-	     // a GridBag tries to arrange things in a 'gridlike' layout
-	     // where components move around depending on how the window is sized
-	     
-	     JPanel pane1 = new JPanel();
-	     //pane1 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-	     pane1 = new JPanel(new GridBagLayout());
-	     
-	    
 		   
 	     //---------------------TABLE to display current FILE--------------------
 	     dataModel_ = new TableModel();
@@ -768,7 +682,7 @@ import java.util.logging.*;
 	     
 	     //-----------------Select alternate VLC program---------------------------
 	     JPanel vlcPane = new JPanel();
-	     vlcPane = faf.buildFileActionPane("VLC");
+	     vlcPane = this.buildVLCActionPane();
 	     
 	     
 	     // A container can also be created with a specific layout

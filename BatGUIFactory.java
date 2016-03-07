@@ -12,11 +12,13 @@ public class BatGUIFactory {
     	if (type.compareTo("slicer")==0) {
     		System.out.println("Initializing SLICER");
     		BatGUI b = new BatGUISlicer(args);
+    		b.setArgs(args);
     		return b;
     	}
     	if (type.compareTo("html")==0) {
     		System.out.println("Initializing HTML");
     		BatGUI b = new BatGUIHtml(args);
+    		b.setArgs(args);
     		return b;
     	}
     	System.err.println("Wrong factory request, was " + type + ", but should be 'slicer' or 'html'");

@@ -19,39 +19,31 @@ public class GenericButtonPanelFactory {
 		//batGui_ = batgui;
 		mapa = imap;
 	}
-	
+	//---------------getButtons-------(radio)--------------------
 	public JPanel getButtons(String borderTitle, String[] labels) {
-    //--------------radio buttons ------------------------
-		
-	int nButtons = labels.length;
+       int nButtons = labels.length;
 	
-	buttons = new JRadioButton[nButtons];
-	int i=0;
-	while (i < nButtons) {
-	
-     buttons[i]   = new JRadioButton( labels[i] , true);
-     i += 1;
-	}
+	   buttons = new JRadioButton[nButtons];
+	   int i=0;
+	   while (i < nButtons) {
+              buttons[i]   = new JRadioButton( labels[i] , true);
+              i += 1;
+	   }
  
-	 		     
+	   ButtonGroup bgroup = new ButtonGroup();
+       i = 0; 
+       while (i < nButtons) {
+        	bgroup.add(buttons[i]);
+            i += 1;
+       }
     
-    
-    ButtonGroup bgroup = new ButtonGroup();
-    i = 0; 
-    while (i < nButtons) {
-    	bgroup.add(buttons[i]);
-    i += 1;
-    }
-    
-    JPanel radioPanel = new JPanel();
-    radioPanel.setLayout(new GridLayout(1, nButtons));
-    i = 0; 
-    while (i < nButtons) {
-    	radioPanel.add(buttons[i]);
-    i += 1;
-    }
-    
-   // radioPanel.addComponentListener(qaudrantListener);
+       JPanel radioPanel = new JPanel();
+       radioPanel.setLayout(new GridLayout(1, nButtons));
+       i = 0; 
+       while (i < nButtons) {
+         	radioPanel.add(buttons[i]);
+            i += 1;
+       }
     
     radioPanel.setBorder(BorderFactory.createTitledBorder(
                BorderFactory.createEtchedBorder(), borderTitle));
@@ -59,26 +51,23 @@ public class GenericButtonPanelFactory {
     return radioPanel;
    }
 	
-	
+     //-----------------------------out--------------------------	
 	 private void out(String s) {
 		 System.out.println(s);
 	 }
+	 //---------------AddAction-------------------------------
 	 public void addAction(JPanel p) {
 		   int i = 0;
 		   int nButtons = p.getComponentCount();
 		   while (i < nButtons) {
-		    	/*
-		    	buttons[i].addActionListener(new java.awt.event.ActionListener() {
-			        public void actionPerformed(java.awt.event.ActionEvent evt) {
-			         quadrantButtonPress(evt);
-			        }});
-		    	*/
-		    	((JRadioButton)(p.getComponent(i))).addActionListener(	new java.awt.event.ActionListener() {
+		    	((JRadioButton)(p.getComponent(i))).addActionListener(new java.awt.event.ActionListener() {
 			        public void actionPerformed(java.awt.event.ActionEvent evt) {
 				         mapa.ackshun(evt);
-				        }});
+				        } // end block of 'actionPerformed' code
+			        } // end 'new java.awt.event.ActionListener()' 
+		    	); // end   'addActionListener' argument def
 		    	i += 1;
-		    }
+		   } // end 'while'
 	 }
 	 /******************************************************************************
 	 private void quadrantButtonPress(java.awt.event.ActionEvent vent) {
