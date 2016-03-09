@@ -20,10 +20,23 @@ public class PageBuilder  {
 		File filez[] = new File[vfp.length];
 		int j = 0;
 		int k = 0;
+		Integer x = null;
+		Integer y = null;
+		if (vfp.length == 2) {
+			x = new Integer(System.getProperty("Dim2x"));
+			y = new Integer(System.getProperty("Dim2y"));
+		} else if (vfp.length == 4) {
+			x = new Integer(System.getProperty("Dim4x"));
+			y = new Integer(System.getProperty("Dim4y"));
+		} else if (vfp.length == 6) {
+			x = new Integer(System.getProperty("Dim6x"));
+			y = new Integer(System.getProperty("Dim6y"));	
+		}
+		out ("Height will be "+ y.toString() + ", width will be "+x.toString());
 		while (j < vfp.length) {
 			filez[j] = vfp[j].getVideoFile();
 			if (filez[j] != null ) {
-				page.append(this.vidStart());
+				page.append(this.vidStart(x,y));
 			    String path = new String(filez[j].getPath());
 			    //out("Path before: "+path);
 			    path = path.replaceAll("\\\\", "/");
@@ -44,10 +57,17 @@ public class PageBuilder  {
 		out ("\n\n\n"+bar+"\n"+page+"\n"+bar);
 		String fileBase = System.getProperty("filebase");
 		out ("htm file base is "+fileBase);
-		Date dx = new Date();
-		out (dx.getMonth()+" "+dx.getHours() + " " + dx.getMinutes()+ " "+ dx.getSeconds());
-		String fn = new String(fileBase+"MultiVideo."+dx.getMonth()+"."+dx.getHours()+"."+dx.getMinutes()+"."
-				+dx.getSeconds()+".htm");
+		Calendar now = Calendar.getInstance();
+		int day = now.get(Calendar.DAY_OF_MONTH);
+		int mo = now.get(Calendar.MONTH)+1;
+		int hr = now.get(Calendar.HOUR);
+		int min = now.get(Calendar.MINUTE);
+		int sec = now.get(Calendar.SECOND);
+		
+		out (mo+" "+day + " " + hr + " "+ min + " "+sec);
+		
+		String fn = new String(fileBase+"MultiVideo."+mo+"."+day+"."+hr+"."
+				+min+"."+sec+".htm");
 		out ("new filename: "+fn);
 		File of = new File(fn);
 		this.writeFile(page, of);
@@ -74,13 +94,42 @@ public class PageBuilder  {
 	
 	public String head () {
 		String s=null;
-		s=new String("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \n     \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\"><html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\"><head> \n <meta http-equiv=\"content-type\" content=\"text/html; charset=iso-8859-15\" />  <meta http-equiv=\"content-language\" content=\"en\" /> \n <link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" /> \n <title>VLC Plugin Demo</title></head>\n<body>");
+		s=new String("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \n     \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\"><html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\"><head> \n <meta http-equiv=\"content-type\" content=\"text/html; charset=iso-8859-15\" />  <meta http-equiv=\"content-language\" content=\"en\" /> \n <link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" /> \n <title>VLC Plugin Demo</title></head>\n<body");
+		String type = System.getProperty("BrowserBackgroundType");
+		if (type == null) {
+			out("No BrowserBackgroundType");
+			String t = new String(s+">");
+			return t;
+		}
+	
+		if (type.compareTo("color") == 0) {
+			String c = System.getProperty("BrowserBackgroundColor");
+			if( c == null) {
+				out("No color specified by BrowswerBackgroundColor");
+				c = new String("#000000");
+			}
+			String t = new String(s+ " bgcolor=\"" + c + "\">");
+			return t;
+		}
+		if (type.compareTo("image")==0) {
+			String i = new String(System.getProperty("BrowserBackgroundImage"));
+			if ( i == null) {
+				out("No BrowserBackgroundImage specified, even for image type background");
+				String t = new String(s+">");
+				return t;
+			}
+			String t = new String(s+" background=\""+i+"\">");
+			return t;
+		}
 		return s;
 	}
-	public String vidStart () {
-		String s= null;
-		s = new String(" <Video  width=\"600\" height=\"400\" autoplay loop>	<source src=\"file:///");
-		return s;
+	public String vidStart (Integer x, Integer y) {
+		String s   = new String(" <Video  width=\"");
+		String s1  = new String("\" height=\"");
+		String s2  = new String("\" autoplay loop>	<source src=\"file:///");
+		String rtn = new String(
+				s + x.toString() + s1 + y.toString() + s2);
+		return rtn;
 	}
 	public String vidEnd() {
 		String s = null;
@@ -99,9 +148,11 @@ public class PageBuilder  {
 		p.out("Path before: "+path);
 	    path = path.replaceAll("\\\\", "/");
 	    p.out("Path after:  "+path);
+	    Integer x = 500;
+	    Integer y = 375;
 		
 		p.out("header: " + p.head());
-		p.out("\nvidStart: "+p.vidStart());
+		p.out("\nvidStart: "+p.vidStart(x,y));
 		p.out("\nvidEnd  : "+p.vidEnd());
 		p.out("\nPageEnd:  "+p.pageEnd());
 	}
