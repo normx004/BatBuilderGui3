@@ -1,4 +1,5 @@
 package batboy;
+import java.awt.Button;
 import java.awt.Color;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
@@ -85,13 +86,49 @@ public class BatGUI {
 		  protected void setArgs(String[] x) {
 			  myArgs = x;
 		  }
+			protected File       batFile_ = null;
+			protected File getBatFile() { return batFile_;}
+			protected JFileChooser batFileSaveChooser_ = null;
+			//------------------TEST BUTTON-----------------------------------------
+			 public void testButtonPress(java.awt.event.ActionEvent e) { 
+				 //must be overridden!!! }
+			 }
+		     Button getTestButton() {
+		    	 Button testButton = new Button("test");
+			     //pane2.add(testButton);
+		     testButton.addActionListener(new java.awt.event.ActionListener() {
+			        public void actionPerformed(java.awt.event.ActionEvent evt) {
+			         testButtonPress(evt);
+			        }
+		           });
+		     return testButton;
+			}
+		     
+		  //---------------BAT FILE HANDLING-------------------------------
+		  public void  setBatFile(String path) {
+			   String fstr = new String(path + ".xtestx.bat");
+			   batFile_    = new File(fstr);
+			   //out("in setBatFile in BatGUI, setting videoFileChooser 'set selected' file to "+fstr);
+			   videoFileChooser_.setSelectedFile(batFile_);
+			   //out("in batgui set bat file is " + fstr);
+			   if ( batFileSaveChooser_ == null) {
+				   batFileSaveChooser_ = new JFileChooser(batFile_);
+				   //out("in batgui set bat file setting batFileSaveChooser file to "+fstr);
+				   batFileSaveChooser_.setSelectedFile(batFile_);
+			   }
+		   }
+		   public String getBatFileName() {
+			   return batFile_.getPath();
+		   }
+		   public File getBatFileFile() {
+			   return batFile_;
+		   }
+		
 		  //-------------------------INIT-------------------------------------
 		  Boolean gotProps=new Boolean(false);
 		  public void init() {
 			  //this method must be overridden!
-			    // logr.log(Level.INFO, "who hooooo");
-			     // create frame
-			     
+			   
 			     System.out.println("starting BatGUI constructor. if props file supplied, s/b first arg or -Dprops=file");
 			     if ( myArgs.length > 0 && myArgs[0] != null) {
 			    	 out("props expected in "+myArgs[0]);
@@ -159,8 +196,7 @@ public class BatGUI {
 		     
 		     frame = new BackgroundImageJFrame(ic);
 		     frame.setTitle(title);
-		     frame.setSize(900, 800);
-		     
+		     frame.setSize(900, 800);		     
 		     frame.setBackground(Color.CYAN);
 		    
 		     // Add a listener for the close event

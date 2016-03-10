@@ -7,9 +7,11 @@ import java.lang.*;
 
 public class PageBuilder  {
     VideoFilePointer vfp[] = null;
-	public PageBuilder(VideoFilePointer[] vp) {
+    BatGUI bg_ = null;
+	public PageBuilder(VideoFilePointer[] vp, BatGUI bg) {
 		// TODO Auto-generated constructor stub
 		vfp = vp;
+		bg_ = bg;
 	}
 	public void out (String s) { System.out.println(s);}
 	@SuppressWarnings("deprecation")
@@ -69,6 +71,8 @@ public class PageBuilder  {
 		String fn = new String(fileBase+"MultiVideo."+mo+"."+day+"."+hr+"."
 				+min+"."+sec+".htm");
 		out ("new filename: "+fn);
+		bg_.setBatFile(fn);
+		
 		File of = new File(fn);
 		this.writeFile(page, of);
 		// all done, successful!
@@ -142,8 +146,9 @@ public class PageBuilder  {
 		return s;
 	}
 	public static void main(String[] args) {
+		BatGUI bg = new BatGUI();
 		VideoFilePointer vp[] = new VideoFilePointer[1];
-		PageBuilder p = new PageBuilder(vp);
+		PageBuilder p = new PageBuilder(vp,bg);
 		String path = new String("C:\\Users\\norm\\Videos\\Misckellaneous\\FamousDiana\\W\\GNMiddayNews-Apr-18-2014WGNDT-11AM.mpg");
 		p.out("Path before: "+path);
 	    path = path.replaceAll("\\\\", "/");

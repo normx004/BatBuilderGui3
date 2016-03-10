@@ -13,38 +13,49 @@ public class ExecWrapper {
 	//  might be nice if cmd  could be passed in directly...
 
 	  private String[] cmds_ = null;
-	  private String[] cmdsStart_ = null;
+	  private String[] cmdsStart = null;
 	  private Runtime rt_;
 	  private String  os_;
 	  private boolean debug_;
 	  private boolean noStdOut_;
 	  private Properties p_;
 	  
+	  private boolean isHtml_ =  false;
+	  private String  cmd_ = null;
+	  
 	  public  Vector results_;
-
+      //------------------construct with an ARRAY of strings----------------------
 	  ExecWrapper (String[] t)
 	    {
 	     init();
-	     System.out.println("Constructed from string array");
+	     out("Constructed from string array");
 	     int sz = t.length + 3;
-	     cmds_ = concatem(cmdsStart_, t);
+	     cmds_ = concatem(cmdsStart, t);
 	    }
-
+      //--------------construct with a string-----------------------
 	  ExecWrapper (String t)
 	    {
-	     System.out.println("Plain string constructor: "+t);
+	     out("Plain string constructor: "+t);
 	     init();
 
 	     String[] loc = new String[1];
 	     loc[0] = t;
-	     cmds_ = concatem(cmdsStart_,loc);
+	     cmds_ = concatem(cmdsStart,loc);
 	       
 	     if (debug_)
 	        {
-	           System.out.println("From-string constructor; Command: '" + t + "'");
+	           out("From-string constructor; Command: '" + t + "'");
 	        }
 	    }
-
+	  //--------------construct for HTML style batGUI-----------------------
+	  ExecWrapper (String cmd, boolean isHtml)
+	    {
+		 isHtml_ = true;
+	     out("Command-based constructor for ExecWrapper: "+cmd);
+	     cmd_ = cmd;
+	     init();
+	    }
+      //----------------------COnCatEm-----------------------------------
 	  public String[] concatem(String[] a, String[] b) {
 	       int max = a.length + b.length;
 	       String[] c = new String[max];
@@ -79,10 +90,10 @@ public class ExecWrapper {
 	          {
 	           tf = new String("false");
 	          }
-	       System.out.println("Set 'no std out' to " + tf);
+	       out("Set 'no std out' to " + tf);
 	      }
 	  }
-
+      private void out(String s) { System.out.println(s);}
 	  public boolean getDebugFromProps()
 	  {
 	  boolean debug=false;
@@ -99,34 +110,35 @@ public class ExecWrapper {
 	         }
 	      return debug;
 	  }
-	 
-
+	  
+      //----------------------------------------INIT--------------------------------------
 	  public void init()
 	  {
-	     rt_          = Runtime.getRuntime();
+		 rt_          = Runtime.getRuntime();
 	     Properties p = System.getProperties();
 	     p_           = p;
 	     os_          = p.getProperty("os.name");
 	     String os_a  = p.getProperty("os.arch");
 	     debug_       = getDebugFromProps();
 
-	     System.out.println("os_: " + os_ + "  arch: " + os_a);
+	     out("os_: " + os_ + "  arch: " + os_a);
 
 	     if (       os_.compareTo("Windows NT") == 0 
 	    		 || os_.compareTo("Windows XP") == 0
 	    	     || os_.compareTo("Windows Vista") == 0
 	    	     || os_.compareTo("Windows 7") == 0
+	    	     || os_.compareTo("Windows 10") == 0
 		    	 )
 	        {
-	    	 System.out.println("Using cmd /c format");
-	         cmdsStart_ = new String[2];
-	         cmdsStart_[0] = "cmd";
-	         cmdsStart_[1] = "/c";
+	    	 out("Using cmd /c format");
+	         cmdsStart = new String[3];
+	         cmdsStart[0] = "cmd";
+	         cmdsStart[1] = "/c";
 	        }
 	     else
 	        {
-	         cmdsStart_ = new String[1];
-	         cmdsStart_[0] = new String(" ");
+	         cmdsStart = new String[1];
+	         cmdsStart[0] = new String(" ");
 	        }
 
 	   }
@@ -149,11 +161,37 @@ public class ExecWrapper {
 	   
 	   if ( debug_)
 	     {
-	      System.out.println("-----------here goes--------------------");
+	      out("-----------here goes--------------------");
 	     }
 
 	   try{
-	         p = getRt().exec(getCmds());
+		     String[] myWork = null;
+		     myWork = getCmds();
+             if (myWork == null) {
+            	 myWork = getCmdsStart();
+             }
+             out("MyWork size: "+myWork.length);
+             int x = 0;
+             while (x < myWork.length) {
+            	 out("mywork["+x+"]"+myWork[x]);
+            	 x+=1;
+             }
+		     out("MyWork: "+myWork.toString());
+		     x = 3;
+		     int y = 0;
+		     while (x < myWork.length) {
+		    	 myWork[y] = myWork[x];
+		    	 y +=1;
+		    	 x +=1;
+		     }
+		     myWork[3] = null;
+		     out("MyWork size: "+myWork.length);
+             x = 0;
+             while (x < myWork.length) {
+            	 out("mywork["+x+"]"+myWork[x]);
+            	 x+=1;
+             }
+	         p = getRt().exec(myWork);
 	         if (!noStdOut_)
 	            {
 	             PrintWriter pOut = new PrintWriter(new BufferedOutputStream(p.getOutputStream()));
@@ -167,7 +205,7 @@ public class ExecWrapper {
 	               byteCount = inP.read(results);
 	               //if ( debug_)
 	                  {
-	                   System.out.println("Bytecount: " + byteCount);
+	                   out("Bytecount: " + byteCount);
 	                  }
 	               if ( byteCount != -1)
 	                  {
@@ -182,7 +220,7 @@ public class ExecWrapper {
 	                       	   k = k - 1;
 	                       }
 	                       String fragment = new String(results,0,k).trim();
-	                       System.out.println("Got an input, its '" + fragment + "'");
+	                       out("Got an input, its '" + fragment + "'");
 	                      }
 	                   String result = new String(results,0,byteCount).trim();
 	                   tempRtn.addElement(result);
@@ -191,7 +229,7 @@ public class ExecWrapper {
 	                  {
 	                   //if ( debug_)
 	                      {
-	                       System.out.println("No (more) output!");
+	                       out("No (more) output!");
 	                      }
 	                  }
 	              }
@@ -201,22 +239,22 @@ public class ExecWrapper {
 	         int exitValue = p.exitValue();
 	         if (debug_)
 	            {
-	             System.out.println("Normal termination; exit value: " + exitValue);
+	             out("Normal termination; exit value: " + exitValue);
 	            }
 	        }
 	     catch (IOException io)
 	        {
-	         System.out.println("IO Exception: " + io);
+	         System.err.println("IO Exception: " + io);
 		 io.printStackTrace(System.err);
 	        }
 	     catch (InterruptedException io)
 	        {
-	         System.out.println("Interrupted Exception: " + io);
+	         System.err.println("Interrupted Exception: " + io);
 		 io.printStackTrace(System.err);
 	        }
 	     catch (IllegalThreadStateException io)
 	        {
-	         System.out.println("Subprocess not yet terminated exception: " + io);
+	         System.err.println("Subprocess not yet terminated exception: " + io);
 		 io.printStackTrace(System.err);
 	        }
 	   Vector rtn = new Vector();
@@ -225,7 +263,7 @@ public class ExecWrapper {
 	    {
 		 StringTokenizer tkn = new StringTokenizer((String)tempRtn.elementAt(rIdx));
 	     int tks = tkn.countTokens();
-	     System.out.println("token count "+tks);
+	     out("token count "+tks);
 	     while ( tkn.hasMoreTokens())
 	     {
 	      rtn.addElement( tkn.nextToken("\n"));
@@ -234,18 +272,50 @@ public class ExecWrapper {
 	    }
 	   return rtn;
 	  }
+	  //----------------------doitHTML----------------------------------
+	  public void doitHtml(String theCmd) {
+		  out("In doitHTML....., the cmd is " + theCmd);
+		  cmdsStart[2]  = cmd_;
+		  String cmd = new String("cmd /c " + theCmd);
+		  out("the command in doit: "+cmd);
+		  //ExecWrapper e = new ExecWrapper(get);
+		  String s=null;
+		  try {
+			  out ("In doitHtml try block");
+			  Process p = Runtime.getRuntime().exec(cmd);
+			  BufferedReader stdInput = new BufferedReader(new
+	          InputStreamReader(p.getInputStream()));
 	 
-	  public static void main (String[] args)
-	    {
-	     
-	     ExecWrapper e = new ExecWrapper(args[0]);
-	     
-	     e.doit(args[0]);
-	    }
-	  
-	  
+	          BufferedReader stdError = new BufferedReader(new
+	                 InputStreamReader(p.getErrorStream()));
+	 
+	            // read the output from the command
+	          out("Here is the standard output of the command:\n");
+	          while (( s = stdInput.readLine()) != null) {
+	                out(s);
+	          }
+	             
+	          // read any errors from the attempted command
+	          out("Here is the standard error of the command (if any):\n");
+	          while ((s = stdError.readLine()) != null) {
+	                out(s);
+	          }
+	             
+	            //System.exit(0);
+	        }
+	        catch (IOException e) {
+	            System.out.println("exception happened - here's what I know: ");
+	            e.printStackTrace();
+	            System.exit(-1);
+	        }
+		  
+		   out("Doit Html Done!");
+		  
+	  }
+	  //----------------------------DOIT---------------------------------------------
 	   public void doit(String arg) {
-	     
+		   
+		 
 		   File f              = null;
 		     BufferedReader brdr = null;
 		     Vector cmds         = new Vector();
@@ -253,7 +323,7 @@ public class ExecWrapper {
 		     Vector              r = new Vector();
 		     int                 idx = 0;
 		     
-	     System.out.println("Expecting argument to be filespec of file of cmds");
+	     out("Expecting argument to be filespec of file of cmds");
 	     
 	    
 	     try {
@@ -277,7 +347,7 @@ public class ExecWrapper {
 	         System.exit(1);
 	     }
 		
-	     System.out.println("Read " + cmds.size() + " lines from " + arg + "\n");
+	     out("Read " + cmds.size() + " lines from " + arg + "\n");
 	     
 	     //r = new ExecRunner[cmds.size()];
 	     int vs = cmds.size();
@@ -286,7 +356,7 @@ public class ExecWrapper {
 	     while (idx < vs) {
 	         //System.out.println("idx is " + idx);
 	         s = (String) cmds.elementAt(idx);
-	         System.out.println("Cmd : " + idx + ": " + s);
+	         out("Cmd : " + idx + ": " + s);
 	         String delim = new String("|");
 	         StringTokenizer tkn = new StringTokenizer(s, delim);
 		     Vector  cvec = new Vector();
@@ -294,12 +364,12 @@ public class ExecWrapper {
 		     while ( tkn.hasMoreTokens())
 	               {
 	                cvec.add( tkn.nextToken());
-		            System.out.println("TOKEN: " + cvec.elementAt(rIdx));
+		            out("TOKEN: " + cvec.elementAt(rIdx));
 	                rIdx += 1;
 	               }
 	        
 	         
-		 System.out.println("got " + rIdx + " tokens");
+		 out("got " + rIdx + " tokens");
 		 int  vecidx = 0;
 		 String[] carray = new String[rIdx];
 		 while ( vecidx < rIdx) {
@@ -310,7 +380,7 @@ public class ExecWrapper {
 			 //} else {
 				 frag = fragment;
 			 //}
-			 System.out.println("fragment[" + vecidx + "] = " + frag );
+			 out("fragment[" + vecidx + "] = " + frag );
 		     carray[vecidx] = frag;
 		     vecidx += 1;
 		 }
@@ -323,26 +393,41 @@ public class ExecWrapper {
 	     }
 	     int  k = 0;
 	     while ( k < idx) {
-	    	 System.out.println("Starting #"+k);
+	    	 out("Starting #"+k);
 	    	 ((ExecRunner)r.elementAt(k)).start();
 	    	 k+=1;
 	     }
 	     int j = 0;
 	     while ( j < idx ) {
-	    	 System.out.println("Join for #"+j+ " of " + idx);
+	    	 out("Join for #"+j+ " of " + idx);
 	    	 ((ExecRunner)r.elementAt(j)).join();
 	    	 ExecRunner er = (ExecRunner)r.elementAt(j);
 	    	 if (er.results_ != null ){
-	    		 System.out.println("vector returned has " + er.results_.size());
+	    		 out("vector returned has " + er.results_.size());
 	    	 }
 	    	 j+=1;
 	     }
 	  
-	     System.out.println("Done!");
+	     out("Done!");
 	    } catch (  	InterruptedException ie ) {
 	    	System.err.println("Interrupted dammit " + ie.getMessage());
 	    	ie.printStackTrace(System.err);
 	    }
 	  
 	}
+	 //-----------------------------------MAIN--------------------
+		  public static void main (String[] args)
+		    {
+		     
+		     ExecWrapper e = new ExecWrapper(args[0]);
+		     
+		     e.doit(args[0]);
+		    }
+		public String[] getCmdsStart() {
+			return cmdsStart;
+		}
+		public void setCmdsStart(String[] cmdsStart) {
+			this.cmdsStart = cmdsStart;
+		}
+		 
 }

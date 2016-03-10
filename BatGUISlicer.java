@@ -59,7 +59,7 @@ import java.util.logging.*;
 	   public void setSpeed(String speed) {
 		speed_ = speed;
 	  }
-	private File       batFile_ = null;
+
 	   //---------------------speed buttons (new!)-----------------------------
 	   JRadioButton speedButt1     = null;
 	   public void setSpeedButt1(JRadioButton serial) {
@@ -136,7 +136,7 @@ import java.util.logging.*;
 	  
 	   private JFileChooser fc2_ = null;
 	   private JFileChooser vlcFileChooser_ = null;
-	   private JFileChooser batFileSaveChooser_ = null;
+	 
 	   
 	   public JFileChooser getVlcFileChooser() { return vlcFileChooser_; }
 	   public void         setVlcFileChooser(JFileChooser j) { vlcFileChooser_ = j;}
@@ -247,25 +247,7 @@ import java.util.logging.*;
 		   vlcFileLabel_.setText(fstr);
 	   }
 	  
-	   public void  setBatFile(String path) {
-		   String fstr = new String(path + ".xtestx.bat");
-		   batFile_    = new File(fstr);
-		   //out("in setBatFile in BatGUI, setting videoFileChooser 'set selected' file to "+fstr);
-		   videoFileChooser_.setSelectedFile(batFile_);
-		   //out("in batgui set bat file is " + fstr);
-		   if ( batFileSaveChooser_ == null) {
-			   batFileSaveChooser_ = new JFileChooser(batFile_);
-			   //out("in batgui set bat file setting batFileSaveChooser file to "+fstr);
-			   batFileSaveChooser_.setSelectedFile(batFile_);
-		   }
-	   }
-	   public String getBatFileName() {
-		   return batFile_.getPath();
-	   }
-	   public File getBatFileFile() {
-		   return batFile_;
-	   }
-	
+	 
 	   
 	   //-----------------BUTTON PRESS--------------------------------
 	   private void buttonPress(java.awt.event.ActionEvent vent) {
@@ -375,7 +357,7 @@ import java.util.logging.*;
 	     this.calcSec("startS");
 	   }
 	   // ------------------------TEST BUTTON------------------------------------
-	   private void testButtonPress(java.awt.event.ActionEvent vent) {
+	   public void testButtonPress(java.awt.event.ActionEvent vent) {
 		   
 		
 		   
@@ -699,7 +681,7 @@ import java.util.logging.*;
 	     });
 	     
 	     //------------------action buttons------------------------------
-	     
+	     /*
 	     Button testButton = new Button("test");
 	     pane2.add(testButton);
 	     testButton.addActionListener(new java.awt.event.ActionListener() {
@@ -707,7 +689,9 @@ import java.util.logging.*;
 		         testButtonPress(evt);
 		        }
 	     });
-	     
+	     */
+	     Button  testButton = getTestButton();
+	     pane2.add(testButton);
 	   //------------------action buttons------------------------------
 	     Button addListButton = new Button("append2list");
 	     pane2.add(addListButton);

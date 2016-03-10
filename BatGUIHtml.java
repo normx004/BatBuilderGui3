@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
 
@@ -61,6 +62,11 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
         // last thing before return!!!
         frame.setVisible(true);
     }
+    
+    public void  setBatFile(String path) {
+		   batFile_    = new File(path);
+    }
+    
     protected void buildMultifileActionPanel () {
     	// the problem here is with 2 or 4 or whatever drop targets in the same JPanel,
     	// it seems drag and drop doesn't distinguish between what button you are dropping
@@ -68,7 +74,16 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     	int k = 0;
     	int howMany           = this.getFileCount();
     	out("build Multi File Action Panel. howMany is "+howMany);
+    	//--------------------DOIT button------------------------
+    	JButton doitButton = new JButton("Do it");
+    	doitButton.setActionCommand("doit");	
+    	doitButton.addActionListener(this);
+    	frame.add(doitButton);
+    	//-------------------TEST button----------------------------
+    	Button  testButton = getTestButton();
+	    frame.add(testButton);
     	
+    	// Build the file input frames 
     	vidFiles              = new VideoFilePointer[howMany];
     	
     	while (k < howMany) {
@@ -92,21 +107,12 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     	}
     	
     	
-    	JButton doitButton = new JButton("Do it");
-    	doitButton.setActionCommand("doit");	
-    	doitButton.addActionListener(this);
-    	frame.add(doitButton);
     	
     	frame.setVisible(true);
     }
-    public  void setVideoFile(File f) {
-		   videoFile_  = f;
-		   String path = videoFile_.getPath();
-		   out("in batgui video file is "+ path);
-		   whatVideoFile.setText(path);
-	   }
+  
     public void actionPerformed(ActionEvent e) {
-    	PageBuilder pb = new PageBuilder(vidFiles);
+    	PageBuilder pb = new PageBuilder(vidFiles, this);
         if ("doit".equals(e.getActionCommand())) {
           String result = pb.generatePage();
           //show result of page generation
@@ -120,7 +126,46 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
           BevelBorder bord = new BevelBorder(1);
           j.setBorder(bord);
           frame.add(j);
+          
+          JLabel k = new JLabel(this.getBatFileName());
+          k.setOpaque(true);
+          k.setBackground(Color.white);
+          BevelBorder bord1 = new BevelBorder(1);
+          k.setBorder(bord1);
+          frame.add(k);
+          
           frame.setVisible(true);
         } 
     }
+    public void testButtonPress(java.awt.event.ActionEvent vent) {
+        if (DEBUG) {
+        	 out("-----------------------testButtonPress---------------------------------------");
+        	 out("--------------------------------------------------------------");
+        	 out("testButton: " +vent.toString());
+             out("Event value : " + vent.getActionCommand());
+             out("--------------------------------------------------------------");
+             out("--------------------------------------------------------------");
+        }
+        test();
+    }
+    public void test() {
+    	// run the file and see how it looks
+    	File fyle = super.getBatFile();
+    	out("Test button 'test' starts with "+fyle.toString());
+    	String nam = fyle.getName();
+    	out("Test: base file name is "+nam);
+    	String fileBase = System.getProperty("filebase");
+    	out("Test: parent path is "+fileBase);
+    	File foil = new File(fileBase + "\\"+nam);
+    	out("Result is: "+foil.getPath());
+    	out("Bat file (really, the html) is "+fyle.getPath());
+    	String cmd = new String("C:\\PROGRA~2\\Opera\\350206~1.92\\opera.exe -newwindow \""+
+    	                        fyle.getPath()+"\"");
+    	out("Cmd is: "+cmd);
+    	ExecWrapper e = new ExecWrapper(cmd,true);
+    	//e.setDebug(true);
+    	out("Calling 'doitHtml'");
+    	e.doitHtml(cmd);
+    }
+             
 }
