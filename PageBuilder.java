@@ -7,6 +7,7 @@ import java.lang.*;
 
 public class PageBuilder  {
     VideoFilePointer vfp[] = null;
+    public int getImgCount() { return vfp.length;}
     BatGUI bg_ = null;
 	public PageBuilder(VideoFilePointer[] vp, BatGUI bg) {
 		// TODO Auto-generated constructor stub
@@ -38,6 +39,11 @@ public class PageBuilder  {
 		while (j < vfp.length) {
 			filez[j] = vfp[j].getVideoFile();
 			if (filez[j] != null ) {
+				if ( j ==0 || j == 2 || j ==4 || j == 6) {
+					page.append("<div class=\"columnLeft\">");
+				} else { 
+					page.append("<div class=\"columnRight\">");
+				}
 				page.append(this.vidStart(x,y));
 			    String path = new String(filez[j].getPath());
 			    //out("Path before: "+path);
@@ -46,6 +52,7 @@ public class PageBuilder  {
 				page.append(path);
 				page.append(this.vidEnd());
 				page.append("\n");
+				page.append("</div>\n");
 				k += 1;
 			}
 			j += 1;
@@ -94,16 +101,31 @@ public class PageBuilder  {
 		System.err.println("io error dealing with bat file to write: " + ioe.getMessage());
 	  }
      }
-
+    public String getCss(String original, int count) {
+    	String s = original;
+    	CssGenerator c = new CssGenerator(count);
+    	if ( count == 2) {
+    		s = c.getCss(s);
+    	} else if (count ==4) {
+    		s = c.getCss(s);
+    	} else if (count == 6) {
+    		s = c.getCss(s);
+    	} else if (count ==8 ) {
+    		s = c.getCss(s);
+    	}
+    	return s;
+    }
 	
 	public String head () {
 		String s=null;
 		s=new String("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \n     \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\"><html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\"><head> \n <meta http-equiv=\"content-type\" content=\"text/html; charset=iso-8859-15\" />  <meta http-equiv=\"content-language\" content=\"en\" /> \n <link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" /> \n <title>VLC Plugin Demo</title></head>\n<body");
+		
 		String type = System.getProperty("BrowserBackgroundType");
+		String t = null;
 		if (type == null) {
 			out("No BrowserBackgroundType");
-			String t = new String(s+">");
-			return t;
+		t = new String(s+">");
+			
 		}
 	
 		if (type.compareTo("color") == 0) {
@@ -112,19 +134,19 @@ public class PageBuilder  {
 				out("No color specified by BrowswerBackgroundColor");
 				c = new String("#000000");
 			}
-			String t = new String(s+ " bgcolor=\"" + c + "\">");
-			return t;
+		t = new String(s+ " bgcolor=\"" + c + "\">");
+			
 		}
 		if (type.compareTo("image")==0) {
 			String i = new String(System.getProperty("BrowserBackgroundImage"));
 			if ( i == null) {
 				out("No BrowserBackgroundImage specified, even for image type background");
-				String t = new String(s+">");
-				return t;
+				t = new String(s+">");
+			
 			}
-			String t = new String(s+" background=\""+i+"\">");
-			return t;
+		t = new String(s+" background=\""+i+"\">");
 		}
+		s = getCss(t, this.getImgCount());
 		return s;
 	}
 	public String vidStart (Integer x, Integer y) {
