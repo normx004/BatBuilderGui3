@@ -36,13 +36,18 @@ public class PageBuilder  {
 			y = new Integer(System.getProperty("Dim6y"));	
 		}
 		out ("Height will be "+ y.toString() + ", width will be "+x.toString());
+		// NOTE: need an extra "</div>" after each row, either 2 or 3 column...
+		//       not sure this logic covers it yet....works for 2-columns now.
 		while (j < vfp.length) {
 			filez[j] = vfp[j].getVideoFile();
 			if (filez[j] != null ) {
 				if ( j ==0 || j == 2 || j ==4 || j == 6) {
-					page.append("<div class=\"columnLeft\">");
+					if ( j == 2) {
+						page.append("</div>");
+					}
+					page.append("<div id=\"aboutimages\">\n<div id=\"aboutimgleft\">\n");
 				} else { 
-					page.append("<div class=\"columnRight\">");
+					page.append("<div id=\"aboutimgright\">\n" );
 				}
 				page.append(this.vidStart(x,y));
 			    String path = new String(filez[j].getPath());
@@ -57,6 +62,7 @@ public class PageBuilder  {
 			}
 			j += 1;
 		}
+		page.append("</div>");
 		page.append(this.pageEnd());
 		if (k < vfp.length) {
 			return status;
@@ -118,36 +124,48 @@ public class PageBuilder  {
 	
 	public String head () {
 		String s=null;
-		s=new String("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \n     \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\"><html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\"><head> \n <meta http-equiv=\"content-type\" content=\"text/html; charset=iso-8859-15\" />  <meta http-equiv=\"content-language\" content=\"en\" /> \n <link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" /> \n <title>VLC Plugin Demo</title></head>\n<body");
+		s=new String("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \n     \""+
+		"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\"><html xmlns=\""+
+		"http://www.w3.org/1999/xhtml\" xml:lang=\"en\"><head> \n "+
+		"<meta http-equiv=\"content-type\" content=\"text/html; "+
+		"charset=iso-8859-15\" />  <meta http-equiv=\"content-language\""+
+		"content=\"en\" /> \n <link rel=\"stylesheet\" type=\"text/css\""+
+		"href=\"style.css\" /> \n <title>VLC Plugin Demo</title>");
+				
+		String css = getCss(new String (""), this.getImgCount());
+				
+		String s1= new String("</head>\n<body");
+		
+		String temp = s+css+s1;
+		s = temp;
 		
 		String type = System.getProperty("BrowserBackgroundType");
 		String t = null;
 		if (type == null) {
 			out("No BrowserBackgroundType");
-		t = new String(s+">");
-			
-		}
-	
-		if (type.compareTo("color") == 0) {
-			String c = System.getProperty("BrowserBackgroundColor");
-			if( c == null) {
-				out("No color specified by BrowswerBackgroundColor");
-				c = new String("#000000");
+			t = new String(s+">");
+		}else {
+				if (type.compareTo("color") == 0) {
+					String c = System.getProperty("BrowserBackgroundColor");
+				if( c == null) {
+					out("No color specified by BrowswerBackgroundColor");
+					c = new String("#000000");
+				}
+				t = new String(s+ " bgcolor=\"" + c + "\">");
+			} else {		
+				if (type.compareTo("image")==0) {
+					String i = new String(System.getProperty("BrowserBackgroundImage"));
+					if ( i == null) {
+						out("No BrowserBackgroundImage specified, even for image type background");
+						t = new String(s+">");
+					} else {
+						t = new String(s+" background=\""+i+"\">");
+					}
+				}
 			}
-		t = new String(s+ " bgcolor=\"" + c + "\">");
-			
 		}
-		if (type.compareTo("image")==0) {
-			String i = new String(System.getProperty("BrowserBackgroundImage"));
-			if ( i == null) {
-				out("No BrowserBackgroundImage specified, even for image type background");
-				t = new String(s+">");
-			
-			}
-		t = new String(s+" background=\""+i+"\">");
-		}
-		s = getCss(t, this.getImgCount());
-		return s;
+		//s = getCss(t, this.getImgCount());
+		return t;
 	}
 	public String vidStart (Integer x, Integer y) {
 		String s   = new String(" <Video  width=\"");
@@ -155,11 +173,14 @@ public class PageBuilder  {
 		String s2  = new String("\" autoplay loop>	<source src=\"file:///");
 		String rtn = new String(
 				s + x.toString() + s1 + y.toString() + s2);
+	
+		//String rtn  = new String(" <Video  autoplay loop>	<source src=\"file:///");
 		return rtn;
 	}
 	public String vidEnd() {
 		String s = null;
-		s = new String("\"	type='video/mp4;codecs=\"avc1.42E01E, mp4a.40.2\"'>  <h3> Your browser does not support html5 video! </h3> </Video>");
+		s = new String("\"	type='video/mp4;codecs=\"avc1.42E01E, mp4a.40.2\"'>  "+
+		"\n             <h3> Your browser does not support html5 video! </h3> </Video>\n</div>");
 		return s;
 	}
 	public String pageEnd() {
