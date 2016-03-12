@@ -79,10 +79,28 @@ public class PageBuilder  {
 		int min = now.get(Calendar.MINUTE);
 		int sec = now.get(Calendar.SECOND);
 		
+		// add "how many files" to filename string
+		String tag = new String("");
+		if (this.getImgCount() == 2 ) {
+			tag = new String("-two");
+		} else {
+			if (this.getImgCount() == 4 ) {
+				tag = new String("-four");
+			} else {
+				if (this.getImgCount() == 6) {
+					tag = new String ("-six");
+				} else {
+					if (this.getImgCount() == 9 ) {
+						tag = new String("-nine");
+					}
+				}
+			}
+		}
+		
 		out (mo+" "+day + " " + hr + " "+ min + " "+sec);
 		
 		String fn = new String(fileBase+"MultiVideo."+mo+"."+day+"."+hr+"."
-				+min+"."+sec+".htm");
+				+min+"."+sec+tag+".htm");
 		out ("new filename: "+fn);
 		bg_.setBatFile(fn);
 		

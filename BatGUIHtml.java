@@ -120,13 +120,14 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
         	  frame.getContentPane().remove(j);
         	  //j.setEnabled(false);
           }
+          // ack file generation
           j = new JLabel(result);
           j.setOpaque(true);
           j.setBackground(Color.white);
           BevelBorder bord = new BevelBorder(1);
           j.setBorder(bord);
           frame.add(j);
-          
+          // show resulting file name
           JLabel k = new JLabel(this.getBatFileName());
           k.setOpaque(true);
           k.setBackground(Color.white);
