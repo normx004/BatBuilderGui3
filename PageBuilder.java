@@ -25,6 +25,7 @@ public class PageBuilder  {
 		int k = 0;
 		Integer x = null;
 		Integer y = null;
+		out("vfp.length is "+vfp.length);
 		if (vfp.length == 2) {
 			x = new Integer(System.getProperty("Dim2x"));
 			y = new Integer(System.getProperty("Dim2y"));
@@ -34,35 +35,71 @@ public class PageBuilder  {
 		} else if (vfp.length == 6) {
 			x = new Integer(System.getProperty("Dim6x"));
 			y = new Integer(System.getProperty("Dim6y"));	
+		} else 	if (vfp.length == 9) {
+			x = new Integer(System.getProperty("Dim9x"));
+			y = new Integer(System.getProperty("Dim9y"));	
 		}
 		out ("Height will be "+ y.toString() + ", width will be "+x.toString());
 		// NOTE: need an extra "</div>" after each row, either 2 or 3 column...
 		//       not sure this logic covers it yet....works for 2-columns now.
-		while (j < vfp.length) {
-			filez[j] = vfp[j].getVideoFile();
-			if (filez[j] != null ) {
-				if ( j ==0 || j == 2 || j ==4 || j == 6) {
-					if ( j == 2) {
-						page.append("</div>");
+		if (vfp.length==2 || vfp.length == 4 )  {
+			while (j < vfp.length) {
+				filez[j] = vfp[j].getVideoFile();
+				if (filez[j] != null ) {
+					if ( j ==0 || j == 2 || j ==4 || j == 6) {
+						if ( j == 2) {
+							page.append("</div>");
+						}
+						page.append("\n<div id=\"aboutimages\">\n<div id=\"aboutimgleft\">\n");
+					} else { 
+						page.append("<div id=\"aboutimgright\">\n" );
 					}
-					page.append("<div id=\"aboutimages\">\n<div id=\"aboutimgleft\">\n");
-				} else { 
-					page.append("<div id=\"aboutimgright\">\n" );
+					page.append(this.vidStart());
+					String path = new String(filez[j].getPath());
+					//out("Path before: "+path);
+					path = path.replaceAll("\\\\", "/");
+					//out("Path after:  "+path);
+					page.append(path);
+					page.append(this.vidEnd());
+					page.append("\n");
+					page.append("</div>\n");
+					k += 1;
 				}
-				page.append(this.vidStart(x,y));
-			    String path = new String(filez[j].getPath());
-			    //out("Path before: "+path);
-			    path = path.replaceAll("\\\\", "/");
-			    //out("Path after:  "+path);
-				page.append(path);
-				page.append(this.vidEnd());
-				page.append("\n");
-				page.append("</div>\n");
-				k += 1;
+				j += 1;
 			}
-			j += 1;
+			page.append("</div>");
 		}
-		page.append("</div>");
+		if (vfp.length==6 || vfp.length == 9 )  {
+			while (j < vfp.length) {
+				filez[j] = vfp[j].getVideoFile();
+				if (filez[j] != null ) {
+					if ( j ==0 || j == 3  || j == 6) {
+						if ( j == 3 || j == 6) {
+							page.append("</div>");
+						}
+						page.append("\n<div id=\"aboutimages\">\n<div id=\"aboutimgleft\">\n");
+					} else if (j==1 || j == 4 || j == 7){ 
+						page.append("<div id=\"aboutimgcenter\">\n" );
+					} else if (j ==2 || j == 5 || j == 8) {
+						page.append("<div id=\"aboutimgright\">\n" );						
+					}
+					page.append(this.vidStart());
+					String path = new String(filez[j].getPath());
+					//out("Path before: "+path);
+					path = path.replaceAll("\\\\", "/");
+					//out("Path after:  "+path);
+					page.append(path);
+					page.append(this.vidEnd());
+					page.append("\n");
+					//page.append("</div>\n");
+					k += 1;
+				}
+				j += 1;
+			}
+			page.append("</div>");
+		}
+		
+		
 		page.append(this.pageEnd());
 		if (k < vfp.length) {
 			return status;
@@ -134,7 +171,7 @@ public class PageBuilder  {
     		s = c.getCss(s);
     	} else if (count == 6) {
     		s = c.getCss(s);
-    	} else if (count ==8 ) {
+    	} else if (count ==9 ) {
     		s = c.getCss(s);
     	}
     	return s;
@@ -157,6 +194,8 @@ public class PageBuilder  {
 		String temp = s+css+s1;
 		s = temp;
 		
+		// see what to put in the background, based on the props
+		// either an image, or a color, or maybe nothing
 		String type = System.getProperty("BrowserBackgroundType");
 		String t = null;
 		if (type == null) {
@@ -182,7 +221,6 @@ public class PageBuilder  {
 				}
 			}
 		}
-		//s = getCss(t, this.getImgCount());
 		return t;
 	}
 	public String vidStart (Integer x, Integer y) {
@@ -193,6 +231,10 @@ public class PageBuilder  {
 				s + x.toString() + s1 + y.toString() + s2);
 	
 		//String rtn  = new String(" <Video  autoplay loop>	<source src=\"file:///");
+		return rtn;
+	}
+	public String vidStart () {
+		String rtn  = new String(" <Video  autoplay loop>	<source src=\"file:///");
 		return rtn;
 	}
 	public String vidEnd() {

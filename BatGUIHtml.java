@@ -45,7 +45,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
         buts[1] = new String("2");
         buts[2] = new String("4");
         buts[3] = new String("6");
-        buts[4] = new String("8");
+        buts[4] = new String("9");
         
         //public JPanel getButtons(String borderTitle, String[] labels) {
         MakeArbitraryPanel mapa      = new MakeArbitraryPanel(this);
