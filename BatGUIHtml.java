@@ -21,9 +21,9 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 
 public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
-	protected JLabel j = null;
+	protected JLabel j                    = null;
 	protected VideoFilePointer[] vidFiles = null; 
-	protected int fileCount = 0;
+	protected int fileCount               = 0;
 	
 	public int getFileCount() {
 		return fileCount;
@@ -75,7 +75,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     	int howMany           = this.getFileCount();
     	out("build Multi File Action Panel. howMany is "+howMany);
     	//--------------------DOIT button------------------------
-    	JButton doitButton = new JButton("Do it");
+    	JButton doitButton = new JButton("Make Page");
     	doitButton.setActionCommand("doit");	
     	doitButton.addActionListener(this);
     	frame.add(doitButton);
@@ -142,7 +142,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
         if (DEBUG) {
         	 out("-----------------------testButtonPress---------------------------------------");
         	 out("--------------------------------------------------------------");
-        	 out("testButton: " +vent.toString());
+        	 out("testButton:   " +vent.toString());
              out("Event value : " + vent.getActionCommand());
              out("--------------------------------------------------------------");
              out("--------------------------------------------------------------");
@@ -168,5 +168,5 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     	out("Calling 'doitHtml'");
     	e.doitHtml(cmd);
     }
-             
+
 }

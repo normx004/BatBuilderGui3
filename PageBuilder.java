@@ -39,7 +39,7 @@ public class PageBuilder  {
 			x = new Integer(System.getProperty("Dim9x"));
 			y = new Integer(System.getProperty("Dim9y"));	
 		}
-		out ("Height will be "+ y.toString() + ", width will be "+x.toString());
+		out ("Array: " + vfp.length+".  Height will be "+ y.toString() + ", width will be "+x.toString());
 		// NOTE: need an extra "</div>" after each row, either 2 or 3 column...
 		//       not sure this logic covers it yet....works for 2-columns now.
 		if (vfp.length==2 || vfp.length == 4 )  {
@@ -74,7 +74,7 @@ public class PageBuilder  {
 				filez[j] = vfp[j].getVideoFile();
 				if (filez[j] != null ) {
 					if ( j ==0 || j == 3  || j == 6) {
-						if ( j == 3 || j == 6) {
+						if ( j == 3 || j == 6 ) {
 							page.append("</div>");
 						}
 						page.append("\n<div id=\"aboutimages\">\n<div id=\"aboutimgleft\">\n");
@@ -104,43 +104,8 @@ public class PageBuilder  {
 		if (k < vfp.length) {
 			return status;
 		}
-		// we had enough files, so write the page to a file...
-		String bar = new String("----------------------------------------------------");
-		out ("\n\n\n"+bar+"\n"+page+"\n"+bar);
-		String fileBase = System.getProperty("filebase");
-		out ("htm file base is "+fileBase);
-		Calendar now = Calendar.getInstance();
-		int day = now.get(Calendar.DAY_OF_MONTH);
-		int mo = now.get(Calendar.MONTH)+1;
-		int hr = now.get(Calendar.HOUR);
-		int min = now.get(Calendar.MINUTE);
-		int sec = now.get(Calendar.SECOND);
-		
-		// add "how many files" to filename string
-		String tag = new String("");
-		if (this.getImgCount() == 2 ) {
-			tag = new String("-two");
-		} else {
-			if (this.getImgCount() == 4 ) {
-				tag = new String("-four");
-			} else {
-				if (this.getImgCount() == 6) {
-					tag = new String ("-six");
-				} else {
-					if (this.getImgCount() == 9 ) {
-						tag = new String("-nine");
-					}
-				}
-			}
-		}
-		
-		out (mo+" "+day + " " + hr + " "+ min + " "+sec);
-		
-		String fn = new String(fileBase+"MultiVideo."+mo+"."+day+"."+hr+"."
-				+min+"."+sec+tag+".htm");
-		out ("new filename: "+fn);
-		bg_.setBatFile(fn);
-		
+		// now create a file name, and write the new page to the file
+	    String fn = setFileName();		
 		File of = new File(fn);
 		this.writeFile(page, of);
 		// all done, successful!
@@ -176,7 +141,45 @@ public class PageBuilder  {
     	}
     	return s;
     }
+	private String setFileName() {
+		// we had enough files, so write the page to a file...
+		String bar = new String("----------------------------------------------------");
 	
+		String fileBase = System.getProperty("filebase");
+		out ("htm file base is "+fileBase);
+		Calendar now = Calendar.getInstance();
+		int day = now.get(Calendar.DAY_OF_MONTH);
+		int mo = now.get(Calendar.MONTH)+1;
+		int hr = now.get(Calendar.HOUR);
+		int min = now.get(Calendar.MINUTE);
+		int sec = now.get(Calendar.SECOND);
+		
+		// add "how many files" to filename string
+		String tag = new String("");
+		if (this.getImgCount() == 2 ) {
+			tag = new String("-two");
+		} else {
+			if (this.getImgCount() == 4 ) {
+				tag = new String("-four");
+			} else {
+				if (this.getImgCount() == 6) {
+					tag = new String ("-six");
+				} else {
+					if (this.getImgCount() == 9 ) {
+						tag = new String("-nine");
+					}
+				}
+			}
+		}
+		
+		out (mo+" "+day + " " + hr + " "+ min + " "+sec);
+		
+		String fn = new String(fileBase+"MultiVideo."+mo+"."+day+"."+hr+"."
+				+min+"."+sec+tag+".htm");
+		out ("new filename: "+fn);
+		bg_.setBatFile(fn);
+	    return fn;
+	}
 	public String head () {
 		String s=null;
 		s=new String("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \n     \""+
