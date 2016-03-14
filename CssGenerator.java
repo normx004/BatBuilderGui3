@@ -2,7 +2,9 @@ package batboy;
 
 public class CssGenerator {
     String cssString = null;
+    private int count_ = 0;
 	public CssGenerator(int count) {
+		count_ = count;
 		// TODO Auto-generated constructor stub
 		if (count == 4) {
 			Integer width  = new Integer(System.getProperty("Dim4x"));
@@ -41,6 +43,7 @@ public class CssGenerator {
 			"    text-align: center;\n"+
 			"    margin: 0 auto;\n"+
 			"    width: 100%;\n"+
+			"    margin-top: 200px; " +
 			"    }\n"+
 			"\n"+  
 			"  #aboutimgleft {\n"+
@@ -72,7 +75,11 @@ public class CssGenerator {
 			"     width:900px;\n"+
 			"    height:500px;\n"+
 			"}\n"+ 
-			"</style>");			
+			"</style>");		
+			
+			  if ( count_ != 2) {
+		        	css = css.replaceAll("margin-top: 200px;", "margin-top: 10px;");
+		        }
 			
 			
 			String head = new String("<h2>Very Hot Video</h2>");
@@ -91,6 +98,7 @@ public class CssGenerator {
 				"    text-align: center;\n"+
 				"    margin: 0 auto;\n"+
 				"    width: 100%;\n"+
+				"      margin-top: 200px; " +
 				"    }\n"+
 				"\n"+  
 				"  #aboutimgleft {\n"+
@@ -128,6 +136,9 @@ public class CssGenerator {
 		        //out("First replace: "+css);
 		        css=css.replaceAll("HHH", height.toString());
 		        //out("Second replace: "+css);
+		        if ( count_ != 2) {
+		        	css = css.replaceAll("margin-top: 200px;", "margin-top: 10px;");
+		        }
 				
 				String head = new String("<h2>Very Hot Video</h2>");
 				cssString = css+head;

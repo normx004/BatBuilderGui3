@@ -41,7 +41,16 @@ public class PageBuilder  {
 		}
 		out ("Array: " + vfp.length+".  Height will be "+ y.toString() + ", width will be "+x.toString());
 		// NOTE: need an extra "</div>" after each row, either 2 or 3 column...
-		//       not sure this logic covers it yet....works for 2-columns now.
+		// could possibly clear these out (on a page refresh) with a variant of this JS:
+		/* 
+		 * in this loop:
+
+			var div = document.getElementById('xyz');
+			while (div) {
+    			div.parentNode.removeChild(div);
+    			div = document.getElementById('xyz');
+			}
+		 */
 		if (vfp.length==2 || vfp.length == 4 )  {
 			while (j < vfp.length) {
 				filez[j] = vfp[j].getVideoFile();
@@ -130,6 +139,8 @@ public class PageBuilder  {
     public String getCss(String original, int count) {
     	String s = original;
     	CssGenerator c = new CssGenerator(count);
+    	return(c.getCss(s));
+    	/*
     	if ( count == 2) {
     		s = c.getCss(s);
     	} else if (count ==4) {
@@ -140,6 +151,7 @@ public class PageBuilder  {
     		s = c.getCss(s);
     	}
     	return s;
+    	*/
     }
 	private String setFileName() {
 		// we had enough files, so write the page to a file...

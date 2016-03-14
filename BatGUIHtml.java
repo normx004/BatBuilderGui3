@@ -53,6 +53,9 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
         JPanel butPan = gb.getButtons(new String("How Many To Show in Grid"), buts);
         gb.addAction(butPan);
         JLabel howmany = new JLabel("How Many?");
+        howmany.setBackground(Color.BLACK);
+        howmany.setOpaque(true);
+        howmany.setForeground(Color.CYAN);
         frame.add(howmany);
         frame.add(butPan);
         
