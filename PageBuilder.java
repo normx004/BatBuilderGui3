@@ -9,6 +9,13 @@ public class PageBuilder  {
     VideoFilePointer vfp[] = null;
     public int getImgCount() { return vfp.length;}
     BatGUI bg_ = null;
+    Integer x_=null;
+    Integer y_=null;
+    
+    
+    
+    
+    
 	public PageBuilder(VideoFilePointer[] vp, BatGUI bg) {
 		// TODO Auto-generated constructor stub
 		vfp = vp;
@@ -18,7 +25,10 @@ public class PageBuilder  {
 	@SuppressWarnings("deprecation")
 	public String generatePage(){
 		StringBuffer page = new StringBuffer("");
+		// head() gets the page header including the HTML type and css pointers 
+		// 
 		page.append(this.head());
+		// error msg just in case
 		String status = new String("not enough files specified!");
 		File filez[] = new File[vfp.length];
 		int j = 0;
@@ -39,6 +49,8 @@ public class PageBuilder  {
 			x = new Integer(System.getProperty("Dim9x"));
 			y = new Integer(System.getProperty("Dim9y"));	
 		}
+		this.setX(x);
+		this.setY(y);
 		out ("Array: " + vfp.length+".  Height will be "+ y.toString() + ", width will be "+x.toString());
 		// NOTE: need an extra "</div>" after each row, either 2 or 3 column...
 		// could possibly clear these out (on a page refresh) with a variant of this JS:
@@ -63,14 +75,18 @@ public class PageBuilder  {
 					} else { 
 						page.append("<div id=\"aboutimgright\">\n" );
 					}
+					// here's where we actually build the <video ... /video> entries
+					String vEntry = this.makeVideoEntry(filez[j]);
+					/*
 					page.append(this.vidStart());
 					String path = new String(filez[j].getPath());
-					//out("Path before: "+path);
+					// comes from the "drop" with windows separators...gotta change to unix for the browser
 					path = path.replaceAll("\\\\", "/");
-					//out("Path after:  "+path);
 					page.append(path);
 					page.append(this.vidEnd());
 					page.append("\n");
+					*/
+					page.append(vEntry);
 					page.append("</div>\n");
 					k += 1;
 				}
@@ -92,6 +108,9 @@ public class PageBuilder  {
 					} else if (j ==2 || j == 5 || j == 8) {
 						page.append("<div id=\"aboutimgright\">\n" );						
 					}
+					
+					String vEntry = this.makeVideoEntry(filez[j]);
+					/*
 					page.append(this.vidStart());
 					String path = new String(filez[j].getPath());
 					//out("Path before: "+path);
@@ -100,7 +119,11 @@ public class PageBuilder  {
 					page.append(path);
 					page.append(this.vidEnd());
 					page.append("\n");
+					*/
+					
 					//page.append("</div>\n");
+					
+					page.append(vEntry);
 					k += 1;
 				}
 				j += 1;
@@ -121,21 +144,29 @@ public class PageBuilder  {
 		status = new String("OK, generating page!");
 		return status;
 	}
+	protected String makeVideoEntry(File fy) {
+		String path = new String(fy.getPath());
+		int rindex = path.lastIndexOf(".");
+		String type = path.substring(rindex, path.length());
+		boolean isMp4 = false;
+		if (type.compareToIgnoreCase(".mp4")==0) {
+			out ("MP4!!! Path: " + path);
+			isMp4 = true;
+		}
+		
+		StringBuffer rtn = new StringBuffer("");
+		rtn.append(this.vidStart(isMp4,this.getX(), this.getY()));
+		// path comes from the "drop" with windows separators...
+		// gotta change to unix-style for the browser
+		path = path.replaceAll("\\\\", "/");
+		rtn.append(path);
+		rtn.append(this.vidEnd(isMp4));
+		rtn.append("\n");
+		return rtn.toString();
+	}
 	
-	protected void writeFile(StringBuffer sb, File of) {
-	  FileOutputStream os = null;
-	  out ("writing htm file "+of.getPath());
-	  try {
-		os = new FileOutputStream(of);
-		String st = new String(sb);
-		byte b[]  = st.getBytes();
-		//out(st);
-		os.write(b);
-  	    os.close();
-	  } catch (IOException ioe) {
-		System.err.println("io error dealing with bat file to write: " + ioe.getMessage());
-	  }
-     }
+	
+	
     public String getCss(String original, int count) {
     	String s = original;
     	CssGenerator c = new CssGenerator(count);
@@ -192,6 +223,21 @@ public class PageBuilder  {
 		bg_.setBatFile(fn);
 	    return fn;
 	}
+    protected void writeFile(StringBuffer sb, File of) {
+	  	  FileOutputStream os = null;
+	  	  out ("writing htm file "+of.getPath());
+	  	  try {
+	  		os = new FileOutputStream(of);
+	  		String st = new String(sb);
+	  		byte b[]  = st.getBytes();
+	  		//out(st);
+	  		os.write(b);
+	    	    os.close();
+	  	  } catch (IOException ioe) {
+	  		System.err.println("io error dealing with bat file to write: " + ioe.getMessage());
+	  	  }
+	  }
+	
 	public String head () {
 		String s=null;
 		s=new String("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \n     \""+
@@ -248,15 +294,35 @@ public class PageBuilder  {
 		//String rtn  = new String(" <Video  autoplay loop>	<source src=\"file:///");
 		return rtn;
 	}
-	public String vidStart () {
-		String rtn  = new String(" <Video  autoplay loop>	<source src=\"file:///");
-		return rtn;
+	public String vidStart (boolean isMp4, Integer x, Integer y) {
+		String rtn = new String("");
+		if ( isMp4) {
+		    rtn  = new String(" <Video  autoplay loop>	<source src=\"file:///");
+		    return rtn;
+		}
+		// not mp4, so use vlc plugin
+		String embed1 = new String (
+			"<embed type=\"application/x-vlc-plugin\"  ");
+		String embed2 = new String(
+			" pluginspage=\"http://www.videolan.org\"  "+
+			" version=\"VideoLAN.VLCPlugin.2\" id=\"vlcplayer\" "+
+		    " loop=\"true\" "+
+		    " autoPlay=\"true\" autoLoop=\"true\" "+
+		    " target=\"file:///");            // file:///c:/temp/vid1.wmv" 
+		                                      //   " width=\"900px\" height=\"500px\"     "+
+		String embed1a = new String(" width=\"" + x.toString() + "\" height=\"" + y.toString()+" ");
+		return embed1+embed1a+embed2;
 	}
-	public String vidEnd() {
-		String s = null;
-		s = new String("\"	type='video/mp4;codecs=\"avc1.42E01E, mp4a.40.2\"'>  "+
-		"\n             <h3> Your browser does not support html5 video! </h3> </Video>\n</div>");
-		return s;
+	public String vidEnd(boolean isMp4) {
+		String rtn= new String("");
+		if (isMp4) {
+		  rtn = new String("\"	type='video/mp4;codecs=\"avc1.42E01E, mp4a.40.2\"'>  "+
+		  "\n             <h3> Your browser does not support html5 video! </h3> </Video>\n</div>");
+		  return rtn;
+		}
+		// not mp4, so use vlc plugin
+		rtn = new String("\"\n</embed>\n</div>\n");
+		return rtn;
 	}
 	public String pageEnd() {
 		String s = null;
@@ -275,8 +341,20 @@ public class PageBuilder  {
 	    Integer y = 375;
 		
 		p.out("header: " + p.head());
-		p.out("\nvidStart: "+p.vidStart(x,y));
-		p.out("\nvidEnd  : "+p.vidEnd());
+		p.out("\nvidStart: "+p.vidStart(false,x,y));
+		p.out("\nvidEnd  : "+p.vidEnd(false));
 		p.out("\nPageEnd:  "+p.pageEnd());
+	}
+	public Integer getX() {
+		return x_;
+	}
+	public void setX(Integer x_) {
+		this.x_ = x_;
+	}
+	public Integer getY() {
+		return y_;
+	}
+	public void setY(Integer y_) {
+		this.y_ = y_;
 	}
 }

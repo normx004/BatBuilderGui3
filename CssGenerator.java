@@ -134,10 +134,16 @@ public class CssGenerator {
 		
 		        css= css.replaceAll("WWW", width.toString());
 		        //out("First replace: "+css);
-		        css=css.replaceAll("HHH", height.toString());
+		        css= css.replaceAll("HHH", height.toString());
 		        //out("Second replace: "+css);
 		        if ( count_ != 2) {
+		          if ( count_ == 4) {
 		        	css = css.replaceAll("margin-top: 200px;", "margin-top: 10px;");
+		          } else if (count_ == 6) {
+		        	css = css.replaceAll("margin-top: 200px;", "margin-top: 60px;");
+		          } else if (count_ == 9) {
+		        	css = css.replaceAll("margin-top: 200px;", "margin-top: 60px;");
+		          }
 		        }
 				
 				String head = new String("<h2>Very Hot Video</h2>");

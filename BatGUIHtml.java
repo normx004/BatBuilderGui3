@@ -141,6 +141,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
           frame.setVisible(true);
         } 
     }
+    // test button gets hit when the page is built and can be thrown to a browser for a test
     public void testButtonPress(java.awt.event.ActionEvent vent) {
         if (DEBUG) {
         	 out("-----------------------testButtonPress---------------------------------------");
@@ -150,8 +151,10 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
              out("--------------------------------------------------------------");
              out("--------------------------------------------------------------");
         }
+        // actually runit
         test();
     }
+    // test the page by opening it with opera
     public void test() {
     	// run the file and see how it looks
     	File fyle = super.getBatFile();
