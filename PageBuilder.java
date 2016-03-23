@@ -197,6 +197,7 @@ public class PageBuilder  {
 		int min = now.get(Calendar.MINUTE);
 		int sec = now.get(Calendar.SECOND);
 		
+		
 		// add "how many files" to filename string
 		String tag = new String("");
 		if (this.getImgCount() == 2 ) {
@@ -214,14 +215,20 @@ public class PageBuilder  {
 				}
 			}
 		}
-		
-		out (mo+" "+day + " " + hr + " "+ min + " "+sec);
-		
-		String fn = new String(fileBase+"MultiVideo."+mo+"."+day+"."+hr+"."
-				+min+"."+sec+tag+".htm");
+		String m = 	(fixNum(mo)+"."+fixNum(day) + "."+ fixNum(hr) + "."+ fixNum(min) + "."+fixNum(sec));
+		out(m);
+		String fn = new String(fileBase+"MultiVideo."+m+tag+".htm");
 		out ("new filename: "+fn);
 		bg_.setBatFile(fn);
 	    return fn;
+	}
+	private String fixNum (int num) {
+		Integer i = new Integer(num);
+		String  o = i.toString();
+		if (o.length() < 2) {
+			o = "0" + o;
+		}
+		return o;
 	}
     protected void writeFile(StringBuffer sb, File of) {
 	  	  FileOutputStream os = null;
