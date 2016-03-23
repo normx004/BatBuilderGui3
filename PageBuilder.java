@@ -242,23 +242,53 @@ public class PageBuilder  {
 		String s=null;
 		s=new String("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \n     \""+
 		"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\"><html xmlns=\""+
-		"http://www.w3.org/1999/xhtml\" xml:lang=\"en\"><head> \n "+
+		"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\n<head> \n "+
 		"<meta http-equiv=\"content-type\" content=\"text/html; "+
 		"charset=iso-8859-15\" />  <meta http-equiv=\"content-language\""+
 		"content=\"en\" /> \n <link rel=\"stylesheet\" type=\"text/css\""+
 		"href=\"style.css\" /> \n <title>VLC Plugin Demo</title>");
 				
 		String css = getCss(new String (""), this.getImgCount());
-				
-		String s1= new String("</head>\n<body");
+
+		// add JavaScript to provide variable background...if a directory
+		// for the background files has been specified
+		StringBuffer scrpt = new StringBuffer("");
+		if ( bg_.getBackGroundDirectory().length() > 0) {
+			scrpt = new StringBuffer
+					(
+					"\n<script type=\"text/javascript\"> \n"+
+					"  function backSet(){  \n"+
+					"  	var i =1; \n"+
+					"    setInterval(function() { \n"+
+					"    	var body = document.getElementsByTagName('body')[0]; \n"+
+					"    	var imgString = \"url(file:///"); 
+			 Integer bgImgInt = bg_.getBackgroundImageInterval();
+			 scrpt.append(bg_.getBackGroundDirectory());
+			 scrpt.append(
+					"/img\" + i + \".jpg)\"; \n"+	
+					"    	i = i+1; \n"+
+					"    	if (i > 9) { \n"+
+					"    	   i = 1; \n"+
+					"    	}\n"+
+					"    	body.style.background=imgString; }, ");
+			 scrpt.append(bgImgInt.toString());
+			 scrpt.append(
+					//"  }, 7000); \n"+
+					" ); } \n" +
+			        "</script> \n"
+					);
+		}
 		
-		String temp = s+css+s1;
+		String s1= new String("\n</head>\n<body");
+		
+		String temp = s+css+scrpt+s1;
 		s = temp;
 		
 		// see what to put in the background, based on the props
 		// either an image, or a color, or maybe nothing
 		String type = System.getProperty("BrowserBackgroundType");
 		String t = null;
+		String bgimg = new String(System.getProperty("BrowserBackgroundImage"));
 		if (type == null) {
 			out("No BrowserBackgroundType");
 			t = new String(s+">");
@@ -271,13 +301,20 @@ public class PageBuilder  {
 				}
 				t = new String(s+ " bgcolor=\"" + c + "\">");
 			} else {		
-				if (type.compareTo("image")==0) {
-					String i = new String(System.getProperty("BrowserBackgroundImage"));
-					if ( i == null) {
+				if (type.compareTo("image")==0 && bg_.getBackGroundDirectory().length()==0){
+					
+					if ( bgimg == null) {
 						out("No BrowserBackgroundImage specified, even for image type background");
 						t = new String(s+">");
 					} else {
-						t = new String(s+" background=\""+i+"\">");
+						t = new String(s+" background=\""+bgimg+"\">");
+					}
+				} else if (bg_.getBackGroundDirectory().length() > 0) {
+					if ( bgimg != null) {
+						t = new String(s+" background=\""+bgimg+"\" onload=\"backSet();\">");
+					} else {
+					   // start black, then get image backgrounds...
+					    t = new String(s+" bgcolor=\"black\" onload=\"backSet();\">");
 					}
 				}
 			}

@@ -81,8 +81,10 @@ public class CssGenerator {
 		        	css = css.replaceAll("margin-top: 200px;", "margin-top: 10px;");
 		        }
 			
-			
-			String head = new String("<h2>Very Hot Video</h2>");
+			String head = new String("");
+			if (count_ != 9) {
+			    head = new String("<h2>Very Hot Video</h2>");
+			}
 			cssString = css+head;
 		}
 	
@@ -90,15 +92,20 @@ public class CssGenerator {
 	
 	private String gen4 (Integer width, Integer height) {
 		out("gen4 width "+width.toString()+", height "+height.toString());
-		String css = new String (
+		String marginTop = new String ("60px;");
+		if (count_ == 9 ) {
+			marginTop = new String("10px;");
+		}
+		StringBuffer css = new StringBuffer (
 				"<style>\n"+
 				"  article, aside, figure, footer, header, hgroup,\n"+ 
 				"  menu, nav, section { display: block; }\n"+
 				"  #aboutimages{\n"+
 				"    text-align: center;\n"+
 				"    margin: 0 auto;\n"+
-				"    width: 100%;\n"+
-				"      margin-top: 200px; " +
+				"    width: 100%;\n" +
+				"    margin-top: ");
+		css.append( marginTop +
 				"    }\n"+
 				"\n"+  
 				"  #aboutimgleft {\n"+
@@ -132,22 +139,24 @@ public class CssGenerator {
 				"}\n"+ 
 				"</style>");
 		
-		        css= css.replaceAll("WWW", width.toString());
+		        String cssS= css.toString().replaceAll("WWW", width.toString());
 		        //out("First replace: "+css);
-		        css= css.replaceAll("HHH", height.toString());
+		        cssS= cssS.replaceAll("HHH", height.toString());
 		        //out("Second replace: "+css);
 		        if ( count_ != 2) {
 		          if ( count_ == 4) {
-		        	css = css.replaceAll("margin-top: 200px;", "margin-top: 10px;");
+		        	cssS = cssS.replaceAll("margin-top: 200px;", "margin-top: 10px;");
 		          } else if (count_ == 6) {
-		        	css = css.replaceAll("margin-top: 200px;", "margin-top: 60px;");
+		        	cssS = cssS.replaceAll("margin-top: 200px;", "margin-top: 60px;");
 		          } else if (count_ == 9) {
-		        	css = css.replaceAll("margin-top: 200px;", "margin-top: 60px;");
+		        	cssS = cssS.replaceAll("margin-top: 200px;", "margin-top: 10px;");
 		          }
 		        }
-				
-				String head = new String("<h2>Very Hot Video</h2>");
-				cssString = css+head;
+		        String head = new String("");
+				if (count_ != 9) {
+					head = new String("<h2>Very Hot Video</h2>");	
+				}
+				cssString = cssS+head;
 				return cssString;
 	}
 	public String getCss(String s){

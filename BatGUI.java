@@ -22,7 +22,9 @@ public class BatGUI {
 	 protected JFileChooser videoFileChooser_ = null;
 	 public    void         setVideoFileChooser(JFileChooser j) { videoFileChooser_ = j;}
 	 public    JFileChooser getVideoFileChooser() { return videoFileChooser_;}
-	   
+	 protected String backGroundDirectory = null;
+	 protected Integer backgroundImageInterval = 5000; // 5 sec default...
+	 
 	   
 	 protected static boolean DEBUG = false;
 	   
@@ -51,6 +53,17 @@ public class BatGUI {
 	         out("Putting all props to system props");
 	         Properties sysProps = System.getProperties();
 	         sysProps.putAll(p);
+	         String backGrounds = System.getProperty("BrowserBackgroundDirectory");
+	         if (backGrounds == null){
+	        	 backGrounds = new String("");
+	         }
+	         out ("Found background directory in props: "+backGrounds);
+	         setBackGroundDirectory(backGrounds);
+	         String bgInt = System.getProperty("BackgroundImageInterval");
+	         if (bgInt != null) {
+	        	 Integer bgi = new Integer (bgInt);
+	        	 this.setBackgroundImageInterval(bgi);
+	         }
 		 }
 		
 	//--------------------sleeper------------------------------  
@@ -283,6 +296,18 @@ public class BatGUI {
 		}
 		public void setFrame(JFrame frame) {
 			this.frame = frame;
+		}
+		public String getBackGroundDirectory() {
+			return backGroundDirectory;
+		}
+		public void setBackGroundDirectory(String backGroundDirectory) {
+			this.backGroundDirectory = backGroundDirectory;
+		}
+		public Integer getBackgroundImageInterval() {
+			return backgroundImageInterval;
+		}
+		public void setBackgroundImageInterval(Integer backgroundImageInterval) {
+			this.backgroundImageInterval = backgroundImageInterval;
 		}
 }
 
