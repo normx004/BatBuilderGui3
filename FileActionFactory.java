@@ -85,8 +85,7 @@ public class FileActionFactory {
 	     return videoFilePane;
 	}
 	//--------------Build File Action Pane for HTML version-----------------------------
-	public //JPanel
-	       void buildFileActionPane(VideoFilePointer vPtr) {
+	public  void buildFileActionPane(VideoFilePointer vPtr) {
 		 vPtr.setVideoFilePane(new JPanel());
 		 //File lastDir         = getLastDirUsed();
 		 vPtr.setJfc(new JFileChooser(/*lastDir*/));
@@ -114,13 +113,13 @@ public class FileActionFactory {
 	        	 try {
 	                 evt.acceptDrop(DnDConstants.ACTION_COPY);
 	                 //List<File> droppedFiles = (List<File>)
-	                Object droppedFiles = 
+	                 Object droppedFiles = 
 	                     evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 	                 for (File file : (java.util.List<File>)droppedFiles) {
 	                     System.out.println("DROPPPED FILE ON BUTTON(FileName):"+file.getPath());
 	                     //got to replace "set video file" with access to the text field in the Jpanel
 	                     Component[] components = jp.getComponents(); 
-	                     Component component = null; 
+	                     Component   component  = null; 
 	                     for (int ci = 0; ci < components.length; ci++) 
 	                     { 
 	                        component = components[ci]; 

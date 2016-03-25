@@ -90,7 +90,14 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     	vidFiles              = new VideoFilePointer[howMany];
     	
     	while (k < howMany) {
+    		// each new "manyFiles" is a JPanel that is a file drop target. 
+    		// the "vidFiles" array contains VideoFilePointer objects, each
+    		// one with a pointer to the corresponding panel, and will
+    		// contain the file objects dropped onto the JPanel
     		
+    		// in "file action factory" the Panel is associated with a drop target
+    		// function that will handle the drop for that particular panel by setting
+    		// the JLabel text to the new file name.
     		FileActionFactory faf = new FileActionFactory(this);
     		JPanel manyFiles      = new JPanel();
     		FlowLayout fl         = new FlowLayout();

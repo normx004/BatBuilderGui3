@@ -110,19 +110,7 @@ public class PageBuilder  {
 					}
 					
 					String vEntry = this.makeVideoEntry(filez[j]);
-					/*
-					page.append(this.vidStart());
-					String path = new String(filez[j].getPath());
-					//out("Path before: "+path);
-					path = path.replaceAll("\\\\", "/");
-					//out("Path after:  "+path);
-					page.append(path);
-					page.append(this.vidEnd());
-					page.append("\n");
-					*/
-					
-					//page.append("</div>\n");
-					
+										
 					page.append(vEntry);
 					k += 1;
 				}
@@ -145,9 +133,9 @@ public class PageBuilder  {
 		return status;
 	}
 	protected String makeVideoEntry(File fy) {
-		String path = new String(fy.getPath());
-		int rindex = path.lastIndexOf(".");
-		String type = path.substring(rindex, path.length());
+		String path   = new String(fy.getPath());
+		int rindex    = path.lastIndexOf(".");
+		String type   = path.substring(rindex, path.length());
 		boolean isMp4 = false;
 		if (type.compareToIgnoreCase(".mp4")==0) {
 			out ("MP4!!! Path: " + path);
