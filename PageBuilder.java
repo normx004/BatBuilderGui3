@@ -65,6 +65,10 @@ public class PageBuilder  {
 		 */
 		if (vfp.length==2 || vfp.length == 4 )  {
 			while (j < vfp.length) {
+				LinkedList q = vfp[j].getFileQueue();
+				if (q.size() > 1) {
+					out ("MULTI FILES ON THIS VFP - new embed logic needed!!!!");
+				}
 				filez[j] = vfp[j].getVideoFile();
 				if (filez[j] != null ) {
 					if ( j ==0 || j == 2 || j ==4 || j == 6) {
@@ -77,15 +81,7 @@ public class PageBuilder  {
 					}
 					// here's where we actually build the <video ... /video> entries
 					String vEntry = this.makeVideoEntry(filez[j]);
-					/*
-					page.append(this.vidStart());
-					String path = new String(filez[j].getPath());
-					// comes from the "drop" with windows separators...gotta change to unix for the browser
-					path = path.replaceAll("\\\\", "/");
-					page.append(path);
-					page.append(this.vidEnd());
-					page.append("\n");
-					*/
+					
 					page.append(vEntry);
 					page.append("</div>\n");
 					k += 1;
@@ -96,6 +92,10 @@ public class PageBuilder  {
 		}
 		if (vfp.length==6 || vfp.length == 9 )  {
 			while (j < vfp.length) {
+				LinkedList q = vfp[j].getFileQueue();
+				if (q.size() > 1) {
+					out ("MULTI FILES ON THIS VFP - new embed logic needed!!!!");
+				}
 				filez[j] = vfp[j].getVideoFile();
 				if (filez[j] != null ) {
 					if ( j ==0 || j == 3  || j == 6) {
@@ -255,14 +255,14 @@ public class PageBuilder  {
 					"  function backSet(){  \n"+
 					"  	var i =1; \n"+
 					"    setInterval(function() { \n"+
-					"    	var body = document.getElementsByTagName('body')[0]; \n"+
+					"    	var body = document.getElementsByTagName('body')[0];\n"+
+					"       var z = Math.floor((Math.random() * 100) + 1);\n"+
 					"    	var imgString = \"url(file:///"); 
 			 Integer bgImgInt = bg_.getBackgroundImageInterval();
 			 scrpt.append(bg_.getBackGroundDirectory());
 			 scrpt.append(
-					"/img\" + i + \".jpg)\"; \n"+	
-					"    	i = i+1; \n"+
-					"    	if (i > 9) { \n"+
+					"/img\" + z + \".jpg)\"; \n"+	
+					"    	if (i > 100) { \n"+
 					"    	   i = 1; \n"+
 					"    	}\n"+
 					"    	body.style.background=imgString; }, ");
@@ -281,41 +281,44 @@ public class PageBuilder  {
 		
 		// see what to put in the background, based on the props
 		// either an image, or a color, or maybe nothing
-		String type = System.getProperty("BrowserBackgroundType");
-		String t = null;
-		String bgimg = new String(System.getProperty("BrowserBackgroundImage"));
+		String type  = System.getProperty("BrowserBackgroundType");
+		String bgimg = System.getProperty("BrowserBackgroundImage");
+		String t     = null;
 		if (type == null) {
 			out("No BrowserBackgroundType");
 			t = new String(s+">");
-		}else {
-				if (type.compareTo("color") == 0) {
-					String c = System.getProperty("BrowserBackgroundColor");
-				if( c == null) {
-					out("No color specified by BrowswerBackgroundColor");
-					c = new String("#000000");
-				}
-				t = new String(s+ " bgcolor=\"" + c + "\">");
-			} else {		
-				if (type.compareTo("image")==0 && bg_.getBackGroundDirectory().length()==0){
-					
-					if ( bgimg == null) {
-						out("No BrowserBackgroundImage specified, even for image type background");
-						t = new String(s+">");
-					} else {
-						t = new String(s+" background=\""+bgimg+"\">");
-					}
-				} else if (bg_.getBackGroundDirectory().length() > 0) {
-					if ( bgimg != null) {
-						t = new String(s+" background=\""+bgimg+"\" onload=\"backSet();\">");
-					} else {
-					   // start black, then get image backgrounds...
-					    t = new String(s+" bgcolor=\"black\" onload=\"backSet();\">");
-					}
-				}
+			return t;
+		}
+		if (type.compareTo("color") == 0) {
+			String c = System.getProperty("BrowserBackgroundColor");
+			if( c == null) {
+			   out("No color specified by BrowswerBackgroundColor");
+			   c = new String("#000000");
+			}
+			t = new String(s+ " bgcolor=\"" + c + "\">");
+			return t;
+		}
+		if (type.compareTo("image")==0 && bg_.getBackGroundDirectory().length()==0){			
+			if ( bgimg == null) {
+			     out("No BrowserBackgroundImage specified, even for image type background");
+			     t = new String(s+">");
+			     return t;
 			}
 		}
+		t = new String(s+" background=\""+bgimg+"\">");
+		if (bg_.getBackGroundDirectory().length() > 0) {
+		    if ( bgimg != null) {
+		        t = new String(s+" background=\""+bgimg+"\" onload=\"backSet();\">");
+		    } else {
+		        // start black, then get image backgrounds...
+		        t = new String(s+" bgcolor=\"black\" onload=\"backSet();\">");
+		    }   
+		    return t;
+	     }
+		t = new String(s+">");
 		return t;
-	}
+		}
+		
 	public String vidStart (Integer x, Integer y) {
 		String s   = new String(" <Video  width=\"");
 		String s1  = new String("\" height=\"");
@@ -340,8 +343,7 @@ public class PageBuilder  {
 			" version=\"VideoLAN.VLCPlugin.2\" id=\"vlcplayer\" "+
 		    " loop=\"true\" "+
 		    " autoPlay=\"true\" autoLoop=\"true\" "+
-		    " target=\"file:///");            // file:///c:/temp/vid1.wmv" 
-		                                      //   " width=\"900px\" height=\"500px\"     "+
+		    " target=\"file:///");
 		String embed1a = new String(" width=\"" + x.toString() + "\" height=\"" + y.toString()+" ");
 		return embed1+embed1a+embed2;
 	}

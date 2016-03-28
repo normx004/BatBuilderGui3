@@ -11,11 +11,11 @@ import java.awt.dnd.*;
 import java.awt.datatransfer.*;
 
 public class FileActionFactory {
-	BatGUI  batGui_ = null;
+	protected BatGUIHtml  batGui_ = null;
 	
 	private void out(String x) { System.out.println(x);}	
 	
-	FileActionFactory (BatGUI bg) {
+	FileActionFactory (BatGUIHtml bg) {
 		batGui_ = bg;
 	}
 	public JPanel buildFileActionPane(String type) {
@@ -86,10 +86,11 @@ public class FileActionFactory {
 	}
 	//--------------Build File Action Pane for HTML version-----------------------------
 	public  void buildFileActionPane(VideoFilePointer vPtr) {
-		 vPtr.setVideoFilePane(new JPanel());
-		 //File lastDir         = getLastDirUsed();
+		 vPtr.setVideoFilePane(new NormsJPanel());
+		 vPtr.getVideoFilePane().setPanelNumber(vPtr.getIndex());
+		 out("in buildFAF, vPtr idx = "+vPtr.getIndex());
+	
 		 vPtr.setJfc(new JFileChooser(/*lastDir*/));
-		// batGui_.setVideoFileChooser(jfc);
 	     vPtr.setJflvfc( new JFrame());
 	     // this adds an 'action' object that is invoked when the button is clicked
 	     // jfl vfc is "jframe with visual file chooser"
@@ -98,18 +99,21 @@ public class FileActionFactory {
 	     
 	     openButton.setText("videofile");
 	     vPtr.getVideoFilePane().add(openButton);
-	     // get waht video file returns a "JLabel"
-	     vPtr.getVideoFilePane().add(vPtr.getWhatVideoFile());
-	     
+	     // get WhatVideoFile returns a "JLabel" that is the drop target; text is "---what file?----"
+	     // or the file path if a file has been chosen for that slot
+	     vPtr.getVideoFilePane().add(vPtr.getWhatVideoFileLabel());
+	    
 	    //-----------------watch for dropped files!=---------------------
 	     vPtr.getVideoFilePane().setDropTarget(new DropTarget() {
 	         public synchronized void drop(DropTargetDropEvent evt) {
 	        	 out("DROP DROP DROP EVENT!!!! "+ evt.toString());
 	        	 DropTargetContext ctx = evt.getDropTargetContext();
-	        	 Component comp = ctx.getComponent();
-	        	 Class o = comp.getClass();
+	        	 Component comp        = ctx.getComponent();
+	        	 Class o               = comp.getClass();
 	        	 out("Component is "+o.getCanonicalName());
-	        	 JPanel jp = (JPanel)comp;
+	        	 NormsJPanel jp        = (NormsJPanel)comp;
+	        	 int vidFileIdx        = jp.getPanelNumber();
+	        	 out("FileActionFactory: dropTarget found vid index is "+vidFileIdx);
 	        	 try {
 	                 evt.acceptDrop(DnDConstants.ACTION_COPY);
 	                 //List<File> droppedFiles = (List<File>)
@@ -128,6 +132,15 @@ public class FileActionFactory {
 	                           //out("YES! its a JLabel");
 	                           JLabel x =  ((JLabel)(component));
 	                           x.setText(file.getPath());
+	                           
+	                           String  vfText = file.getPath();
+	                   		   out ("in FileActionFactory:dropTarge Setting vid file " + vidFileIdx + " to path "+vfText);
+	                           batGui_.getVidFiles()[vidFileIdx].fileQueue.add(new File(vfText));
+	                   		   out ("in FileActionFactory:dropTarge file queue is "+batGui_.getVidFiles()[vidFileIdx].fileQueue.size());
+	                           
+	                           
+	                           
+	                           
 	                           JFrame frame = batGui_.getFrame();
 	                           frame.invalidate();
 	                        }

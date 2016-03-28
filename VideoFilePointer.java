@@ -12,28 +12,36 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import java.util.*;
 // THIS is a DATA CONTAINER for all the stuff needed to display each individual 
 // row in the builder screen, and to contain the 'dropped' file info
 public class VideoFilePointer {
-    public     JPanel                 videoFilePane = null;
-    public     int                    index = 0;
-    public     JFileChooser           jfc = null;
-    public     JFrame                 jflvfc = null;
-    public     File                   videoFile = null;
-    public     JLabel                 whatVideoFile = new JLabel ("----------------------------------------------------------------what file?--------------------------------------------------------------------------------");
-	public VideoFilePointer() {
+    private     NormsJPanel            videoFilePane = null;
+    private     int                    index = 0;
+    private     JFileChooser           jfc = null;
+    private     JFrame                 jflvfc = null;
+    private     File                   videoFile = null;
+    protected   LinkedList<File>       fileQueue = new LinkedList<File>();
+    private     JLabel                 whatVideoFileLabel = new JLabel ("----------------------------------------------------------------what file?--------------------------------------------------------------------------------");
+	
+    
+    public VideoFilePointer() {
 		// TODO Auto-generated constructor stub
 	}
- 	public JLabel getWhatVideoFile() {
-		return whatVideoFile;
+ 	public JLabel getWhatVideoFileLabel() {
+		return whatVideoFileLabel;
 	}
-	public void setWhatVideoFile(JLabel whatVideoFile) {
-		this.whatVideoFile = whatVideoFile;
+	public void setWhatVideoFileLable(JLabel whatVideoFile) {
+		String  vfText = whatVideoFile.getText();
+		out ("in VideoFilePointer:setWhatVideoFile Setting vide file for path "+vfText);
+		this.whatVideoFileLabel = whatVideoFile;
+		this.fileQueue.add(new File(vfText));
+		out ("in VideoFilePointer:setWhatVideoFile file queue is "+this.fileQueue.size());
 	}
-	public JPanel getVideoFilePane() {
+	public NormsJPanel getVideoFilePane() {
 		return videoFilePane;
 	}
-	public void setVideoFilePane(JPanel videoFilePane) {
+	public void setVideoFilePane(NormsJPanel videoFilePane) {
 		this.videoFilePane = videoFilePane;
 	}
 	public JFileChooser getJfc() {
@@ -56,9 +64,19 @@ public class VideoFilePointer {
 	}
 	//-----------------------get video file--------------------
 	public File getVideoFile() {
-		return new File(whatVideoFile.getText());
+		return new File(whatVideoFileLabel.getText());
 	}
+	private void out (String s) { System.out.println(s);}
 	public void setVideoFile(File videoFile) {
-		this.whatVideoFile.setText(videoFile.getPath());
+		out ("in VideoFilePointer:setVideoFile Setting vide file for path "+videoFile.getPath());
+		this.whatVideoFileLabel.setText(videoFile.getPath());
+		this.fileQueue.add(videoFile);
+		out ("in VideoFilePointer:setVideoFile file queue is "+this.fileQueue.size());
+	}
+	public LinkedList<File> getFileQueue() {
+		return fileQueue;
+	}
+	public void setFileQueue(LinkedList<File> fileQueue) {
+		this.fileQueue = fileQueue;
 	}
 }

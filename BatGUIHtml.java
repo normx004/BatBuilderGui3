@@ -1,16 +1,20 @@
 package batboy;
 
 import java.awt.event.ActionEvent;
+import javax.swing.border.LineBorder; 
+
 import java.awt.event.ActionListener;
 import java.awt.event.FocusListener;
 
 import java.awt.*;
 
 import javax.swing.JPanel;
+import javax.swing.border.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.JLabel;
 
 import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
@@ -37,7 +41,9 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
 	}
     public void init() {
     	super.init();
+    	String vsn = new String(" 2016-03-27a");
     	String title = new String("HtmlFilms");
+    	title = new String(title + " "+vsn);
     	initWindowStart(title);
         String[] buts = new String[5];
         
@@ -59,10 +65,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
         frame.add(howmany);
         frame.add(butPan);
         
-        //FileActionFactory faf = new FileActionFactory(this);
-        //JPanel filePanel = faf.buildFileActionPane("FILE");
-        //frame.add(filePanel);
-        // last thing before return!!!
+       
         frame.setVisible(true);
     }
     
@@ -90,7 +93,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     	vidFiles              = new VideoFilePointer[howMany];
     	
     	while (k < howMany) {
-    		// each new "manyFiles" is a JPanel that is a file drop target. 
+    		// each new "manyFiles" is a JPanel that contains a file drop target. 
     		// the "vidFiles" array contains VideoFilePointer objects, each
     		// one with a pointer to the corresponding panel, and will
     		// contain the file objects dropped onto the JPanel
@@ -99,7 +102,10 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     		// function that will handle the drop for that particular panel by setting
     		// the JLabel text to the new file name.
     		FileActionFactory faf = new FileActionFactory(this);
-    		JPanel manyFiles      = new JPanel();
+    		NormsJPanel manyFiles      = new NormsJPanel();
+    		manyFiles.setPanelNumber(k);
+    		Border myBord = BorderFactory.createRaisedBevelBorder();
+    		manyFiles.setBorder(myBord);
     		FlowLayout fl         = new FlowLayout();
     		manyFiles.setLayout(fl);
     		//int height            = 45 * howMany; // 45 pixels per row
@@ -181,5 +187,11 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     	out("Calling 'doitHtml'");
     	e.doitHtml(cmd);
     }
+	public VideoFilePointer[] getVidFiles() {
+		return vidFiles;
+	}
+	public void setVidFiles(VideoFilePointer[] vidFiles) {
+		this.vidFiles = vidFiles;
+	}
 
 }
