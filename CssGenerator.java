@@ -82,7 +82,7 @@ public class CssGenerator {
 		        }
 			
 			String head = new String("");
-			if (count_ != 9 && count_ != 4) {
+			if (count_ != 9) {
 			    head = new String("<h2>Very Hot Video</h2>");
 			}
 			cssString = css+head;
@@ -91,9 +91,9 @@ public class CssGenerator {
 	public void out(String s) { System.out.println(s);}
 	
 	private String gen4 (Integer width, Integer height) {
-		out("gen4 width "+width.toString()+", height "+height.toString()+"  count_ is "+count_);
+		out("gen4 width "+width.toString()+", height "+height.toString());
 		String marginTop = new String ("60px;");
-		if (count_ == 9 || count_ == 4) {
+		if (count_ == 9 ) {
 			marginTop = new String("10px;");
 		}
 		StringBuffer css = new StringBuffer (
@@ -153,7 +153,7 @@ public class CssGenerator {
 		          }
 		        }
 		        String head = new String("");
-				if (count_ != 9 && count_ != 4) {
+				if (count_ != 9) {
 					head = new String("<h2>Very Hot Video</h2>");	
 				}
 				cssString = cssS+head;
