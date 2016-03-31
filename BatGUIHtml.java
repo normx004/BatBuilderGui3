@@ -179,7 +179,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     	File foil = new File(fileBase + "\\"+nam);
     	out("Result is: "+foil.getPath());
     	out("Bat file (really, the html) is "+fyle.getPath());
-    	String cmd = new String("C:\\PROGRA~2\\Opera\\350206~1.92\\opera.exe -newwindow \""+
+    	String cmd = new String("C:\\PROGRA~2\\Opera\\launcher.exe -newwindow \""+
     	                        fyle.getPath()+"\"");
     	out("Cmd is: "+cmd);
     	ExecWrapper e = new ExecWrapper(cmd,true);

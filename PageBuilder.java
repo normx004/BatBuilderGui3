@@ -149,29 +149,12 @@ public class PageBuilder  {
 	}
 	protected String makeMultiVideoEntry(LinkedList <File> q, int vidNum) {
 		StringBuffer v = new StringBuffer("");
-		
-		
-		
-		
-		
 		v.append(
 				"<Video  autoplay  id=\"myVideo" + vidNum +"\"></Video>\n" + 	
 			    "</div>\n"+
 			 	"<script>\n");
-		String func = new String(
-				"function myHandler"+vidNum+"(elName, vidZ) { \n" +
-		    	"	if (typeof i" + vidNum +" === 'undefined'){ \n" +
-				"		i" + vidNum +" = 1; \n" +
-		 		"	} else { \n" +
-		 		"		i" + vidNum +" += 1; \n" +
-		     	"	} \n" +
-				"	if ( i" + vidNum +" === vidZ.length) { \n" +
-				"		i" + vidNum +" = 0; \n" +
-		    	"	} \n" +
-		     	"	videoPlay(elName, vidZ, i" + vidNum +"); \n" + 
-		    	"	}\n" +
+		String func = new String(		
 				"var vidsrc" + vidNum + " = new Array();\n");
-		//out("FUNCTiON TO CALL: "+func);
 		v.append(func);
 		int idx = 0;
 		while (idx < q.size()) {
@@ -193,10 +176,16 @@ public class PageBuilder  {
 				v.append("';\n");
 				idx += 1;
 		        }
+		
+		// here goes var H3 = new make the handler etc
+		String vfnc = new String ("var H" + vidNum +" = new makeTheHandlerObject('myVideo"+
+		                           vidNum+"', vidsrc"+vidNum+", 0);\n");
+		v.append(vfnc);
+		// followed by document.getElement...
 	    v.append("videoPlay(\"myVideo" + vidNum +"\", vidsrc" +  vidNum +", 0);\n");
 		v.append("document.getElementById('myVideo"+vidNum+
-				"').addEventListener('ended', function() { myHandler"+vidNum+"('myVideo"+
-				vidNum+"',vidsrc"+vidNum+")}, false);\n");
+				 "').addEventListener('ended', function() { H"+vidNum+
+				 ".show();}, false);\n");
 		v.append("</script>\n");
 		return v.toString();
 	}
@@ -348,19 +337,38 @@ public class PageBuilder  {
 		//       be tied to, the array of paths/links to the underlying video files, and 
 		//       the index of the now-current video in the array
 		//
+		String handlerVid = new String(
+				"<script type=\"text/javascript\">\n" +
+				"  function makeTheHandlerObject ( el, vid, ix) {\n"+
+				"  	this.elName = el;\n"+
+				"  	this.vidZ = vid;\n"+
+				"  	this.idx = ix;\n"+
+				"  }\n"+
+                "   \n"+
+				" makeTheHandlerObject.prototype.show = function() {\n"+
+				"	if (typeof this.idx === 'undefined'){ \n"+
+				"		this.idx = 1; \n"+
+				"	} else { \n"+
+				"		this.idx += 1; \n"+
+				"	} \n"+
+				"	if ( this.idx === this.vidZ.length) { \n"+
+				"		this.idx = 0; \n"+
+				"	} \n"+
+				"    videoPlay(this.elName, this.vidZ, this.idx); \n"+
+				"	}\n"+
+				"</script>\n");
 		//       args to myHandler are the  Doc element that the player window should
 		//       be tied to, and the array of paths/links to the underlying video files
-		String sVid = new String ("<script>\n" +
+		String sVid = new String ("<script type=\"text/javascript\">\n" +
 			"	function videoPlay(elName, vidZ, videonum) {  \n" +
 		    "	var theElem = document.getElementById(elName); \n" +  
 			"    theElem.setAttribute(\"src\", vidZ[videonum]); \n" +
     		"	theElem.load(); \n" +
 	    	"	theElem.play(); \n" +
 		    "   } \n" +
-    		
 	        "</script>\n"); 
 		
-		String s1= new String(sVid + "\n</head>\n<body");
+		String s1= new String(handlerVid + sVid + "\n</head>\n<body");
 		
 		String temp = s+css+scrpt+s1;
 		s = temp;
