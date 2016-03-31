@@ -23,6 +23,7 @@ public class PageBuilder  {
 	}
 	public void out (String s) { System.out.println(s);}
 	@SuppressWarnings("deprecation")
+	//----------------GENERATE PAGE------------------------------
 	public String generatePage(){
 		StringBuffer page = new StringBuffer("");
 		// head() gets the page header including the HTML type and css pointers 
@@ -65,9 +66,11 @@ public class PageBuilder  {
 		 */
 		if (vfp.length==2 || vfp.length == 4 )  {
 			while (j < vfp.length) {
+				boolean multiFile = false;
 				LinkedList q = vfp[j].getFileQueue();
 				if (q.size() > 1) {
 					out ("MULTI FILES ON THIS VFP - new embed logic needed!!!!");
+					multiFile = true;
 				}
 				filez[j] = vfp[j].getVideoFile();
 				if (filez[j] != null ) {
@@ -80,7 +83,12 @@ public class PageBuilder  {
 						page.append("<div id=\"aboutimgright\">\n" );
 					}
 					// here's where we actually build the <video ... /video> entries
-					String vEntry = this.makeVideoEntry(filez[j]);
+					String vEntry = null;
+					if ( multiFile) {
+						vEntry = this.makeMultiVideoEntry(q, j);
+					} else {
+						vEntry = this.makeVideoEntry(filez[j]);
+					}
 					
 					page.append(vEntry);
 					page.append("</div>\n");
@@ -92,9 +100,11 @@ public class PageBuilder  {
 		}
 		if (vfp.length==6 || vfp.length == 9 )  {
 			while (j < vfp.length) {
+				boolean multiFile = false;
 				LinkedList q = vfp[j].getFileQueue();
 				if (q.size() > 1) {
 					out ("MULTI FILES ON THIS VFP - new embed logic needed!!!!");
+					multiFile = true;
 				}
 				filez[j] = vfp[j].getVideoFile();
 				if (filez[j] != null ) {
@@ -109,7 +119,12 @@ public class PageBuilder  {
 						page.append("<div id=\"aboutimgright\">\n" );						
 					}
 					
-					String vEntry = this.makeVideoEntry(filez[j]);
+					String vEntry = null;
+					if ( multiFile) {
+						vEntry = this.makeMultiVideoEntry(q, j);
+					} else {
+						vEntry = this.makeVideoEntry(filez[j]);
+					}
 										
 					page.append(vEntry);
 					k += 1;
@@ -131,6 +146,59 @@ public class PageBuilder  {
 		// all done, successful!
 		status = new String("OK, generating page!");
 		return status;
+	}
+	protected String makeMultiVideoEntry(LinkedList <File> q, int vidNum) {
+		StringBuffer v = new StringBuffer("");
+		
+		
+		
+		
+		
+		v.append(
+				"<Video  autoplay  id=\"myVideo" + vidNum +"\"></Video>\n" + 	
+			    "</div>\n"+
+			 	"<script>\n");
+		String func = new String(
+				"function myHandler"+vidNum+"(elName, vidZ) { \n" +
+		    	"	if (typeof i" + vidNum +" === 'undefined'){ \n" +
+				"		i" + vidNum +" = 1; \n" +
+		 		"	} else { \n" +
+		 		"		i" + vidNum +" += 1; \n" +
+		     	"	} \n" +
+				"	if ( i" + vidNum +" === vidZ.length) { \n" +
+				"		i" + vidNum +" = 0; \n" +
+		    	"	} \n" +
+		     	"	videoPlay(elName, vidZ, i" + vidNum +"); \n" + 
+		    	"	}\n" +
+				"var vidsrc" + vidNum + " = new Array();\n");
+		//out("FUNCTiON TO CALL: "+func);
+		v.append(func);
+		int idx = 0;
+		while (idx < q.size()) {
+				v.append("vidsrc" + vidNum + "["+idx+"]='");
+				String path   = new String(q.get(idx).getPath());
+				int rindex    = path.lastIndexOf(".");
+				String type   = path.substring(rindex, path.length());
+				boolean isMp4 = false;
+				if (type.compareToIgnoreCase(".mp4")==0) {
+					out ("MP4!!! Path: " + path);
+					isMp4 = true;
+				}
+				
+				StringBuffer rtn = new StringBuffer("");
+				// path comes from the "drop" with windows separators...
+				// gotta change to unix-style for the browser
+				path = path.replaceAll("\\\\", "/");
+				v.append(path);
+				v.append("';\n");
+				idx += 1;
+		        }
+	    v.append("videoPlay(\"myVideo" + vidNum +"\", vidsrc" +  vidNum +", 0);\n");
+		v.append("document.getElementById('myVideo"+vidNum+
+				"').addEventListener('ended', function() { myHandler"+vidNum+"('myVideo"+
+				vidNum+"',vidsrc"+vidNum+")}, false);\n");
+		v.append("</script>\n");
+		return v.toString();
 	}
 	protected String makeVideoEntry(File fy) {
 		String path   = new String(fy.getPath());
@@ -273,8 +341,26 @@ public class PageBuilder  {
 			        "</script> \n"
 					);
 		}
+		// add scripts for multi-video play.  videoPlay does the "play the vid"
+		// work; myHandler is set as an event on "when the video ends...(switch
+		// to the next in the list"
+		// note: args to videoPlay are the Doc element that the player window should
+		//       be tied to, the array of paths/links to the underlying video files, and 
+		//       the index of the now-current video in the array
+		//
+		//       args to myHandler are the  Doc element that the player window should
+		//       be tied to, and the array of paths/links to the underlying video files
+		String sVid = new String ("<script>\n" +
+			"	function videoPlay(elName, vidZ, videonum) {  \n" +
+		    "	var theElem = document.getElementById(elName); \n" +  
+			"    theElem.setAttribute(\"src\", vidZ[videonum]); \n" +
+    		"	theElem.load(); \n" +
+	    	"	theElem.play(); \n" +
+		    "   } \n" +
+    		
+	        "</script>\n"); 
 		
-		String s1= new String("\n</head>\n<body");
+		String s1= new String(sVid + "\n</head>\n<body");
 		
 		String temp = s+css+scrpt+s1;
 		s = temp;
