@@ -297,8 +297,8 @@ public class PageBuilder  {
 		"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\n<head> \n "+
 		"<meta http-equiv=\"content-type\" content=\"text/html; "+
 		"charset=iso-8859-15\" />  <meta http-equiv=\"content-language\""+
-		"content=\"en\" /> \n <link rel=\"stylesheet\" type=\"text/css\""+
-		"href=\"style.css\" /> \n <title>VLC Plugin Demo</title>");
+		"content=\"en\" /> \n "+
+		"<title>VLC Plugin Demo</title>");
 				
 		String css = getCss(new String (""), this.getImgCount());
 
