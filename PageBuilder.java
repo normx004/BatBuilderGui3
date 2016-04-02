@@ -294,7 +294,8 @@ public class PageBuilder  {
 		String s=null;
 		s=new String("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \n     \""+
 		"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\"><html xmlns=\""+
-		"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\n<head> \n "+
+		"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\n"+
+		"<head> \n "+
 		"<meta http-equiv=\"content-type\" content=\"text/html; "+
 		"charset=iso-8859-15\" />  <meta http-equiv=\"content-language\""+
 		"content=\"en\" /> \n "+
@@ -309,11 +310,17 @@ public class PageBuilder  {
 			scrpt = new StringBuffer
 					(
 					"\n<script type=\"text/javascript\"> \n"+
+					"		function getsec() {\n"+
+					"	 var secx = new Date().getSeconds();\n"+
+					"	 return secx;\n"+
+					"	}\n"+
+							
 					"  function backSet(){  \n"+
-					"  	var i =1; \n"+
+					"  	var i =getsec(); \n"+
 					"    setInterval(function() { \n"+
 					"    	var body = document.getElementsByTagName('body')[0];\n"+
 					"       var z = Math.floor((Math.random() * 100) + 1);\n"+
+					"       console.log(\"Random: \"+z);\n"+
 					"    	var imgString = \"url(file:///"); 
 			 Integer bgImgInt = bg_.getBackgroundImageInterval();
 			 scrpt.append(bg_.getBackGroundDirectory());
