@@ -150,27 +150,17 @@ public class PageBuilder  {
 		status = new String("OK, generating page!");
 		return status;
 	}
+	
+	// Multi now used for all multis-not just MP4
 	protected String makeMultiVideoEntry(LinkedList <File> q, int vidNum) {
-		// first, find out if there are ANY non-mp4 items in the list
-		boolean isMp4 = true;
-		int idx = 0;
-		while (idx < q.size()) {
-				String path   = new String(q.get(idx).getPath());
-				int rindex    = path.lastIndexOf(".");
-				String type   = path.substring(rindex, path.length());
-				if (type.compareToIgnoreCase(".mp4")!=0) {
-					out ("NOT entirely MP4!!! Path: " + path);
-					isMp4 = false;
-					break;
-				}
-				idx += 1;
-		}
 		
 		// OK, now we know if we need to use the "embed vlc" code, or can just go with
 		// plain html5 "video" tags...
 		StringBuffer v = new StringBuffer("");
-		v.append(
-				"<Video  autoplay  id=\"myVideo" + vidNum +"\"></Video>\n" + 	
+		v.append( // do i need width/height here? YES!
+				"<embed  type=\"application/x-vlc-plugin\"     pluginspage=\"http://www.videolan.org\" \n"+
+				" width=\"" + this.getX().toString() + "\" height=\"" + this.getY().toString() + "\" \n" +
+				"version=\"VideoLAN.VLCPlugin.2\" id=\"vlcplayer" + vidNum + "\" autoPlay=\"true\" autoloop=\"true\" \n"+ 	
 			    "</div>\n"+
 			 	"<script>\n");
 		String func = new String(		
@@ -179,7 +169,7 @@ public class PageBuilder  {
 		
 		// OK, now we know if we need to use the "embed vlc" code, or can just go with
 		// plain html5 "video" tags...
-		idx = 0;
+		int idx = 0;
 		while (idx < q.size()) {
 				v.append("vidsrc" + vidNum + "["+idx+"]='");
 				String path   = new String(q.get(idx).getPath());		
@@ -187,20 +177,20 @@ public class PageBuilder  {
 				// path comes from the "drop" with windows separators...
 				// gotta change to unix-style for the browser
 				path = path.replaceAll("\\\\", "/");
-				v.append(path);
+				v.append("file:///" + path);
 				v.append("';\n");
 				idx += 1;
 		 }
 		
 		// here goes var H3 = new make the handler etc
-		String vfnc = new String ("var H" + vidNum +" = new makeTheHandlerObject('myVideo"+
+		String vfnc = new String ("var H" + vidNum +" = new makeTheMultiHandlerObject('vlcplayer"+
 		                           vidNum+"', vidsrc"+vidNum+", 0);\n");
 		v.append(vfnc);
 		// followed by document.getElement...
-	    v.append("videoPlay(\"myVideo" + vidNum +"\", vidsrc" +  vidNum +", 0);\n");
-		v.append("document.getElementById('myVideo"+vidNum+
-				 "').addEventListener('ended', function() { H"+vidNum+
-				 ".show();}, false);\n");
+	    //v.append("videoPlay(\"myVideo" + vidNum +"\", vidsrc" +  vidNum +", 0);\n");
+		//v.append("document.getElementById('myVideo"+vidNum+
+		//		 "').addEventListener('ended', function() { H"+vidNum+
+		//		 ".show();}, false);\n");
 		v.append("</script>\n");
 		return v.toString();
 	}
@@ -215,7 +205,8 @@ public class PageBuilder  {
 		}
 		
 		StringBuffer rtn = new StringBuffer("");
-		rtn.append(this.vidStart(isMp4,this.getX(), this.getY()));
+		String start = this.vidStart(isMp4,this.getX(), this.getY());
+		rtn.append(start);
 		// path comes from the "drop" with windows separators...
 		// gotta change to unix-style for the browser
 		path = path.replaceAll("\\\\", "/");
@@ -307,12 +298,12 @@ public class PageBuilder  {
 	
 	public String head () {
 		String s=null;
-		s=new String("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \n     \""+
-		"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\"><html xmlns=\""+
+		s=new String("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \n     \" "+
+		"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\"><html xmlns=\" "+
 		"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\n"+
 		"<head> \n "+
 		"<meta http-equiv=\"content-type\" content=\"text/html; "+
-		"charset=iso-8859-15\" />  <meta http-equiv=\"content-language\""+
+		"charset=iso-8859-15\" />  <meta http-equiv=\"content-language\" "+
 		"content=\"en\" /> \n "+
 		"<title>VLC Plugin Demo</title>");
 				
@@ -348,49 +339,40 @@ public class PageBuilder  {
 			 scrpt.append(bgImgInt.toString());
 			 scrpt.append(
 					//"  }, 7000); \n"+
-					" ); } \n" +
-			        "</script> \n"
-					);
+					" ); } \n");
+			 // now add the functions for multi-VLC entries
+			 scrpt.append("// ------------------------------utility function--------------- \n" +
+			 "function getVLC(str) { \n" +
+			 "	var yy = document.getElementById(str); \n" +
+			 "	return yy; \n" +
+			 " } \n" +
+			 "  \n" +
+			 " //-------------------------MAKE THE HANDLER OBJECT-------------------- \n" +
+			 " 	  function makeTheMultiHandlerObject ( el, vid, ix) { \n" +
+			 " 	  //console.log(\"entered make the handler ovject for \" + el); \n" +
+			 "  	this.elName = el; \n" +
+			 "  	this.vidZ = vid; \n" +
+			 "  	this.idx = ix; \n" +
+			 "  	var iz = 0; \n" +
+			 "  	var vlc = getVLC(el); \n" +
+			 "  	if (vlc === 'undefined') { \n" +
+			 "  		 console.log(\"OOOPS in makeTheHandlerObject, couldn't find VLC\"); \n" +
+			 "  	} \n" +
+			 "  	while (iz < vid.length) { \n" +
+			 "  		//console.log(\"Adding to playlist: ( \" + el + \") \" + vid[iz]); \n" +
+			 "  		vlc.playlist.add(vid[iz]); \n" +
+			 "  		var plen = vlc.playlist.items.count; \n" +
+			 "  		//console.log(\"vlc.playlist.items.count: ( \" + el + \") \" + \" is now \" + plen); \n" +
+			 "  		iz += 1; \n" +
+			 "  	} \n" + 
+			 "  	// this plays the playlist once...\"autoloop\" in the embed tag makes it loop \n" +
+			 "  	vlc.playlist.play(); \n" +
+			 "  } \n" +
+			 "</script> \n"
+			);
 		}
-		// add scripts for multi-video play.  videoPlay does the "play the vid"
-		// work; myHandler is set as an event on "when the video ends...(switch
-		// to the next in the list"
-		// note: args to videoPlay are the Doc element that the player window should
-		//       be tied to, the array of paths/links to the underlying video files, and 
-		//       the index of the now-current video in the array
-		//
-		String handlerVid = new String(
-				"<script type=\"text/javascript\">\n" +
-				"  function makeTheHandlerObject ( el, vid, ix) {\n"+
-				"  	this.elName = el;\n"+
-				"  	this.vidZ = vid;\n"+
-				"  	this.idx = ix;\n"+
-				"  }\n"+
-                "   \n"+
-				" makeTheHandlerObject.prototype.show = function() {\n"+
-				"	if (typeof this.idx === 'undefined'){ \n"+
-				"		this.idx = 1; \n"+
-				"	} else { \n"+
-				"		this.idx += 1; \n"+
-				"	} \n"+
-				"	if ( this.idx === this.vidZ.length) { \n"+
-				"		this.idx = 0; \n"+
-				"	} \n"+
-				"    videoPlay(this.elName, this.vidZ, this.idx); \n"+
-				"	}\n"+
-				"</script>\n");
-		//       args to myHandler are the  Doc element that the player window should
-		//       be tied to, and the array of paths/links to the underlying video files
-		String sVid = new String ("<script type=\"text/javascript\">\n" +
-			"	function videoPlay(elName, vidZ, videonum) {  \n" +
-		    "	var theElem = document.getElementById(elName); \n" +  
-			"    theElem.setAttribute(\"src\", vidZ[videonum]); \n" +
-    		"	theElem.load(); \n" +
-	    	"	theElem.play(); \n" +
-		    "   } \n" +
-	        "</script>\n"); 
 		
-		String s1= new String(handlerVid + sVid + "\n</head>\n<body");
+		String s1= new String( "\n</head>\n<body");
 		
 		String temp = s+css+scrpt+s1;
 		s = temp;
@@ -435,16 +417,18 @@ public class PageBuilder  {
 		return t;
 		}
 		
-	public String vidStart (Integer x, Integer y) {
-		String s   = new String(" <Video  width=\"");
-		String s1  = new String("\" height=\"");
-		String s2  = new String("\" autoplay loop>	<source src=\"file:///");
-		String rtn = new String(
-				s + x.toString() + s1 + y.toString() + s2);
+	//public String vidStart (Integer x, Integer y) {
+	//	String s   = new String(" <Video  width=\"");
+	//	String s1  = new String("\" height=\"");
+	//	String s2  = new String("\" autoplay loop>	<source src=\"file:///");
+	//	String rtn = new String(
+	//			s + x.toString() + s1 + y.toString() + s2);
 	
 		//String rtn  = new String(" <Video  autoplay loop>	<source src=\"file:///");
-		return rtn;
-	}
+	//	return rtn;
+	//}\
+	
+
 	public String vidStart (boolean isMp4, Integer x, Integer y) {
 		String rtn = new String("");
 		if ( isMp4) {
