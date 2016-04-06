@@ -36,6 +36,9 @@ public class PageBuilder  {
 		int k = 0;
 		Integer x = null;
 		Integer y = null;
+		
+		// NOTE: vfp.length is the indicator of how many windows are to be put
+		// on the page...each window showing a video or a list of videos.
 		out("vfp.length is "+vfp.length);
 		if (vfp.length == 2) {
 			x = new Integer(System.getProperty("Dim2x"));
@@ -148,6 +151,23 @@ public class PageBuilder  {
 		return status;
 	}
 	protected String makeMultiVideoEntry(LinkedList <File> q, int vidNum) {
+		// first, find out if there are ANY non-mp4 items in the list
+		boolean isMp4 = true;
+		int idx = 0;
+		while (idx < q.size()) {
+				String path   = new String(q.get(idx).getPath());
+				int rindex    = path.lastIndexOf(".");
+				String type   = path.substring(rindex, path.length());
+				if (type.compareToIgnoreCase(".mp4")!=0) {
+					out ("NOT entirely MP4!!! Path: " + path);
+					isMp4 = false;
+					break;
+				}
+				idx += 1;
+		}
+		
+		// OK, now we know if we need to use the "embed vlc" code, or can just go with
+		// plain html5 "video" tags...
 		StringBuffer v = new StringBuffer("");
 		v.append(
 				"<Video  autoplay  id=\"myVideo" + vidNum +"\"></Video>\n" + 	
@@ -156,18 +176,13 @@ public class PageBuilder  {
 		String func = new String(		
 				"var vidsrc" + vidNum + " = new Array();\n");
 		v.append(func);
-		int idx = 0;
+		
+		// OK, now we know if we need to use the "embed vlc" code, or can just go with
+		// plain html5 "video" tags...
+		idx = 0;
 		while (idx < q.size()) {
 				v.append("vidsrc" + vidNum + "["+idx+"]='");
-				String path   = new String(q.get(idx).getPath());
-				int rindex    = path.lastIndexOf(".");
-				String type   = path.substring(rindex, path.length());
-				boolean isMp4 = false;
-				if (type.compareToIgnoreCase(".mp4")==0) {
-					out ("MP4!!! Path: " + path);
-					isMp4 = true;
-				}
-				
+				String path   = new String(q.get(idx).getPath());		
 				StringBuffer rtn = new StringBuffer("");
 				// path comes from the "drop" with windows separators...
 				// gotta change to unix-style for the browser
@@ -175,7 +190,7 @@ public class PageBuilder  {
 				v.append(path);
 				v.append("';\n");
 				idx += 1;
-		        }
+		 }
 		
 		// here goes var H3 = new make the handler etc
 		String vfnc = new String ("var H" + vidNum +" = new makeTheHandlerObject('myVideo"+
@@ -318,7 +333,7 @@ public class PageBuilder  {
 					"  function backSet(){  \n"+
 					"  	var i =getsec(); \n"+
 					"    setInterval(function() { \n"+
-					"    	var body = document.getElementsByTagName('body')[0];\n"+
+					"    	var bodx = document.getElementsByTagName('body')[0];\n"+
 					"       var z = Math.floor((Math.random() * 100) + 1);\n"+
 					"       console.log(\"Random: \"+z);\n"+
 					"    	var imgString = \"url(file:///"); 
@@ -329,7 +344,7 @@ public class PageBuilder  {
 					"    	if (i > 100) { \n"+
 					"    	   i = 1; \n"+
 					"    	}\n"+
-					"    	body.style.background=imgString; }, ");
+					"    	bodx.style.background=imgString; }, ");
 			 scrpt.append(bgImgInt.toString());
 			 scrpt.append(
 					//"  }, 7000); \n"+
