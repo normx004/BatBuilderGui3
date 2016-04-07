@@ -160,7 +160,8 @@ public class PageBuilder  {
 		v.append( // do i need width/height here? YES!
 				"<embed  type=\"application/x-vlc-plugin\"     pluginspage=\"http://www.videolan.org\" \n"+
 				" width=\"" + this.getX().toString() + "\" height=\"" + this.getY().toString() + "\" \n" +
-				"version=\"VideoLAN.VLCPlugin.2\" id=\"vlcplayer" + vidNum + "\" autoPlay=\"true\" autoloop=\"true\" \n"+ 	
+				"version=\"VideoLAN.VLCPlugin.2\" id=\"vlcplayer" + vidNum + 
+				"\" autoPlay=\"true\" autoloop=\"true\" ></embed>\n"+ 	
 			    "</div>\n"+
 			 	"<script>\n");
 		String func = new String(		
