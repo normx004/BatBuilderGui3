@@ -24,10 +24,18 @@ import javax.swing.JFrame;
 import java.awt.event.KeyEvent;
 import java.io.File;
 
+import java.util.*;
+
 public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
 	protected JLabel j                    = null;
 	protected VideoFilePointer[] vidFiles = null; 
 	protected int fileCount               = 0;
+	
+	ArrayList theScreenElements = new ArrayList();
+	
+	public void addAScreenElementToList(Component c) {
+		theScreenElements.add((Object) c);
+	}
 	
 	public int getFileCount() {
 		return fileCount;
@@ -74,6 +82,20 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     }
     
     protected void buildMultifileActionPanel () {
+    	ArrayList scr = this.getTheScreenElements();
+    	if (scr == null || scr.isEmpty()) {
+    		// no previous screen to clear!
+    	} else {
+    		int scrCount = scr.size();
+    		out("will be deleting "+ scrCount + " things from screen");
+    		int k = 0;
+    		while (k < scrCount) {
+    			Component c = (Component) scr.get(k);
+    			c.setVisible(false);
+    			k += 1;
+    		}
+    	}
+    	
     	// the problem here is with 2 or 4 or whatever drop targets in the same JPanel,
     	// it seems drag and drop doesn't distinguish between what button you are dropping
     	// onto...at least, I can't see how to do that. So I'll make 'n' separate panels...
@@ -85,9 +107,11 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     	doitButton.setActionCommand("doit");	
     	doitButton.addActionListener(this);
     	frame.add(doitButton);
+    	addAScreenElementToList(doitButton);
     	//-------------------TEST button----------------------------
     	Button  testButton = getTestButton();
 	    frame.add(testButton);
+	    addAScreenElementToList(testButton);
     	
     	// Build the file input frames 
     	vidFiles              = new VideoFilePointer[howMany];
@@ -117,9 +141,11 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     		vidFiles[k].setIndex(k);
     		faf.buildFileActionPane(vidFiles[k]);
     		manyFiles.add(vidFiles[k].getVideoFilePane());
+    		addAScreenElementToList(vidFiles[k].getVideoFilePane());
     		k+=1;
     		
     		frame.add(manyFiles);
+    		addAScreenElementToList(manyFiles);
     	}
     	
     	
@@ -143,6 +169,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
           BevelBorder bord = new BevelBorder(1);
           j.setBorder(bord);
           frame.add(j);
+          addAScreenElementToList(j);
           // show resulting file name
           JLabel k = new JLabel(this.getBatFileName());
           k.setOpaque(true);
@@ -150,6 +177,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
           BevelBorder bord1 = new BevelBorder(1);
           k.setBorder(bord1);
           frame.add(k);
+          addAScreenElementToList(k);
           
           frame.setVisible(true);
         } 
@@ -192,6 +220,12 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
 	}
 	public void setVidFiles(VideoFilePointer[] vidFiles) {
 		this.vidFiles = vidFiles;
+	}
+	public ArrayList getTheScreenElements() {
+		return theScreenElements;
+	}
+	public void setTheScreenElements(ArrayList theScreenElements) {
+		this.theScreenElements = theScreenElements;
 	}
 
 }

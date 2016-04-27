@@ -109,7 +109,7 @@ public class BatGUI {
 		     Button getTestButton() {
 		    	 Button testButton = new Button("test");
 			     //pane2.add(testButton);
-		     testButton.addActionListener(new java.awt.event.ActionListener() {
+		         testButton.addActionListener(new java.awt.event.ActionListener() {
 			        public void actionPerformed(java.awt.event.ActionEvent evt) {
 			         testButtonPress(evt);
 			        }
