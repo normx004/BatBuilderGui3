@@ -66,7 +66,7 @@ public class FileActionFactory {
 	    //-----------------watch for dropped files!=---------------------
 	     videoFilePane.setDropTarget(new DropTarget() {
 	         public synchronized void drop(DropTargetDropEvent evt) {
-	        	 out("DROP DROP DROP EVENT!!!! "+ evt.toString());
+	        	 out("videoFilePane.setDropTarget line 69 DROP DROP DROP EVENT!!!! "+ evt.toString());
 	             try {
 	                 evt.acceptDrop(DnDConstants.ACTION_COPY);
 	                 //List<File> droppedFiles = (List<File>)
@@ -83,6 +83,19 @@ public class FileActionFactory {
 	     });
 	     //-=-------------EnD of Watch for dropped----------------------------------------- 
 	     return videoFilePane;
+	}
+	  //-----------------------link checker------------------------
+    public String seeLink(String path) throws IOException,  mslinks.ShellLinkException {
+		out("Seelink invoked with path: "+path);
+		File fyle = new File (path);
+		if (fyle.exists()) {
+			out("Well, at least the file exists (the shortcut that is)");
+		}
+		mslinks.ShellLink s1 = new mslinks.ShellLink(fyle);
+		out("ShellLink object has been created");
+		String thePath = s1.resolveTarget();
+		out("link target is "+thePath);
+		return thePath;
 	}
 	//--------------Build File Action Pane for HTML version-----------------------------
 	public  void buildFileActionPane(VideoFilePointer vPtr) {
@@ -103,10 +116,14 @@ public class FileActionFactory {
 	     // or the file path if a file has been chosen for that slot
 	     vPtr.getVideoFilePane().add(vPtr.getWhatVideoFileLabel());
 	    
+	  
 	    //-----------------watch for dropped files!=---------------------
+	     // this seems to be where a video dragged to a multi-video-html-window
+	     // constructor instance processes the drops...must check for link and 
+	     // if link, substitute the link target...
 	     vPtr.getVideoFilePane().setDropTarget(new DropTarget() {
 	         public synchronized void drop(DropTargetDropEvent evt) {
-	        	 out("DROP DROP DROP EVENT!!!! "+ evt.toString());
+	        	 out("vptr.getVideoFilePane line 109 DROP DROP DROP EVENT!!!! "+ evt.toString());
 	        	 DropTargetContext ctx = evt.getDropTargetContext();
 	        	 Component comp        = ctx.getComponent();
 	        	 Class o               = comp.getClass();
@@ -120,7 +137,24 @@ public class FileActionFactory {
 	                 Object droppedFiles = 
 	                     evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 	                 for (File file : (java.util.List<File>)droppedFiles) {
-	                     System.out.println("DROPPPED FILE ON BUTTON(FileName):"+file.getPath());
+	                	 String thePath = file.getPath();
+	                     System.out.println("DROPPPED FILE ON BUTTON(FileName):"+thePath);
+	                     
+	                     
+	                     String finalPath = null;
+	                     try {
+	                    	 finalPath = seeLink(thePath);
+	                     } catch (IOException ioe) {
+	                    	 System.err.println("Uh oh, io exception looking at " + thePath);
+	                     } catch (mslinks.ShellLinkException sle) {
+	                    	 System.err.println("ok, looks like " + thePath + " is not a link");
+	                     }
+	                     
+	                     if (finalPath != null ) {
+	                    	 out("OK! it was a link, link target is "+finalPath);
+	                    	 thePath = finalPath;
+	                     }
+	                     
 	                     //got to replace "set video file" with access to the text field in the Jpanel
 	                     Component[] components = jp.getComponents(); 
 	                     Component   component  = null; 
@@ -131,9 +165,9 @@ public class FileActionFactory {
 	                        {   
 	                           //out("YES! its a JLabel");
 	                           JLabel x =  ((JLabel)(component));
-	                           x.setText(file.getPath());
+	                           x.setText(thePath);
 	                           
-	                           String  vfText = file.getPath();
+	                           String  vfText = thePath;
 	                   		   out ("in FileActionFactory:dropTarge Setting vid file " + vidFileIdx + " to path "+vfText);
 	                           batGui_.getVidFiles()[vidFileIdx].fileQueue.add(new File(vfText));
 	                   		   out ("in FileActionFactory:dropTarge file queue is "+batGui_.getVidFiles()[vidFileIdx].fileQueue.size());

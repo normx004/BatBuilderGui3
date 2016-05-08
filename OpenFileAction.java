@@ -66,7 +66,7 @@ import javax.swing.JFrame;
             	} else {
             	  if (vfp != null ) {
             		vfp.setVideoFile(file);
-            		vfp.getWhatVideoFile().setText(file.getPath());
+            		vfp.getWhatVideoFileLabel().setText(file.getPath());
             	  }
             	}
                 
