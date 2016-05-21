@@ -373,7 +373,7 @@ public class PageBuilder  {
 			);
 		}
 		
-		String s1= new String( "\n</head>\n<body");
+		String s1= new String( "\n</head>\n<body onload=\"backSet();\" ");
 		
 		String temp = s+css+scrpt+s1;
 		s = temp;
