@@ -221,7 +221,7 @@ public class PageBuilder  {
 	
     public String getCss(String original, int count) {
     	String s = original;
-    	CssGenerator c = new CssGenerator(count);
+    	CssGenerator c = new CssGenerator(count, bg_);
     	return(c.getCss(s));
     	/*
     	if ( count == 2) {
@@ -378,43 +378,8 @@ public class PageBuilder  {
 		String temp = s+css+scrpt+s1;
 		s = temp;
 		
-		// see what to put in the background, based on the props
-		// either an image, or a color, or maybe nothing
-		String type  = System.getProperty("BrowserBackgroundType");
-		String bgimg = System.getProperty("BrowserBackgroundImage");
-		String t     = null;
-		if (type == null) {
-			out("No BrowserBackgroundType");
-			t = new String(s+">");
-			return t;
-		}
-		if (type.compareTo("color") == 0) {
-			String c = System.getProperty("BrowserBackgroundColor");
-			if( c == null) {
-			   out("No color specified by BrowswerBackgroundColor");
-			   c = new String("#000000");
-			}
-			t = new String(s+ " bgcolor=\"" + c + "\">");
-			return t;
-		}
-		if (type.compareTo("image")==0 && bg_.getBackGroundDirectory().length()==0){			
-			if ( bgimg == null) {
-			     out("No BrowserBackgroundImage specified, even for image type background");
-			     t = new String(s+">");
-			     return t;
-			}
-		}
-		t = new String(s+" background=\""+bgimg+"\">");
-		if (bg_.getBackGroundDirectory().length() > 0) {
-		    if ( bgimg != null) {
-		        t = new String(s+" background=\""+bgimg+"\" onload=\"backSet();\">");
-		    } else {
-		        // start black, then get image backgrounds...
-		        t = new String(s+" bgcolor=\"black\" onload=\"backSet();\">");
-		    }   
-		    return t;
-	     }
-		t = new String(s+">");
+		
+		String t = new String(s+">");
 		return t;
 		}
 		
@@ -464,6 +429,7 @@ public class PageBuilder  {
 		s = new String(" </body></html>");
 		return s;
 	}
+	
 	public static void main(String[] args) {
 		BatGUI bg = new BatGUI();
 		VideoFilePointer vp[] = new VideoFilePointer[1];
