@@ -178,7 +178,7 @@ public class CssGenerator {
 		 				background-attachment: fixed;
 		 				background-repeat: no-repeat;
 		 				background-position: center;
-		 				background-color: cyan;
+		 				background-color: black;
 		 		}          
 		 	</style>
 		*/ 	

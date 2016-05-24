@@ -660,7 +660,7 @@ import java.util.logging.*;
 	     BuildSPPanel   prb = new BuildSPPanel(this);
 	     JPanel radioPanelsp = prb.getPanel();
 	    
-	     FileActionFactory faf = new FileActionFactory(this);
+	     FileActionFactory faf = new FileActionFactory(null);
 	     
 	     //-----------------Select alternate VLC program---------------------------
 	     JPanel vlcPane = new JPanel();
