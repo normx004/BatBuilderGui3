@@ -26,6 +26,8 @@ import java.io.File;
 
 import java.util.*;
 
+//import EightPointThree.*;
+
 public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
 	protected JLabel j                    = null;
 	protected VideoFilePointer[] vidFiles = null; 
@@ -72,8 +74,9 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
         howmany.setForeground(Color.CYAN);
         frame.add(howmany);
         frame.add(butPan);
-        
-       
+        //position the window at upper right
+        Point p = new Point(10,10);
+        frame.setLocation(p);
         frame.setVisible(true);
     }
     
@@ -193,13 +196,13 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
              out("--------------------------------------------------------------");
         }
         // actually runit
-        test();
+        this.test();
     }
     // test the page by opening it with opera
-    public void test() {
+    public void test() {  // test the page
     	// run the file and see how it looks
     	File fyle = super.getBatFile();
-    	out("Test button 'test' starts with "+fyle.toString());
+    	out("xxxTest button 'test' starts with "+fyle.toString());
     	String nam = fyle.getName();
     	out("Test: base file name is "+nam);
     	String fileBase = System.getProperty("filebase");
@@ -207,13 +210,30 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     	File foil = new File(fileBase + "\\"+nam);
     	out("Result is: "+foil.getPath());
     	out("Bat file (really, the html) is "+fyle.getPath());
-    	String cmd = new String("C:\\PROGRA~2\\Opera\\launcher.exe -newwindow \""+
-    	                        fyle.getPath()+"\"");
-    	out("Cmd is: "+cmd);
-    	ExecWrapper e = new ExecWrapper(cmd,true);
+    	
+    	out("\nConstructing RunCmdFor83");
+    	RunCmdFor83 rc83 = new RunCmdFor83();
+    	out("Calllllling RunCmdFor83");
+    	String shorty = rc83.xlateTo83(fyle.getPath());
+    	out("DONE with RunCmdFor83\n");
+    	
+    	StringBuffer cmd = new StringBuffer("");
+    	// default test browser to opera, but allow an alternate from the properties
+    	String browser = new String ("\"C:\\PROGRA~2\\Opera\\launcher.exe\" -newwindow ");
+    	String altBrowse = System.getProperty("testbrowser");
+    	
+    	if (altBrowse != null) {
+    		String brow = new String("\"" +altBrowse+"\" ");
+    		cmd.append(brow);
+    	} else {
+    		cmd.append(browser);
+    	}
+    	cmd.append(new String("  \""  + shorty + "\""));
+    	out("Cmd is: "+cmd.toString());
+    	ExecWrapper e = new ExecWrapper(cmd.toString(),true);
     	//e.setDebug(true);
-    	out("Calling 'doitHtml'");
-    	e.doitHtml(cmd);
+    	out("Cxxxalling 'doitHtml'");
+    	e.doitHtml(cmd.toString());
     }
 	public VideoFilePointer[] getVidFiles() {
 		return vidFiles;

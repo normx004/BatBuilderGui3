@@ -276,7 +276,10 @@ public class ExecWrapper {
 	  public void doitHtml(String theCmd) {
 		  out("In doitHTML....., the cmd is " + theCmd);
 		  cmdsStart[2]  = cmd_;
-		  String cmd = new String("cmd /c " + theCmd);
+		  // NOTE: at least with FireFox, the cmd /c screws up the system
+		  // so that the filename of the html file is always said to be
+		  // of improper format (or something like that)
+		  String cmd = new String(/*"cmd /c " + */theCmd);
 		  out("the command in doit: "+cmd);
 		  //ExecWrapper e = new ExecWrapper(get);
 		  String s=null;

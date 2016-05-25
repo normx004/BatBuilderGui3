@@ -104,6 +104,7 @@ public class BatGUI {
 			protected JFileChooser batFileSaveChooser_ = null;
 			//------------------TEST BUTTON-----------------------------------------
 			 public void testButtonPress(java.awt.event.ActionEvent e) { 
+				 out("TestButtonPress in BatGUI");
 				 //must be overridden!!! }
 			 }
 		     Button getTestButton() {
