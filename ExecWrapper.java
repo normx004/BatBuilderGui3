@@ -279,6 +279,11 @@ public class ExecWrapper {
 		  // NOTE: at least with FireFox, the cmd /c screws up the system
 		  // so that the filename of the html file is always said to be
 		  // of improper format (or something like that)
+		  
+		  // on the other hand, it seems like the window gets kicked off but
+		  // something blocks both the browser window and the java builder window
+		  // so that the browser won't display its contents until the java builder is
+		  // killed...weird.  didn't happen that way with cmd /c "brower" "html file"
 		  String cmd = new String(/*"cmd /c " + */theCmd);
 		  out("the command in doit: "+cmd);
 		  //ExecWrapper e = new ExecWrapper(get);
