@@ -11,12 +11,16 @@ import java.awt.dnd.*;
 import java.awt.datatransfer.*;
 
 public class FileActionFactory {
-	protected BatGUIHtml  batGui_ = null;
+	protected BatGUIHtml  batGuiH_ = null;
+	protected BatGUISlicer batGuiS_ = null;
 	
 	private void out(String x) { System.out.println(x);}	
 	
 	FileActionFactory (BatGUIHtml bg) {
-		batGui_ = bg;
+		batGuiH_ = bg;
+	}
+	FileActionFactory (BatGUISlicer bg) {
+		batGuiS_ = bg;
 	}
 	public JPanel buildFileActionPane(String type) {
 		JPanel bogus = null;
@@ -49,19 +53,19 @@ public class FileActionFactory {
 		return res;
 	}
 	// -----what video file shall we use------------------------
-	
+	// this routine used only if building slider xspf file for single-vlc display
 	public JPanel buildFileActionPane() {
 		 JPanel videoFilePane = new JPanel();
 		 File lastDir         = getLastDirUsed();
 		 JFileChooser jfc     = new JFileChooser(lastDir);
-		 batGui_.setVideoFileChooser(jfc);
+		 batGuiS_.setVideoFileChooser(jfc);
 	     JFrame jf1vfc        = new JFrame();
-	     Action openAction    = new OpenFileAction(jf1vfc, batGui_.getVideoFileChooser(), batGui_);
+	     Action openAction    = new OpenFileAction(jf1vfc, batGuiS_.getVideoFileChooser(), batGuiS_);
 	     JButton openButton   = new JButton(openAction);
 	     openButton.setText("videofile");
 	     videoFilePane.add(openButton);
-	     batGui_.setWhatVideoFile ( new JLabel ("----------------------------------------------------------------what file?--------------------------------------------------------------------------------"));
-	     videoFilePane.add(batGui_.getWhatVideoFile());
+	     batGuiS_.setWhatVideoFile ( new JLabel ("----------------------------------------------------------------what file?--------------------------------------------------------------------------------"));
+	     videoFilePane.add(batGuiS_.getWhatVideoFile());
 	     
 	    //-----------------watch for dropped files!=---------------------
 	     videoFilePane.setDropTarget(new DropTarget() {
@@ -74,7 +78,7 @@ public class FileActionFactory {
 	                     evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 	                 for (File file : (java.util.List<File>)droppedFiles) {
 	                     System.out.println("DROPPPED FILE ON THIS BUTTON(Name):"+file.getPath());
-	                     batGui_.setVideoFile(file);
+	                     batGuiS_.setVideoFile(file);
 	                 }
 	             } catch (Exception ex) {
 	                 ex.printStackTrace();
@@ -169,13 +173,13 @@ public class FileActionFactory {
 	                           
 	                           String  vfText = thePath;
 	                   		   out ("in FileActionFactory:dropTarge Setting vid file " + vidFileIdx + " to path "+vfText);
-	                           batGui_.getVidFiles()[vidFileIdx].fileQueue.add(new File(vfText));
-	                   		   out ("in FileActionFactory:dropTarge file queue is "+batGui_.getVidFiles()[vidFileIdx].fileQueue.size());
+	                           batGuiH_.getVidFiles()[vidFileIdx].fileQueue.add(new File(vfText));
+	                   		   out ("in FileActionFactory:dropTarge file queue is "+batGuiH_.getVidFiles()[vidFileIdx].fileQueue.size());
 	                           
 	                           
 	                           
 	                           
-	                           JFrame frame = batGui_.getFrame();
+	                           JFrame frame = batGuiH_.getFrame();
 	                           frame.invalidate();
 	                        }
 	                     }

@@ -209,7 +209,7 @@ import java.util.logging.*;
        public  void setVideoFile(File f) {
 		   videoFile_  = f;
 		   String path = videoFile_.getPath();
-		   out("in batgui video file is "+ path);
+		   out("BatGUISLicer line 212: in batgui video file is "+ path);
 		   setBatFile(path);
 		   whatVideoFile.setText(path);
 		   if (cmdFile_ == null) {
@@ -218,6 +218,9 @@ import java.util.logging.*;
 		   //out("in 'set video file' setting cmdfile batfile path to "+path);
 		   cmdFile_.setBatFile(path);
 	   }
+       public File getVideoFile() {
+    	   return videoFile_;
+       }
        //-------------------------------------------------------------------\
       
        public void        setVlcFileLabel(JLabel j) { vlcFileLabel_ = j;}
@@ -405,16 +408,18 @@ import java.util.logging.*;
 	             out("Last slash in "+vf+" is at "+endIndex);
 	             String base = vf.substring(0, endIndex);
 	             out("Base is " + base);
-	             String tBat = new String(base+"\\testum.bat");
+	             //String tBat = new String(base+"\\testum.bat");
+	             String tBat = new String("q:\\temp\\batgui.test\\testum.bat");
 	             out("temp bat file is "+tBat);
 	             // tell the cmd file about it
-	             cfx.setBatFile(tBat);
+	             cfx.pushBatFile(tBat);
 	             // use same cmd file name each time for the test
 	             Boolean overwrite = new Boolean(Boolean.TRUE);
 	             cfx.test(overwrite);
 	             if ( batFileSaveChooser_ != null) {
 	            	 batFileSaveChooser_.rescanCurrentDirectory();
 	             }
+	             cfx.popBatFile();
 	   }
 	   
 	   //
@@ -427,7 +432,13 @@ import java.util.logging.*;
 	             c.setEnd(endtotsec_.getText());
 	             c.setX(xval_.getText());
 	             c.setY(yval_.getText());
-	             c.setTargetVideoFile(this.getVideoFile());
+	             File f = this.getVideoFile();
+	             if ( f == null) {
+	            	 System.err.println("Uh oh...in makeCmdLine, this.getVideoFile() returned 'null'");
+	            	 Thread.currentThread().dumpStack();
+	            	 System.exit(1);
+	             }
+	             c.setTargetVideoFile(f);
 	             c.setXsize(xSize_.getText());
 	             c.setYsize(ySize_.getText());
 	             c.setSpeed(this.getSpeed());
@@ -660,7 +671,7 @@ import java.util.logging.*;
 	     BuildSPPanel   prb = new BuildSPPanel(this);
 	     JPanel radioPanelsp = prb.getPanel();
 	    
-	     FileActionFactory faf = new FileActionFactory(null);
+	     FileActionFactory faf = new FileActionFactory(this);
 	     
 	     //-----------------Select alternate VLC program---------------------------
 	     JPanel vlcPane = new JPanel();

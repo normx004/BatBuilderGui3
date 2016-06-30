@@ -5,7 +5,7 @@ import java.io.*;
 
 public class CmdFile {
 	   private   Vector<CmdLine> cmds = null;
-	   private   String batFile = null;
+	   private   Stack<String> batFile = new Stack<String>();
 	   private   String vlcPathString = null;
 	   
 	   // Max Iter is how many times we want to try to make a unique filename
@@ -31,11 +31,19 @@ public class CmdFile {
 	    }
 	    //------------------getBatFile-----------------------------
 		public String getBatFile() {
-			return batFile;
+			return batFile.firstElement();
 		}
 		public void  setBatFile(String s) {
 			//out("Setting batfile to \"" + s + "\" in CmdFile");
-			batFile = s;
+			batFile = new Stack<String>();
+			batFile.push(s);
+		}
+		public String popBatFile() {
+			String s = batFile.pop();
+			return s;
+		}
+		public void pushBatFile(String s) {
+			batFile.push(s);
 		}
 	  
 		public  void setVlcPathString(String s) {
@@ -44,19 +52,25 @@ public class CmdFile {
 		public String getVlcPathString() {
 			return vlcPathString;
 		}
-	
-	
+		
+		
+	  
+	  //-----------------CONSTRUCTORS--------------------------
 	   public CmdFile(String tg) {
+		 
 		   out("WARNING---string "+tg+" IGNORED on CmdFile contruction");
 		   cmds = new Vector<CmdLine>();
 	   }
 	   public CmdFile () {
+		  
 		   cmds = new Vector<CmdLine>();
 	   }
        public CmdFile( Vector<CmdLine> cl) {
-    	   cmds = cl;
+    	
+		   cmds = cl;
        }
-       
+     //-----------------END CONSTRUCTORS--------------------------
+ 	   
        public void addCmd(CmdLine c) {
     	   cmds.add(c);
        }
@@ -71,6 +85,7 @@ public class CmdFile {
     	writeOutputFile(overwrite);
     	ExecWrapper e = new ExecWrapper(this.getBatFile());
     	e.setDebug(true);
+    	out("Running test from CmdFile-test(bool)");
     	e.doit(this.getBatFile());
     	
     }
@@ -131,34 +146,35 @@ public class CmdFile {
 		try {
 			 os = new FileOutputStream(of);
 		
-		idx = 0;
-		while (idx < len) {
-			out("cmd line number "+ idx);
-			CmdLine k = cmds.elementAt(idx);
-			StringBuffer sb = new StringBuffer(" ");
+			 idx = 0;
+			 while (idx < len) {
+				 out("cmd line number "+ idx);
+				 CmdLine k = cmds.elementAt(idx);
+				 StringBuffer sb = new StringBuffer(" ");
             
-			sb.append("\""          + this.getVlcPathString().trim() + "\" --no-embedded-video --video-x=");
-			sb.append(k.getX()      + " --video-y=");
-			sb.append(k.getY()      + " --volume=20 --start-time ");
-			sb.append(k.getStart()  + " --stop-time ");
-			sb.append(k.getEnd()    + " --play-and-exit --video-on-top ");
-			sb.append("--rate="     + k.getSpeed());
-			// --width 600 --height 400 
-			sb.append(" --width="+k.getXsize()+" ");
-			sb.append(" --height="+k.getYsize()+" ");
+				 sb.append("\""          + this.getVlcPathString().trim() + "\" --no-embedded-video --video-x=");
+				 sb.append(k.getX()      + " --video-y=");
+				 sb.append(k.getY()      + " --volume=20 --start-time ");
+				 sb.append(k.getStart()  + " --stop-time ");
+				 sb.append(k.getEnd()    + " --play-and-exit --video-on-top ");
+				 sb.append("--rate="     + k.getSpeed());
+				 // --width 600 --height 400 
+				 sb.append(" --width="+k.getXsize()+" ");
+				 sb.append(" --height="+k.getYsize()+" ");
 			
-			if (k.getAspect().length() > 0 ) {
-				sb.append(" --aspect-ratio="+k.getAspect()+" ");
-			}
+				 if (k.getAspect().length() > 0 ) {
+					 sb.append(" --aspect-ratio="+k.getAspect()+" ");
+			     }
 			
-			sb. append("\""         + k.getTargetVideoFile().trim() + "\"\n");
-			String st = new String(sb);
-			byte b[]  = st.getBytes();
-			out(st);
-			os.write(b);
-		    idx += 1;
-		}
-		os.close();
+				 sb. append("\""         + k.getTargetVideoFile().trim() + "\"\n");
+				 String st = new String(sb);
+				 byte b[]  = st.getBytes();
+				 out(st);
+				 os.write(b);
+				 idx += 1;
+			 }
+		  out("CMDFILE: line 176: closing output file "+of.getPath()); 
+		  os.close();
 		} catch (IOException ioe) {
 			System.err.println("io error dealing with bat file to write: " + ioe.getMessage());
 		}
@@ -230,15 +246,15 @@ public class CmdFile {
 			bf.append(".xspf");
 		}
 		File  of = new File(bf.toString());
-		out("creating "+bf.toString());
+		out("CMDFILE: line 248: creating "+bf.toString());
 		
 		int count = 0;
-		out("checking bat file "+bf);
+		out("CMDFILE: line 251: checking bat file "+bf);
 		if (of.exists() && !ovw ) {
 			while (of.exists() && count < MAXITER) {
-				out("............already exists....");
+				out("CMDFILE: line 248: ............already exists....");
 				bf = new StringBuffer(bf.append(".bat"));
-				out ("checking " + bf);
+				out ("CMDFILE: line 248: checking " + bf);
 				of = new File(bf.toString());
 				count +=1 ;
 			}

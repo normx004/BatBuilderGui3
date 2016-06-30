@@ -10,7 +10,7 @@ public class ExecRunner extends Thread {
        ex_ = ex;
    }
    public void run () {
-        System.out.println("Running thread");
+        System.out.println("\n---Running thread---\n");
 	    results_ = ex_.runit();
    }
 }

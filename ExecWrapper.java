@@ -121,7 +121,7 @@ public class ExecWrapper {
 	     String os_a  = p.getProperty("os.arch");
 	     debug_       = getDebugFromProps();
 
-	     out("os_: " + os_ + "  arch: " + os_a);
+	     out("os_: '" + os_ + "'  arch: '" + os_a + "'");
 
 	     if (       os_.compareTo("Windows NT") == 0 
 	    		 || os_.compareTo("Windows XP") == 0
@@ -152,6 +152,33 @@ public class ExecWrapper {
 	  {
 	   return cmds_;
 	  }
+	  //--------------------------------------RUNRUNIT-------------------------------
+	  // code from the internet, for FUN TEST!!!
+	  public void runrunit() {
+	  String[] cmd = { 
+			    "cmd.exe", 
+			    "/c", 
+			    "start",  
+			    "/wait", 
+			    "setup",
+			    "/z\"/sfC:\\temp\\input_file.txt\"", 
+			    "/s",
+			    "/f2\"C:\\temp\\newlogfile.log\""   
+			};
+         /*
+         try {
+        	  Runtime.getRuntime().exec(cmd);
+         */ 
+         MyRunner my = new MyRunner();
+         my.setCmd("q:\\temp\\batgui.test\\testum.bat");
+         my.run();
+         /*
+         } catch (IOException ioe) {
+         	System.err.println("in MyRunner, runtime exception: " + ioe.getMessage());
+  			Thread.dumpStack();
+          }
+         */
+	  }
 	  //------------------------------------RUNIT---------------------------------------
 	  public Vector runit()
 	  {// returns vector of strings from stdout
@@ -159,6 +186,9 @@ public class ExecWrapper {
 	   DataInputStream inP;
 	   Vector          tempRtn = new Vector();
 	   
+	   this.runrunit();
+	   return tempRtn;
+	   /**************************************************************************************
 	   if ( debug_)
 	     {
 	      out("-----------here goes--------------------");
@@ -167,9 +197,15 @@ public class ExecWrapper {
 	   try{
 		     String[] myWork = null;
 		     myWork = getCmds();
+		     // clone for testing 
+		     String tCmd[] = null;
+		     tCmd = getCmds();
+		     // 
              if (myWork == null) {
+            	 out("getCmds() returned null, so try 'getCmdsStart()'");
             	 myWork = getCmdsStart();
              }
+             // show the mywork array...
              out("MyWork size: "+myWork.length);
              int x = 0;
              while (x < myWork.length) {
@@ -177,6 +213,8 @@ public class ExecWrapper {
             	 x+=1;
              }
 		     out("MyWork: "+myWork.toString());
+		     // now mywork[3] is the actual command string c:\...\vlc.exe --no-embedded-video...<filespec>
+		     // but for some reason I think the first arg s/b the cmd string, not the literal "cmd"
 		     x = 3;
 		     int y = 0;
 		     while (x < myWork.length) {
@@ -271,6 +309,7 @@ public class ExecWrapper {
 	     rIdx += 1;
 	    }
 	   return rtn;
+	   ************************************************************/
 	  }
 	  //----------------------doitHTML----------------------------------
 	  public void doitHtml(String theCmd) {
