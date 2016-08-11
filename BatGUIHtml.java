@@ -33,6 +33,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
 	protected VideoFilePointer[] vidFiles = null; 
 	protected int fileCount               = 0;
 	
+	
 	ArrayList theScreenElements = new ArrayList();
 	
 	public void addAScreenElementToList(Component c) {
@@ -51,6 +52,8 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
 	}
     public void init() {
     	super.init();
+    	
+    	
     	String vsn = new String(" 2016-03-27a");
     	String title = new String("HtmlFilms");
     	title = new String(title + " "+vsn);
@@ -217,6 +220,21 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     	String shorty = rc83.xlateTo83(fyle.getPath());
     	out("DONE with RunCmdFor83\n");
     	
+    	if (this.isUseHttpServer()) {
+    		out("Shorty ("+shorty+") to be translated for http server");
+    		int col = shorty.indexOf(':');
+    		out("Index of colon is: "+col);
+    		StringBuffer s = new StringBuffer("http://localhost/");
+    		String shirty = shorty.replace("\\", "/");
+    		out("===after replaceall: "+shirty);
+    		s.append(shorty.substring(0, col));
+    		out("Ok, got the drive letter: "+s.toString());
+    		s.append(shirty.substring(col+1));
+    		
+    		out("Finally, replaced the backslashes: "+s);
+    		shorty = s.toString();
+    	}
+    	
     	StringBuffer cmd = new StringBuffer("");
     	// default test browser to opera, but allow an alternate from the properties
     	String browser = new String ("\"C:\\PROGRA~2\\Opera\\launcher.exe\" -newwindow ");
@@ -224,11 +242,13 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     	
     	if (altBrowse != null) {
     		String brow = new String("\"" +altBrowse+"\" ");
+    		out("Using browser: "+brow);
     		cmd.append(brow);
     	} else {
+    		out("Using default browser: "+browser);
     		cmd.append(browser);
     	}
-    	cmd.append(new String("  \""  + shorty + "\""));
+    	cmd.append(new String(" -new-window \""  + shorty + "\""));
     	out("Cmd is: "+cmd.toString());
     	ExecWrapper e = new ExecWrapper(cmd.toString(),true);
     	//e.setDebug(true);
@@ -247,5 +267,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
 	public void setTheScreenElements(ArrayList theScreenElements) {
 		this.theScreenElements = theScreenElements;
 	}
+
+	
 
 }

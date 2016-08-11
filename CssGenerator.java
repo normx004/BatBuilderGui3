@@ -185,6 +185,9 @@ public class CssGenerator {
 		 	
 				String type  = System.getProperty("BrowserBackgroundType");
 				String bgimg = System.getProperty("BrowserBackgroundImage");
+				if (bg_.isUseHttpServer()) {
+					bgimg = System.getProperty("BrowserBackgroundImageAlias");
+				}
 				String t     = new String ("<style>\n  body { \n");
 				String rtn   = new String("");
 				if (type == null) {

@@ -23,8 +23,9 @@ public class BatGUI {
 	 public    void         setVideoFileChooser(JFileChooser j) { videoFileChooser_ = j;}
 	 public    JFileChooser getVideoFileChooser() { return videoFileChooser_;}
 	 protected String backGroundDirectory = null;
+	 protected String  backGroundDirectoryAlias = null;
 	 protected Integer backgroundImageInterval = 5000; // 5 sec default...
-	 
+	 protected boolean useHttpServer = false;
 	   
 	 protected static boolean DEBUG = false;
 	   
@@ -53,17 +54,33 @@ public class BatGUI {
 	         out("Putting all props to system props");
 	         Properties sysProps = System.getProperties();
 	         sysProps.putAll(p);
+	         // background directory and alias
 	         String backGrounds = System.getProperty("BrowserBackgroundDirectory");
 	         if (backGrounds == null){
 	        	 backGrounds = new String("");
 	         }
 	         out ("Found background directory in props: "+backGrounds);
 	         setBackGroundDirectory(backGrounds);
+	         String backGroundsAlias = System.getProperty("BrowserBackgroundDirectoryAlias");
+	         if (backGroundsAlias == null){
+	        	 backGroundsAlias = new String("");
+	         }
+	         out ("Found background alias directory in props: "+backGroundsAlias);
+	         setBackGroundDirectoryAlias(backGroundsAlias);
+	         
+	         
+	         
+	         
 	         String bgInt = System.getProperty("BackgroundImageInterval");
 	         if (bgInt != null) {
 	        	 Integer bgi = new Integer (bgInt);
 	        	 this.setBackgroundImageInterval(bgi);
 	         }
+	         String uhs = System.getProperty("UseHttpServer");
+	     	 if (uhs != null) {
+	     		setUseHttpServer(true);
+	     	 }
+	     	
 		 }
 		
 	//--------------------sleeper------------------------------  
@@ -309,6 +326,18 @@ public class BatGUI {
 		}
 		public void setBackgroundImageInterval(Integer backgroundImageInterval) {
 			this.backgroundImageInterval = backgroundImageInterval;
+		}
+		public boolean isUseHttpServer() {
+			return useHttpServer;
+		}
+		public void setUseHttpServer(boolean useHttpServer) {
+			this.useHttpServer = useHttpServer;
+		}
+		public String getBackGroundDirectoryAlias() {
+			return backGroundDirectoryAlias;
+		}
+		public void setBackGroundDirectoryAlias(String backGroundDirectoryAlias) {
+			this.backGroundDirectoryAlias = backGroundDirectoryAlias;
 		}
 }
 

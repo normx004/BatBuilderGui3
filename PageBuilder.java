@@ -12,14 +12,14 @@ public class PageBuilder  {
     Integer x_=null;
     Integer y_=null;
     
-    
-    
-    
+    boolean useHttpServer = false;
     
 	public PageBuilder(VideoFilePointer[] vp, BatGUI bg) {
 		// TODO Auto-generated constructor stub
 		vfp = vp;
 		bg_ = bg;
+		useHttpServer = bg_.isUseHttpServer(); 
+		out("-------xxxx-------useHttpServer is set to "+useHttpServer+" ---------xxxxxxxxxx--------------");
 	}
 	public void out (String s) { System.out.println(s);}
 	@SuppressWarnings("deprecation")
@@ -269,7 +269,14 @@ public class PageBuilder  {
 		}
 		String m = 	(fixNum(mo)+"."+fixNum(day) + "."+ fixNum(hr) + "."+ fixNum(min) + "."+fixNum(sec));
 		out(m);
-		String fn = new String(fileBase+"MultiVideo."+m+tag+".htm");
+		// if we're interacting with the http server, instead of just a local web
+		// page, the file needs to be of type "php" so the code will function 
+		// correctly.
+		String suffix = new String(".htm");
+		if ( bg_.isUseHttpServer()) {
+			suffix = new String(".php");
+		}
+		String fn = new String(fileBase+"MultiVideo."+m+tag+suffix);
 		out ("new filename: "+fn);
 		bg_.setBatFile(fn);
 	    return fn;
@@ -314,7 +321,9 @@ public class PageBuilder  {
 		// for the background files has been specified
 		StringBuffer scrpt = new StringBuffer("");
 		if ( bg_.getBackGroundDirectory().length() > 0) {
-			scrpt = new StringBuffer
+			BackgroundRandomizer bgr = new BackgroundRandomizer();
+			scrpt = bgr.buildRandomizerLogic(bg_);
+			/*scrpt = new StringBuffer
 					(
 					"\n<script type=\"text/javascript\"> \n"+
 					"		function getsec() {\n"+
@@ -341,6 +350,9 @@ public class PageBuilder  {
 			 scrpt.append(
 					//"  }, 7000); \n"+
 					" ); } \n");
+			 */
+			 
+			 
 			 // now add the functions for multi-VLC entries
 			 scrpt.append("// ------------------------------utility function--------------- \n" +
 			 "function getVLC(str) { \n" +
@@ -371,6 +383,14 @@ public class PageBuilder  {
 			 "  } \n" +
 			 "</script> \n"
 			);
+			 // if we're going to run thru a local web server, can use php to make a random selection
+			 // from any image-containing directory, not just one that has "img1.jpg", "img2.jpg", etc...
+			 if (isUseHttpServer()) {
+				 MakeBackgroundSelectPhp mbsp = new MakeBackgroundSelectPhp();
+				 String php = mbsp.getThePhpCode(bg_.getBackGroundDirectory(), bg_.getBackGroundDirectoryAlias());
+				 scrpt.append(php);
+			 }
+			 
 		}
 		
 		String s1= new String( "\n</head>\n<body onload=\"backSet();\" ");
@@ -441,10 +461,10 @@ public class PageBuilder  {
 	    Integer x = 500;
 	    Integer y = 375;
 		
-		p.out("header: " + p.head());
-		p.out("\nvidStart: "+p.vidStart(false,x,y));
-		p.out("\nvidEnd  : "+p.vidEnd(false));
-		p.out("\nPageEnd:  "+p.pageEnd());
+		p.out("header: "     + p.head());
+		p.out("\nvidStart: " + p.vidStart(false,x,y));
+		p.out("\nvidEnd  : " + p.vidEnd(false));
+		p.out("\nPageEnd:  " + p.pageEnd());
 	}
 	public Integer getX() {
 		return x_;
@@ -458,4 +478,8 @@ public class PageBuilder  {
 	public void setY(Integer y_) {
 		this.y_ = y_;
 	}
+	public boolean isUseHttpServer() {
+		return useHttpServer;
+	}
+	
 }
