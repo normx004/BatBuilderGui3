@@ -174,6 +174,9 @@ public class CssGenerator {
 		Prototype goal output:
 			<style>
 		 		body {
+		 		        // NOTE: if runniing on server, leave this background image
+		 		        // blank; we'll handle it with javascript later in the process
+		 		        //
 		 				background-image: url("file:///c:/temp/v28.jpg");
 		 				background-attachment: fixed;
 		 				background-repeat: no-repeat;
@@ -185,9 +188,8 @@ public class CssGenerator {
 		 	
 				String type  = System.getProperty("BrowserBackgroundType");
 				String bgimg = System.getProperty("BrowserBackgroundImage");
-				if (bg_.isUseHttpServer()) {
-					bgimg = System.getProperty("BrowserBackgroundImageAlias");
-				}
+				
+			
 				String t     = new String ("<style>\n  body { \n");
 				String rtn   = new String("");
 				if (type == null) {
@@ -211,16 +213,27 @@ public class CssGenerator {
 					    
 					}
 				}
-				rtn = new String(t+" background-image: url(\"file:///"+bgimg+"\");\n");
-				if (bg_.getBackGroundDirectory().length() > 0) {
-				    if ( bgimg != null) {
-				        rtn = new String(t+" background-image: url(\"file:///"+bgimg+"\");");
-				    } else {
-				        // start black, then get image backgrounds...
-				        rtn = new String(t+" bgcolor=\"black\" >");
-				    }   
-				   
-			     }
+				if (!bg_.isUseHttpServer()) {
+					out("backgrou image will be "+bgimg);
+					String prefix = new String("\file:///");
+					
+					out("Prefix will be "+prefix);
+					 rtn = new String(t+" background-image: url(\"" + prefix + bgimg+"\");\n");
+					if (bg_.getBackGroundDirectory().length() > 0) {
+						if ( bgimg != null) {
+							rtn = new String(t+rtn);
+						} else {
+							// start black, then get image backgrounds...
+							rtn = new String(t+" bgcolor=\"black\" >");
+						}   
+						out("background diretive will be "+rtn);
+					}
+				} else {
+					rtn = t;
+				}
+			
+				
+				
 				String rtnPlus = new String(
 						"\n    background-position: center;\n"+
 			    		"     background-attachment: fixed;\n" +

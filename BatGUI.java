@@ -219,10 +219,14 @@ public class BatGUI {
 		     String bgfil=System.getProperty("bgimgFile");
 		    
 		     String imgFileName = bgdir + "\\" + bgfil;
+		     out("BatGUI screen imgFileName is "+imgFileName+", bgdir is "+bgdir+", bfil is "+bgfil);
 		     File bgImage = new File(imgFileName);
 		     
 		     if (bgImage.exists()) {
+		    	 out("BatGUI screen bg image file exists");
 		    	 ic = new ImageIcon(imgFileName);
+		     } else {
+		    	 out("NO SUCH bgimg");
 		     }
 		     
 		     frame = new BackgroundImageJFrame(ic);

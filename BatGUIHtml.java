@@ -213,27 +213,28 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     	File foil = new File(fileBase + "\\"+nam);
     	out("Result is: "+foil.getPath());
     	out("Bat file (really, the html) is "+fyle.getPath());
+    	String shorty = fyle.getPath();
     	
-    	out("\nConstructing RunCmdFor83");
-    	RunCmdFor83 rc83 = new RunCmdFor83();
-    	out("Calllllling RunCmdFor83");
-    	String shorty = rc83.xlateTo83(fyle.getPath());
-    	out("DONE with RunCmdFor83\n");
+    	if (! this.isUseHttpServer()) {
+    		out("\nConstructing RunCmdFor83");
+    		RunCmdFor83 rc83 = new RunCmdFor83();
+    		out("Calllllling RunCmdFor83");
+    		shorty = rc83.xlateTo83(fyle.getPath());
+    		out("DONE with RunCmdFor83\n");
+    		String shirty = shorty.replace("\\", "/");
+    		out("===after replaceall: "+shirty);
+    		shorty = shirty;
+    	}
     	
-    	if (this.isUseHttpServer()) {
-    		out("Shorty ("+shorty+") to be translated for http server");
-    		int col = shorty.indexOf(':');
-    		out("Index of colon is: "+col);
+        if ( this.isUseHttpServer()) {
+    		shorty = fyle.getName();
     		StringBuffer s = new StringBuffer("http://localhost/");
     		String shirty = shorty.replace("\\", "/");
     		out("===after replaceall: "+shirty);
-    		s.append(shorty.substring(0, col));
-    		out("Ok, got the drive letter: "+s.toString());
-    		s.append(shirty.substring(col+1));
-    		
-    		out("Finally, replaced the backslashes: "+s);
+    		s.append(shirty);
     		shorty = s.toString();
-    	}
+        }
+   
     	
     	StringBuffer cmd = new StringBuffer("");
     	// default test browser to opera, but allow an alternate from the properties

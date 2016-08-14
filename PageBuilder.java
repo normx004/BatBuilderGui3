@@ -241,6 +241,11 @@ public class PageBuilder  {
 		String bar = new String("----------------------------------------------------");
 	
 		String fileBase = System.getProperty("filebase");
+		if (bg_.isUseHttpServer()) {
+			String qhtdocs = new String("q:\\Apache24\\htdocs\\");
+			System.setProperty("filebase", qhtdocs);
+			fileBase = qhtdocs;
+		}
 		out ("htm file base is "+fileBase);
 		Calendar now = Calendar.getInstance();
 		int day = now.get(Calendar.DAY_OF_MONTH);
@@ -305,6 +310,7 @@ public class PageBuilder  {
 	  }
 	
 	public String head () {
+		out ("##################pagebuilder head##############");
 		String s=null;
 		s=new String("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \n     \" "+
 		"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\"><html xmlns=\" "+
@@ -389,11 +395,40 @@ public class PageBuilder  {
 				 MakeBackgroundSelectPhp mbsp = new MakeBackgroundSelectPhp();
 				 String php = mbsp.getThePhpCode(bg_.getBackGroundDirectory(), bg_.getBackGroundDirectoryAlias());
 				 scrpt.append(php);
+				 
+				 String theInitialBackground = new String(
+						 "<script type=\"text/javascript\"> \n"+
+						 " function setBack(){  \n"+
+						 "  	var bodxx = document.getElementsByTagName('body')[0];\n"+
+						 "      var imgString = \"url(" +
+						 
+							System.getProperty("BrowserBackgroundImageAlias")+
+						 
+						 
+						 ")\";\n"+
+						 "   	 console.log(\"script version \" + imgString);\n"+
+						 "   	bodxx.style.background=imgString; \n"+
+						 "   	}\n"+
+						 "</script>\n"+
+						 
+						"<script>\n"+
+						"function start() {\n"+
+						"  setBack();\n"+
+						"  backSet();\n"+
+						"}\n"+
+						"</script>\n"
+						 );
+				 
+				 scrpt.append(theInitialBackground);
 			 }
 			 
 		}
-		
-		String s1= new String( "\n</head>\n<body onload=\"backSet();\" ");
+		String s1 = null;
+		if (bg_.isUseHttpServer()) {
+		    s1= new String( "\n</head>\n<body onload=\"start();\" ");
+		} else {
+			s1= new String( "\n</head>\n<body onload=\"backSet();\" ");
+		}
 		
 		String temp = s+css+scrpt+s1;
 		s = temp;
