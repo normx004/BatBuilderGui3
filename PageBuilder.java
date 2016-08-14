@@ -205,6 +205,11 @@ public class PageBuilder  {
 			isMp4 = true;
 		}
 		
+		// seems like plain mp4 is giving firefox hiccups, so...
+		if (bg_.isUseHttpServer()) {
+			isMp4 = false;
+		}
+		
 		StringBuffer rtn = new StringBuffer("");
 		String start = this.vidStart(isMp4,this.getX(), this.getY());
 		rtn.append(start);
