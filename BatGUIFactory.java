@@ -6,6 +6,9 @@ public class BatGUIFactory {
 		// TODO Auto-generated constructor stub
 	}
     public BatGUI getBatGUI(String[] args) {
+    	// args:
+    	//    1: props file
+    	//    2: 'slicer' for cutting videos, or 'html' for building web pages to watch them
     	//if type is slicer, get an xspf file generator gui
     	//if type is html,   get a  page generator gui
     	String type = args[1];

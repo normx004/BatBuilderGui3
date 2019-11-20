@@ -25,10 +25,11 @@ public class PageBuilder  {
 	@SuppressWarnings("deprecation")
 	//----------------GENERATE PAGE------------------------------
 	public String generatePage(){
+		out("PageBuilder: generatePage()");
 		StringBuffer page = new StringBuffer("");
 		// head() gets the page header including the HTML type and css pointers 
 		// 
-		page.append(this.head());
+		page.append(this.head(vfp.length));
 		// error msg just in case
 		String status = new String("not enough files specified!");
 		File filez[] = new File[vfp.length];
@@ -87,7 +88,9 @@ public class PageBuilder  {
 					}
 					// here's where we actually build the <video ... /video> entries
 					String vEntry = null;
+					out("checking multifile for lenght=2 or 4");
 					if ( multiFile) {
+						out("         ----yes, multifile");
 						vEntry = this.makeMultiVideoEntry(q, j);
 					} else {
 						vEntry = this.makeVideoEntry(filez[j]);
@@ -123,7 +126,9 @@ public class PageBuilder  {
 					}
 					
 					String vEntry = null;
+					out("-----checking multifile for 6 or 9");
 					if ( multiFile) {
+						out("         yes, multifile");
 						vEntry = this.makeMultiVideoEntry(q, j);
 					} else {
 						vEntry = this.makeVideoEntry(filez[j]);
@@ -151,25 +156,32 @@ public class PageBuilder  {
 		return status;
 	}
 	
-	// Multi now used for all multis-not just MP4
+	// -------------------------Multi now used for all multis-not just MP4----------------------------------------
 	protected String makeMultiVideoEntry(LinkedList <File> q, int vidNum) {
+		out("^^^^^^^^^entered make multi video entry^^^^^^^^^^^^^^^");
 		
-		// OK, now we know if we need to use the "embed vlc" code, or can just go with
-		// plain html5 "video" tags...
 		StringBuffer v = new StringBuffer("");
+	
 		v.append( // do i need width/height here? YES!
-				"<embed  type=\"application/x-vlc-plugin\"     pluginspage=\"http://www.videolan.org\" \n"+
+				"<Video id=" +
+				"\"myVideo" +  vidNum + "\"" + 
 				" width=\"" + this.getX().toString() + "\" height=\"" + this.getY().toString() + "\" \n" +
-				"version=\"VideoLAN.VLCPlugin.2\" id=\"vlcplayer" + vidNum + 
-				"\" autoPlay=\"true\" autoloop=\"true\" ></embed>\n"+ 	
-			    "</div>\n"+
-			 	"<script>\n");
+				" autoPlay autoloop >\n" + 	
+			    "</Video>\n</div>\n" 
+			 	);
+		
+		/* like this:
+		 *  <Video id="myVideo1" width="900" height="500" 
+ 		*	autoPlay autoloop >
+		*	</Video>
+		*	</div>
+		 */
+		
 		String func = new String(		
-				"var vidsrc" + vidNum + " = new Array();\n");
+				"<script>\n var vidsrc" + vidNum + " = new Array();\n");
 		v.append(func);
 		
-		// OK, now we know if we need to use the "embed vlc" code, or can just go with
-		// plain html5 "video" tags...
+		//clean up the filepaths - use fwd slash, for one thing...
 		int idx = 0;
 		while (idx < q.size()) {
 				v.append("vidsrc" + vidNum + "["+idx+"]='");
@@ -178,27 +190,46 @@ public class PageBuilder  {
 				// path comes from the "drop" with windows separators...
 				// gotta change to unix-style for the browser
 				path = path.replaceAll("\\\\", "/");
-				v.append("file:///" + path);
-				v.append("';\n");
+				out("MakeMulti-vidoeentryfile path is "+path);
+				int vidx = path.indexOf ("/vids");
+				out("MakeMulti-videoentryfile index of 'vids' is "+vidx);
+				if (vidx > 0) {
+				    path = path.substring(vidx);
+				    out("MakeMulti-videoentryfile path after substring is "+path);
+				}
+				
+				v.append(path + "';\n");
 				idx += 1;
 		 }
 		
 		// here goes var H3 = new make the handler etc
-		String vfnc = new String ("var H" + vidNum +" = new makeTheMultiHandlerObject('vlcplayer"+
-		                           vidNum+"', vidsrc"+vidNum+", 0);\n");
-		v.append(vfnc);
+		///String vfnc = new String ("var H" + vidNum +" = new makeTheMultiHandlerObject('vlcplayer"+
+		//                           vidNum+"', vidsrc"+vidNum+", 0);\n");
+		//v.append(vfnc);
+		                           
+		                           
 		// followed by document.getElement...
-	    //v.append("videoPlay(\"myVideo" + vidNum +"\", vidsrc" +  vidNum +", 0);\n");
-		//v.append("document.getElementById('myVideo"+vidNum+
-		//		 "').addEventListener('ended', function() { H"+vidNum+
-		//		 ".show();}, false);\n");
+	    v.append("videoPlay(0, vidsrc" +  vidNum + ", \"myVideo" + vidNum +"\");\n");
+	    
+		v.append("document.getElementById(\'myVideo" + vidNum +
+				 "\').addEventListener('ended', function() { myHandler" + vidNum + "(\'" +
+				 "myVideo" + vidNum + "\', vidsrc" + vidNum + ")}, false);\n");
+		
 		v.append("</script>\n");
+		out("\n---------------make multi video entry returned:");
+		out (v.toString());
+		out("\n\n");
 		return v.toString();
 	}
 	protected String makeVideoEntry(File fy) {
 		String path   = new String(fy.getPath());
 		int rindex    = path.lastIndexOf(".");
 		String type   = path.substring(rindex, path.length());
+		
+		
+		// want to go with straight html5 which no longer allows video plugins...so...
+		// everything must be mp4 or webM
+		/*
 		boolean isMp4 = false;
 		if (type.compareToIgnoreCase(".mp4")==0) {
 			out ("MP4!!! Path: " + path);
@@ -209,13 +240,26 @@ public class PageBuilder  {
 		if (bg_.isUseHttpServer()) {
 			isMp4 = false;
 		}
-		
+		*/
+		boolean    isMp4 = true;
 		StringBuffer rtn = new StringBuffer("");
-		String start = this.vidStart(isMp4,this.getX(), this.getY());
+		String     start = this.vidStart(isMp4,this.getX(), this.getY());
 		rtn.append(start);
 		// path comes from the "drop" with windows separators...
 		// gotta change to unix-style for the browser
+		//
+		//Path will look like Q:\Apache24\htdocs\vids\someDirectory\Somevideo.mp4
+		//  --- needs to look like /vids/someDirectory/Somevideo.mp4
+		
 		path = path.replaceAll("\\\\", "/");
+		out("Makevidoeentryfile path is "+path);
+		int idx = path.indexOf ("/vids");
+		out("Makevideoentryfile index of 'vids' is "+idx);
+		path = path.substring(idx);
+		out("Makevideoentryfile path after substring is "+path);
+		
+		
+		
 		rtn.append(path);
 		rtn.append(this.vidEnd(isMp4));
 		rtn.append("\n");
@@ -245,14 +289,11 @@ public class PageBuilder  {
 		// we had enough files, so write the page to a file...
 		String bar = new String("----------------------------------------------------");
 	
-		String fileBase = System.getProperty("filebase");
-		if (bg_.isUseHttpServer()) {
-			String qhtdocs = new String("q:\\Apache24\\htdocs\\");
-			System.setProperty("filebase", qhtdocs);
-			fileBase = qhtdocs;
-		}
+		String fileBase = bg_.getFileBase();
+		
 		out ("htm file base is "+fileBase);
 		Calendar now = Calendar.getInstance();
+		int yr = now.get(Calendar.YEAR);
 		int day = now.get(Calendar.DAY_OF_MONTH);
 		int mo = now.get(Calendar.MONTH)+1;
 		int hr = now.get(Calendar.HOUR);
@@ -277,7 +318,7 @@ public class PageBuilder  {
 				}
 			}
 		}
-		String m = 	(fixNum(mo)+"."+fixNum(day) + "."+ fixNum(hr) + "."+ fixNum(min) + "."+fixNum(sec));
+		String m = 	(fixNum(yr) + "." + fixNum(mo)+"."+fixNum(day) + "."+ fixNum(hr) + "."+ fixNum(min) + "."+fixNum(sec));
 		out(m);
 		// if we're interacting with the http server, instead of just a local web
 		// page, the file needs to be of type "php" so the code will function 
@@ -314,17 +355,21 @@ public class PageBuilder  {
 	  	  }
 	  }
 	
-	public String head () {
+    /*PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \n     \" "+
+		"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\"><html xmlns=\" "+
+		"http://www.w3.org/1999/xhtml\" xml:lang=\"en\"
+		*/    
+    
+	public String head (int numSubWin) {
+
 		out ("##################pagebuilder head##############");
 		String s=null;
-		s=new String("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \n     \" "+
-		"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\"><html xmlns=\" "+
-		"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\n"+
+		s=new String("<!DOCTYPE HTML >\n"+
 		"<head> \n "+
 		"<meta http-equiv=\"content-type\" content=\"text/html; "+
 		"charset=iso-8859-15\" />  <meta http-equiv=\"content-language\" "+
 		"content=\"en\" /> \n "+
-		"<title>VLC Plugin Demo</title>");
+		"<title>Multi-Video Demo</title>");
 				
 		String css = getCss(new String (""), this.getImgCount());
 
@@ -332,6 +377,7 @@ public class PageBuilder  {
 		// for the background files has been specified
 		StringBuffer scrpt = new StringBuffer("");
 		if ( bg_.getBackGroundDirectory().length() > 0) {
+			out("Setting up BackGrounDirectory randomizer");
 			BackgroundRandomizer bgr = new BackgroundRandomizer();
 			scrpt = bgr.buildRandomizerLogic(bg_);
 			/*scrpt = new StringBuffer
@@ -362,41 +408,57 @@ public class PageBuilder  {
 					//"  }, 7000); \n"+
 					" ); } \n");
 			 */
-			 
+			}
 			 
 			 // now add the functions for multi-VLC entries
-			 scrpt.append("// ------------------------------utility function--------------- \n" +
-			 "function getVLC(str) { \n" +
-			 "	var yy = document.getElementById(str); \n" +
-			 "	return yy; \n" +
-			 " } \n" +
-			 "  \n" +
-			 " //-------------------------MAKE THE HANDLER OBJECT-------------------- \n" +
-			 " 	  function makeTheMultiHandlerObject ( el, vid, ix) { \n" +
-			 " 	  //console.log(\"entered make the handler ovject for \" + el); \n" +
-			 "  	this.elName = el; \n" +
-			 "  	this.vidZ = vid; \n" +
-			 "  	this.idx = ix; \n" +
-			 "  	var iz = 0; \n" +
-			 "  	var vlc = getVLC(el); \n" +
-			 "  	if (vlc === 'undefined') { \n" +
-			 "  		 console.log(\"OOOPS in makeTheHandlerObject, couldn't find VLC\"); \n" +
-			 "  	} \n" +
-			 "  	while (iz < vid.length) { \n" +
-			 "  		//console.log(\"Adding to playlist: ( \" + el + \") \" + vid[iz]); \n" +
-			 "  		vlc.playlist.add(vid[iz]); \n" +
-			 "  		var plen = vlc.playlist.items.count; \n" +
-			 "  		//console.log(\"vlc.playlist.items.count: ( \" + el + \") \" + \" is now \" + plen); \n" +
-			 "  		iz += 1; \n" +
-			 "  	} \n" + 
-			 "  	// this plays the playlist once...\"autoloop\" in the embed tag makes it loop \n" +
-			 "  	vlc.playlist.play(); \n" +
-			 "  } \n" +
-			 "</script> \n"
-			);
+			// scrpt.append("<script>\n// ------------------------------utility function--------------- \n" +	
+		    int vLoopIdx = 0;
+		    
+		    while (vLoopIdx < numSubWin) {
+			scrpt.append("\n// ------------------------------utility function--------------- \n" +	
+			 "function myHandler" + vLoopIdx + "(elName, videoArray) {\n" +
+			 "if (typeof i"+vLoopIdx+" === 'undefined'){                                         \n" + 
+			 "		i"+vLoopIdx+" = 1;                                                           \n" +
+			 "	} else {                                                             \n " +
+			 "		i"+vLoopIdx+" += 1;                                                         \n " +
+			 "	}                                                                    \n " +
+			 "	if ( i"+vLoopIdx+" === videoArray.length) {                                      \n " +
+			 "		i"+vLoopIdx+" = 0;                                                          \n " +
+			 "	}                                                                     \n" +
+			 "	videoPlay(i"+vLoopIdx+", videoArray, elName);                                    \n " +
+			 "	}                                                                    \n " +
+			 " \n") ;//+
+		    
+			// "</script> \n" 
+			
+			 scrpt.append("	  function videoPlay ( videoNum, videoSource, el) { \n");
+			 scrpt.append(
+			 "	//-- create a play function that will get a page segment, set its 'videoPlay' target to the first array element-->:\n" +
+			 "	//-- Note: the setAttribute should be in a function maybe with arguments of page segment and video-array-first-element-->\n" +
+			 "	document.getElementById(el).setAttribute(\"src\",videoSource[videoNum]);\n" +
+			 "	document.getElementById(el).load();\n" +
+			 "	document.getElementById(el).play();\n" +
+		     "}");
+			 vLoopIdx += 1;
+		    } // end of "vloop" to make individual handlers for each subwindow
+			
+			 
+		     scrpt.append( "\n</script>\n"); 
+			 
+			 
+			 // I THINK THIS SECTION HAS TO BE REPEATED FOR EACH ARRAY, with the APPROPRIATE NAMING 
+			 // no-should go right after setting up the array of video file names
+			 //scrpt.append(
+			 //" <!-- add an event listenter that, at the end of a video in the array, will bump the array -->\n" +
+			 //" <!-- counter, and play the video that the array counter points to (back to the first if at end -->\n" +
+			 //"document.getElementById('<the tag for this array>').addEventListener('ended', function() { \n" +
+			 //"       myHandler('<the tag for this array>', <arrayJustDefined>)}, false);\n"
+			 //);
+			 
 			 // if we're going to run thru a local web server, can use php to make a random selection
 			 // from any image-containing directory, not just one that has "img1.jpg", "img2.jpg", etc...
 			 if (isUseHttpServer()) {
+				 out("......IsUseHTTPServer for backgrounds.........");
 				 MakeBackgroundSelectPhp mbsp = new MakeBackgroundSelectPhp();
 				 String php = mbsp.getThePhpCode(bg_.getBackGroundDirectory(), bg_.getBackGroundDirectoryAlias());
 				 scrpt.append(php);
@@ -426,13 +488,13 @@ public class PageBuilder  {
 				 
 				 scrpt.append(theInitialBackground);
 			 }
-			 
-		}
+			
+		
 		String s1 = null;
 		if (bg_.isUseHttpServer()) {
-		    s1= new String( "\n</head>\n<body onload=\"start();\" ");
+		    s1= new String( "\n</script></head>\n<body onload=\"start();\" ");
 		} else {
-			s1= new String( "\n</head>\n<body onload=\"backSet();\" ");
+			s1= new String( "\n</script></head>\n<body onload=\"backSet();\" ");
 		}
 		
 		String temp = s+css+scrpt+s1;
@@ -450,39 +512,27 @@ public class PageBuilder  {
 	//	String rtn = new String(
 	//			s + x.toString() + s1 + y.toString() + s2);
 	
-		//String rtn  = new String(" <Video  autoplay loop>	<source src=\"file:///");
+	//String rtn  = new String(" <Video  autoplay loop>	<source src=\"file:///");
 	//	return rtn;
 	//}\
 	
 
 	public String vidStart (boolean isMp4, Integer x, Integer y) {
 		String rtn = new String("");
-		if ( isMp4) {
-		    rtn  = new String(" <Video  autoplay loop>	<source src=\"file:///");
+	
+		    //rtn  = new String(" <Video  autoplay autoloop>	<source src=\"file:///");
+		    rtn  = new String(" <Video  autoplay loop>	<source src=\"");
 		    return rtn;
-		}
-		// not mp4, so use vlc plugin
-		String embed1 = new String (
-			"<embed type=\"application/x-vlc-plugin\"  ");
-		String embed2 = new String(
-			" pluginspage=\"http://www.videolan.org\"  "+
-			" version=\"VideoLAN.VLCPlugin.2\" id=\"vlcplayer\" "+
-		    " loop=\"true\" "+
-		    " autoPlay=\"true\" autoLoop=\"true\" "+
-		    " target=\"file:///");
-		String embed1a = new String(" width=\"" + x.toString() + "\" height=\"" + y.toString()+" ");
-		return embed1+embed1a+embed2;
+	
 	}
 	public String vidEnd(boolean isMp4) {
 		String rtn= new String("");
-		if (isMp4) {
+	
 		  rtn = new String("\"	type='video/mp4;codecs=\"avc1.42E01E, mp4a.40.2\"'>  "+
 		  "\n             <h3> Your browser does not support html5 video! </h3> </Video>\n</div>");
 		  return rtn;
-		}
-		// not mp4, so use vlc plugin
-		rtn = new String("\"\n</embed>\n</div>\n");
-		return rtn;
+		
+		
 	}
 	public String pageEnd() {
 		String s = null;
@@ -501,7 +551,7 @@ public class PageBuilder  {
 	    Integer x = 500;
 	    Integer y = 375;
 		
-		p.out("header: "     + p.head());
+		p.out("header: "     + p.head(4));
 		p.out("\nvidStart: " + p.vidStart(false,x,y));
 		p.out("\nvidEnd  : " + p.vidEnd(false));
 		p.out("\nPageEnd:  " + p.pageEnd());

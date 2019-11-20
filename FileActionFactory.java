@@ -55,6 +55,7 @@ public class FileActionFactory {
 	// -----what video file shall we use------------------------
 	// this routine used only if building slider xspf file for single-vlc display
 	public JPanel buildFileActionPane() {
+		 out("routine used only if building slider xspf file for single-vlc display");
 		 JPanel videoFilePane = new JPanel();
 		 File lastDir         = getLastDirUsed();
 		 JFileChooser jfc     = new JFileChooser(lastDir);
@@ -78,6 +79,7 @@ public class FileActionFactory {
 	                     evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 	                 for (File file : (java.util.List<File>)droppedFiles) {
 	                     System.out.println("DROPPPED FILE ON THIS BUTTON(Name):"+file.getPath());
+	                     
 	                     batGuiS_.setVideoFile(file);
 	                 }
 	             } catch (Exception ex) {
@@ -114,6 +116,7 @@ public class FileActionFactory {
 	     Action openAction    = new OpenFileAction(vPtr.getJflvfc(), vPtr.getJfc(), vPtr);
 	     JButton openButton   = new JButton(openAction);
 	     
+	     out("setting up a BUTTON!!!!!");
 	     openButton.setText("videofile");
 	     vPtr.getVideoFilePane().add(openButton);
 	     // get WhatVideoFile returns a "JLabel" that is the drop target; text is "---what file?----"
@@ -143,7 +146,18 @@ public class FileActionFactory {
 	                 for (File file : (java.util.List<File>)droppedFiles) {
 	                	 String thePath = file.getPath();
 	                     System.out.println("DROPPPED FILE ON BUTTON(FileName):"+thePath);
-	                     
+	                     int lastDot = file.getPath().lastIndexOf('.');
+	                     String whatzit = file.getPath().substring(lastDot, file.getPath().length());
+	                     out("OK, WHATZIT: "+whatzit);
+	                     if ( whatzit.compareToIgnoreCase(".mp4") == 0 || whatzit.compareToIgnoreCase(".webm") == 0 ) {
+	                    	 out("OK its a file type we can handle");
+	                     } else {
+	                    	 out("No, sorry, that's not an mp4 or a webm");
+	                    	 WarningPop ip = new WarningPop();
+	                    	 ip.infoBox("file not mp4 or webm","illegal file type passed to page builder" );
+	                    	 BadTypeException myEx = new BadTypeException();
+	                    	 throw (myEx);
+	                     };
 	                     
 	                     String finalPath = null;
 	                     try {
@@ -175,12 +189,18 @@ public class FileActionFactory {
 	                   		   out ("in FileActionFactory:dropTarge Setting vid file " + vidFileIdx + " to path "+vfText);
 	                           batGuiH_.getVidFiles()[vidFileIdx].fileQueue.add(new File(vfText));
 	                   		   out ("in FileActionFactory:dropTarge file queue is "+batGuiH_.getVidFiles()[vidFileIdx].fileQueue.size());
-	                           
-	                           
-	                           
-	                           
+	                   		   //here's a thought...how about modifying button to show how many files in this queue!!
 	                           JFrame frame = batGuiH_.getFrame();
 	                           frame.invalidate();
+	                        } else {
+	                        	out ("maybe its a button!!!!");
+	                        	if (component instanceof JButton) {
+	                        		out("IT IS IT IS IT IS a button");
+	                        		JButton butter = ((JButton)(component));
+	                        		String tx = butter.getText();
+	                        		String tx1 = "videoFile" + batGuiH_.getVidFiles()[vidFileIdx].fileQueue.size();
+	                        		butter.setText(tx1);
+	                        	}
 	                        }
 	                     }
 	                 }

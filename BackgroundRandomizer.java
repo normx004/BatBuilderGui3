@@ -15,6 +15,9 @@ public class BackgroundRandomizer {
 		}
 		return s;
 	}
+	private void out(String s) {
+		System.out.println(s);
+	}
 	StringBuffer buildHttpServerLogic(BatGUI bg_) {
 	    StringBuffer scrpt = null;	
 	
@@ -30,11 +33,12 @@ public class BackgroundRandomizer {
 					"           z = Math.floor((Math.random() * filez.length) + 1);}\n"+
 					"       console.log(\"httpRandom: \"+z);\n"+
 					"    	var imgString = \"url(\" + filez[z] + \")\";\n");
-			
+			 
 			 Integer bgImgInt = bg_.getBackgroundImageInterval();
 			 scrpt.append("    	bodx.style.background=imgString; }, ");
 			 scrpt.append(bgImgInt.toString());
 			 scrpt.append(" ); } \n");
+			 out("builgHttpserverLogic: backset script (start):\n                   "+scrpt);
 	         }
 		return scrpt;
 	} // end local page logic

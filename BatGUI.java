@@ -82,7 +82,16 @@ public class BatGUI {
 	     	 }
 	     	
 		 }
-		
+	//--------------variable file base------------------
+	  private String fileBase = null;
+	  public String getFileBase() {
+			fileBase = System.getProperty("filebase");
+			if (this.isUseHttpServer()) {
+				fileBase = System.getProperty("filebaseBrowser");
+			}
+	    	out("Test: parent path is "+fileBase);
+			return fileBase;
+		}
 	//--------------------sleeper------------------------------  
 		public void sleep (int time) {
 		  try {

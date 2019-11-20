@@ -11,7 +11,7 @@ public class MakeArbitraryPanel {
    private void out(String s) { System.out.println(s);}
    public void ackshun(java.awt.event.ActionEvent vent) {
 	   BatGUIHtml bH = (BatGUIHtml)bG;
-	   System.out.println("ackshun event!");
+	   System.out.println("MakeArbitraryButtonPanel: ackshun event!");
 	   System.out.println("cmd: " + vent.getActionCommand());
 	   System.out.println("toS: " + vent.toString());
 	   int textWhere = vent.toString().indexOf("text=");

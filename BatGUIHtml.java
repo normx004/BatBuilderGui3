@@ -54,7 +54,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     	super.init();
     	
     	
-    	String vsn = new String(" 2016-03-27a");
+    	String vsn = new String(" 2018-07-06");
     	String title = new String("HtmlFilms");
     	title = new String(title + " "+vsn);
     	initWindowStart(title);
@@ -67,9 +67,9 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
         buts[4] = new String("9");
         
         //public JPanel getButtons(String borderTitle, String[] labels) {
-        MakeArbitraryPanel mapa      = new MakeArbitraryPanel(this);
-        GenericButtonPanelFactory gb = new GenericButtonPanelFactory(mapa);
-        JPanel butPan = gb.getButtons(new String("How Many To Show in Grid"), buts);
+        MakeArbitraryPanel        mapa   = new MakeArbitraryPanel(this);
+        GenericButtonPanelFactory gb     = new GenericButtonPanelFactory(mapa);
+        JPanel                    butPan = gb.getButtons(new String("How Many To Show in Grid"), buts);
         gb.addAction(butPan);
         JLabel howmany = new JLabel("How Many?");
         howmany.setBackground(Color.BLACK);
@@ -131,12 +131,12 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     		// in "file action factory" the Panel is associated with a drop target
     		// function that will handle the drop for that particular panel by setting
     		// the JLabel text to the new file name.
-    		FileActionFactory faf = new FileActionFactory(this);
-    		NormsJPanel manyFiles      = new NormsJPanel();
+    		FileActionFactory faf            = new FileActionFactory(this);
+    		NormsJPanel       manyFiles      = new NormsJPanel();
     		manyFiles.setPanelNumber(k);
-    		Border myBord = BorderFactory.createRaisedBevelBorder();
+    		Border            myBord         = BorderFactory.createRaisedBevelBorder();
     		manyFiles.setBorder(myBord);
-    		FlowLayout fl         = new FlowLayout();
+    		FlowLayout fl                    = new FlowLayout();
     		manyFiles.setLayout(fl);
     		//int height            = 45 * howMany; // 45 pixels per row
     		int height            = 45 ; // 45 pixels per row
@@ -202,6 +202,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
         this.test();
     }
     // test the page by opening it with opera
+    String fileBase = null;
     public void test() {  // test the page
     	// run the file and see how it looks
     	File fyle = super.getBatFile();
@@ -269,6 +270,9 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
 		this.theScreenElements = theScreenElements;
 	}
 
+	
+
+	
 	
 
 }

@@ -215,7 +215,7 @@ public class CssGenerator {
 				}
 				if (!bg_.isUseHttpServer()) {
 					out("backgrou image will be "+bgimg);
-					String prefix = new String("\file:///");
+					String prefix = new String("file:///");
 					
 					out("Prefix will be "+prefix);
 					 rtn = new String(t+" background-image: url(\"" + prefix + bgimg+"\");\n");
