@@ -17,16 +17,17 @@ import java.util.*;
 // row in the builder screen, and to contain the 'dropped' file info
 public class VideoFilePointer {
     private     NormsJPanel            videoFilePane = null;
-    private     int                    index = 0;
-    private     JFileChooser           jfc = null;
-    private     JFrame                 jflvfc = null;
-    private     File                   videoFile = null;
-    protected   LinkedList<File>       fileQueue = new LinkedList<File>();
+    private     int                    index         = 0;
+    private     JFileChooser           jfc           = null;
+    private     JFrame                 jflvfc        = null;
+    private     File                   videoFile     = null;
+    protected   LinkedList<File>       fileQueue     = new LinkedList<File>();
     private     JLabel                 whatVideoFileLabel = new JLabel ("----------------------------------------------------------------what file?--------------------------------------------------------------------------------");
-	
+	private     BatGUI                 bg_ = null;
     
-    public VideoFilePointer() {
+    public VideoFilePointer(BatGUI bg) {
 		// TODO Auto-generated constructor stub
+    	bg_  = bg;
 	}
  	public JLabel getWhatVideoFileLabel() {
 		return whatVideoFileLabel;
@@ -35,7 +36,10 @@ public class VideoFilePointer {
 		String  vfText = whatVideoFile.getText();
 		out ("in VideoFilePointer:setWhatVideoFile Setting vide file for path "+vfText);
 		this.whatVideoFileLabel = whatVideoFile;
-		this.fileQueue.add(new File(vfText));
+		File newvf = new File(vfText);
+		File lastDir = newvf.getParentFile();
+		bg_.setLastDirectory(lastDir);
+		this.fileQueue.add(newvf);
 		out ("in VideoFilePointer:setWhatVideoFile file queue is "+this.fileQueue.size());
 	}
 	public NormsJPanel getVideoFilePane() {

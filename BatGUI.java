@@ -22,10 +22,19 @@ public class BatGUI {
 	 protected JFileChooser videoFileChooser_ = null;
 	 public    void         setVideoFileChooser(JFileChooser j) { videoFileChooser_ = j;}
 	 public    JFileChooser getVideoFileChooser() { return videoFileChooser_;}
-	 protected String backGroundDirectory = null;
-	 protected String  backGroundDirectoryAlias = null;
-	 protected Integer backgroundImageInterval = 5000; // 5 sec default...
-	 protected boolean useHttpServer = false;
+	 protected String       backGroundDirectory = null;
+	 protected String       backGroundDirectoryAlias = null;
+	 protected Integer      backgroundImageInterval = 5000; // 5 sec default...
+	 protected boolean      useHttpServer = false;
+	
+	
+	File      lastDirectory = null;
+		public File getLastDirectory() {
+			return lastDirectory;
+		}
+		public void setLastDirectory(File lastDir) {
+			this.lastDirectory = lastDirectory;
+		}
 	   
 	 protected static boolean DEBUG = false;
 	   
@@ -67,9 +76,6 @@ public class BatGUI {
 	         }
 	         out ("Found background alias directory in props: "+backGroundsAlias);
 	         setBackGroundDirectoryAlias(backGroundsAlias);
-	         
-	         
-	         
 	         
 	         String bgInt = System.getProperty("BackgroundImageInterval");
 	         if (bgInt != null) {
@@ -227,7 +233,7 @@ public class BatGUI {
 		     String bgdir=System.getProperty("bgimgDir");
 		     String bgfil=System.getProperty("bgimgFile");
 		    
-		     String imgFileName = bgdir + "\\" + bgfil;
+		     String imgFileName = bgdir + File.separator + bgfil;
 		     out("BatGUI screen imgFileName is "+imgFileName+", bgdir is "+bgdir+", bfil is "+bgfil);
 		     File bgImage = new File(imgFileName);
 		     
@@ -316,8 +322,8 @@ public class BatGUI {
 		  
 		  System.out.println("java -jar <the jar> <propsfilepath> <slicer|html>");
 		
-		  BatGUIFactory f = new BatGUIFactory();
-		  BatGUI sc = f.getBatGUI(args);
+		  BatGUIFactory f  = new BatGUIFactory();
+		  BatGUI        sc = f.getBatGUI(args);
 		  sc.init();
 		  sc.getProps(args[0]);
 		  sc.sleep(10000);

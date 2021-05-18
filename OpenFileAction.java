@@ -11,9 +11,9 @@ import javax.swing.JFrame;
 
     // This action creates and shows a modal open-file dialog.
     public class OpenFileAction extends AbstractAction {
-        JFrame frame;
-        JFileChooser chooser;
-        BatGUI bg_ = null;
+        JFrame           frame = null;
+        JFileChooser     chooser = null;
+        BatGUI           bg_ = null;
         VideoFilePointer vfp = null;
     
         OpenFileAction(JFrame frame, JFileChooser chooser, BatGUI bg) {
@@ -23,10 +23,11 @@ import javax.swing.JFrame;
             this.chooser = chooser;
             this.frame = frame;
         }
-        OpenFileAction(JFrame frame, JFileChooser chooser, VideoFilePointer vp) {
+        OpenFileAction(JFrame frame, JFileChooser chooser, VideoFilePointer vp, BatGUI bg) {
             super("Open...");
             out("Constructing OpenFileAction with parameter vp = "+vp.toString());
             vfp = vp;
+            bg_=bg;
             this.chooser = chooser;
             this.frame = frame;
         }
@@ -40,7 +41,9 @@ import javax.swing.JFrame;
         	if (vfp == null) { rep = "NULL";} else { rep = vfp.toString();}
         	out("vfp: " + rep);
         	String choosertitle = new String("What is the Target Video File?");
-            chooser.setDialogTitle(choosertitle);	
+            chooser.setDialogTitle(choosertitle);
+            out("OpenFileAction: setting chooser directory to "+bg_.getLastDirectory());
+            chooser.setCurrentDirectory(bg_.getLastDirectory());
             chooser.showOpenDialog(frame);
     
             // Get the selected file
@@ -51,12 +54,14 @@ import javax.swing.JFrame;
             else {
             	out("chosen file: "+ file.getName());
             	out("file path:   "+ file.getPath());
+            	File fyle = file.getParentFile();
+            	bg_.setLastDirectory(fyle);
                 //bg_.setTable((Object)file.getName());
             	if ( bg_ != null ){
-            		bg_.setVideoFile(file);
+            		vfp.setVideoFile(file);
             		try {
                         PrintWriter outr
-                        = new PrintWriter(new BufferedWriter(new FileWriter("q:\\temp\\lastGuiFile")));
+                        = new PrintWriter(new BufferedWriter(new FileWriter("/var/www/html/temp/lastGuiFile")));
                        outr.write(file.getParentFile().toString(),0,(int)file.getParentFile().toString().length());
                        outr.flush();
                        outr.close();
@@ -65,7 +70,10 @@ import javax.swing.JFrame;
                    }
             	} else {
             	  if (vfp != null ) {
+            		out ("openFileAction: vfp is NOT null at line 73");
             		vfp.setVideoFile(file);
+            		File foyle = file.getParentFile();
+                	bg_.setLastDirectory(foyle);
             		vfp.getWhatVideoFileLabel().setText(file.getPath());
             	  }
             	}

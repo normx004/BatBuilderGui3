@@ -8,7 +8,7 @@ public class MyRunner implements Runnable {
 		// TODO Auto-generated constructor stub
 	}
     private void out(String s) {
-    	System.out.println(s);
+    	System.out.println("MyRunner: " +s);
     }
 	@Override
 	public void run() {
@@ -16,8 +16,12 @@ public class MyRunner implements Runnable {
 		try {
 	    	Runtime r = Runtime.getRuntime();
 	    	r.exec(cmd);
+	    	out("no command errors");
 		} catch (IOException ioe) {
 			System.err.println("in MyRunner, runtime exception: " + ioe.getMessage());
+			Thread.dumpStack();
+		} catch (Exception e) {
+			out("Exception: " + e.getMessage());
 			Thread.dumpStack();
 		}
 	}

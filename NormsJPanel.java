@@ -6,6 +6,15 @@ import javax.swing.JPanel;
 
 public class NormsJPanel extends JPanel {
     private     int panelNumber = 0;
+    
+    private     int totalVideoSeconds = 0;
+    public int getTotalVideoSeconds() {
+		return totalVideoSeconds;
+	}
+	public void setTotalVideoSeconds(int totalVideoSeconds) {
+		this.totalVideoSeconds = totalVideoSeconds;
+	}
+
 	public NormsJPanel() {
 		// TODO Auto-generated constructor stub
 	}

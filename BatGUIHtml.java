@@ -32,6 +32,9 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
 	protected JLabel j                    = null;
 	protected VideoFilePointer[] vidFiles = null; 
 	protected int fileCount               = 0;
+	//BatGUI bg_                            = null;
+	//protected String OS = null;
+	
 	
 	
 	ArrayList theScreenElements = new ArrayList();
@@ -143,7 +146,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     		Dimension dim         = new Dimension(800,height);
     		manyFiles.setPreferredSize(dim);
     	
-    		vidFiles[k] = new VideoFilePointer();
+    		vidFiles[k] = new VideoFilePointer(this);
     		vidFiles[k].setIndex(k);
     		faf.buildFileActionPane(vidFiles[k]);
     		manyFiles.add(vidFiles[k].getVideoFilePane());

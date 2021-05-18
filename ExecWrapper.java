@@ -16,7 +16,7 @@ public class ExecWrapper {
 	  private String[] cmdsStart = null;
 	  private Runtime rt_;
 	  private String  os_;
-	  private boolean debug_;
+	  private boolean debug_ = true;
 	  private boolean noStdOut_;
 	  private Properties p_;
 	  
@@ -137,7 +137,7 @@ public class ExecWrapper {
 	        }
 	     else
 	        {
-	         cmdsStart = new String[1];
+	         cmdsStart    = new String[1];
 	         cmdsStart[0] = new String(" ");
 	        }
 
@@ -161,7 +161,7 @@ public class ExecWrapper {
 			    "start",  
 			    "/wait", 
 			    "setup",
-			    "/z\"/sfC:\\temp\\input_file.txt\"", 
+			    "/z\"/C:\\temp\\input_file.txt\"", 
 			    "/s",
 			    "/f2\"C:\\temp\\newlogfile.log\""   
 			};
@@ -465,8 +465,9 @@ public class ExecWrapper {
 	 //-----------------------------------MAIN--------------------
 		  public static void main (String[] args)
 		    {
-		     
-		     ExecWrapper e = new ExecWrapper(args[0]);
+			 System.out.println("first arg is "+args[0]);
+		     //ExecWrapper e = new ExecWrapper(args[0]);
+			 ExecWrapper e = new ExecWrapper(args[0]);
 		     
 		     e.doit(args[0]);
 		    }

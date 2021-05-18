@@ -166,7 +166,7 @@ public class PageBuilder  {
 				"<Video id=" +
 				"\"myVideo" +  vidNum + "\"" + 
 				" width=\"" + this.getX().toString() + "\" height=\"" + this.getY().toString() + "\" \n" +
-				" autoPlay autoloop >\n" + 	
+				" autoPlay autoloop muted>\n" + 	
 			    "</Video>\n</div>\n" 
 			 	);
 		
@@ -255,7 +255,9 @@ public class PageBuilder  {
 		out("Makevidoeentryfile path is "+path);
 		int idx = path.indexOf ("/vids");
 		out("Makevideoentryfile index of 'vids' is "+idx);
-		path = path.substring(idx);
+		if  (idx > -1) {
+			path = path.substring(idx);
+		}
 		out("Makevideoentryfile path after substring is "+path);
 		
 		
@@ -494,7 +496,7 @@ public class PageBuilder  {
 		if (bg_.isUseHttpServer()) {
 		    s1= new String( "\n</script></head>\n<body onload=\"start();\" ");
 		} else {
-			s1= new String( "\n</script></head>\n<body onload=\"backSet();\" ");
+			s1= new String( "\n</script></head>\n<body style=\"background-color:black;\" ");
 		}
 		
 		String temp = s+css+scrpt+s1;
@@ -521,7 +523,7 @@ public class PageBuilder  {
 		String rtn = new String("");
 	
 		    //rtn  = new String(" <Video  autoplay autoloop>	<source src=\"file:///");
-		    rtn  = new String(" <Video  autoplay loop>	<source src=\"");
+		    rtn  = new String(" <Video  autoplay loop muted>	<source src=\"");
 		    return rtn;
 	
 	}
@@ -543,7 +545,9 @@ public class PageBuilder  {
 	public static void main(String[] args) {
 		BatGUI bg = new BatGUI();
 		VideoFilePointer vp[] = new VideoFilePointer[1];
+		
 		PageBuilder p = new PageBuilder(vp,bg);
+		
 		String path = new String("C:\\Users\\norm\\Videos\\Misckellaneous\\FamousDiana\\W\\GNMiddayNews-Apr-18-2014WGNDT-11AM.mpg");
 		p.out("Path before: "+path);
 	    path = path.replaceAll("\\\\", "/");

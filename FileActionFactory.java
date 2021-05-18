@@ -79,7 +79,6 @@ public class FileActionFactory {
 	                     evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 	                 for (File file : (java.util.List<File>)droppedFiles) {
 	                     System.out.println("DROPPPED FILE ON THIS BUTTON(Name):"+file.getPath());
-	                     
 	                     batGuiS_.setVideoFile(file);
 	                 }
 	             } catch (Exception ex) {
@@ -113,12 +112,17 @@ public class FileActionFactory {
 	     vPtr.setJflvfc( new JFrame());
 	     // this adds an 'action' object that is invoked when the button is clicked
 	     // jfl vfc is "jframe with visual file chooser"
-	     Action openAction    = new OpenFileAction(vPtr.getJflvfc(), vPtr.getJfc(), vPtr);
+	     Action openAction    = new OpenFileAction(vPtr.getJflvfc(), vPtr.getJfc(), vPtr, batGuiH_);
 	     JButton openButton   = new JButton(openAction);
 	     
 	     out("setting up a BUTTON!!!!!");
-	     openButton.setText("videofile");
+	     openButton.setText("vfyl");
 	     vPtr.getVideoFilePane().add(openButton);
+	     
+	     out("setting up a text field!!!!!");
+	     JTextField durationInfo   = new JTextField();
+	     durationInfo.setText("0");
+	     vPtr.getVideoFilePane().add(durationInfo);
 	     // get WhatVideoFile returns a "JLabel" that is the drop target; text is "---what file?----"
 	     // or the file path if a file has been chosen for that slot
 	     vPtr.getVideoFilePane().add(vPtr.getWhatVideoFileLabel());
@@ -145,7 +149,9 @@ public class FileActionFactory {
 	                     evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 	                 for (File file : (java.util.List<File>)droppedFiles) {
 	                	 String thePath = file.getPath();
-	                     System.out.println("DROPPPED FILE ON BUTTON(FileName):"+thePath);
+	                	 // save the last-accessed directory for the button area to re-open a chooser in the right directory
+	                	 batGuiH_.setLastDirectory(new File(file.getParent()));             	 
+	                     System.out.println("DROPPED FILE ON BUTTON(FileName):"+thePath);
 	                     int lastDot = file.getPath().lastIndexOf('.');
 	                     String whatzit = file.getPath().substring(lastDot, file.getPath().length());
 	                     out("OK, WHATZIT: "+whatzit);
@@ -175,15 +181,21 @@ public class FileActionFactory {
 	                     
 	                     //got to replace "set video file" with access to the text field in the Jpanel
 	                     Component[] components = jp.getComponents(); 
+	                     int addDuration = 0;
 	                     Component   component  = null; 
-	                     for (int ci = 0; ci < components.length; ci++) 
-	                     { 
-	                        component = components[ci]; 
+	                     for (int ci = 0; ci < components.length; ci++) {
+	                    	component = components[ci];
+	                    	String cn = component.getClass().getName();
+	                        out("Component is a "+cn);
 	                        if (component instanceof JLabel) 
 	                        {   
 	                           //out("YES! its a JLabel");
 	                           JLabel x =  ((JLabel)(component));
 	                           x.setText(thePath);
+	                           FetchVideoDetails fvd = new FetchVideoDetails(thePath);
+	                           addDuration = fvd.times();
+	                           out("FileActionFactory: new file has duration "+addDuration);
+	                          
 	                           
 	                           String  vfText = thePath;
 	                   		   out ("in FileActionFactory:dropTarge Setting vid file " + vidFileIdx + " to path "+vfText);
@@ -203,7 +215,26 @@ public class FileActionFactory {
 	                        	}
 	                        }
 	                     }
-	                 }
+	                     
+	                 // try again but look for the NormsPanel    
+	                 components = jp.getComponents();       
+	                 for (int ci = 0; ci < components.length; ci++) { 
+	                	out ("second time thru, looking for NormsPanel");
+                        component = components[ci]; 
+                        String cn = component.getClass().getName();
+                        out("Component is a "+cn);
+	                    if (component instanceof JTextField) {
+	                           out("aaaaaaaaaaah got one");
+                               JTextField jtf = (JTextField)component;
+                      		   Integer currentSeconds = Integer.parseInt(jtf.getText());
+                      		   out("FileActionFactory: old duration was "+ currentSeconds.intValue());
+                      		   int newVal = currentSeconds.intValue() + addDuration;
+                      		   jtf.setText(Integer.toString(newVal));
+                      	      }
+                            }
+	                    
+	                 
+	               }
 	             } catch (Exception ex) {
 	                 ex.printStackTrace();
 	             }
