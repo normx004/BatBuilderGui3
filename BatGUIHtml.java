@@ -12,8 +12,9 @@ import javax.swing.JPanel;
 import javax.swing.border.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.JLabel;
+import javax.swing.*;
 
-import javax.swing.AbstractButton;
+import javax.swing.JButton;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -156,9 +157,43 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     		frame.add(manyFiles);
     		addAScreenElementToList(manyFiles);
     	}
+    	// define a new JFrame for this part and format it
+    	// with some kind of table layout...
+    	int j = 0;
+    	GridLayout experimentLayout = new GridLayout(0,2);
+    	JPanel butts = new JPanel(experimentLayout);
+    	butts.setPreferredSize(new Dimension(600, 75));
+    	butts.setMaximumSize(butts.getPreferredSize()); 
+    	butts.setMinimumSize(butts.getPreferredSize());
+    	//example
+    	GridBagConstraints c = new GridBagConstraints();
+    	c.fill = GridBagConstraints.HORIZONTAL;
+    	c.gridheight = 2;
+    	c.gridwidth = howMany;
+    	c.gridx = 0;
+    	c.gridy = 0;
     	
+    	while (j < howMany) {
+    		GridBagConstraints cx = new GridBagConstraints();
+        	cx.fill = GridBagConstraints.HORIZONTAL;
+        	cx.gridheight = 2;
+        	cx.gridwidth = howMany;
+        	
+    		cx.gridy = 0;
+    		cx.gridx = j;
+    		cx.fill = GridBagConstraints.HORIZONTAL;
+    		out("adding " + j + "th openbutton at grid x = " + cx.gridx + ", and y = "+cx.gridy);
+    		JButton jbut = vidFiles[j].getOpenButton();
+    		jbut.setName("vfylbutt");
+    		butts.add(vidFiles[j].getOpenButton(),cx);
+    		c.gridy += 1;
+    		c.fill = GridBagConstraints.HORIZONTAL;
+    		out("adding " + j + "th openbutton at grid x = " + cx.gridx + ", and y = "+cx.gridy);
+    		butts.add(vidFiles[j].getDurationTextField(),cx);
+    		j = j + 1;
+    	}
     	
-    	
+    	frame.add(butts);
     	frame.setVisible(true);
     }
   

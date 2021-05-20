@@ -12,20 +12,40 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import java.util.*;
 // THIS is a DATA CONTAINER for all the stuff needed to display each individual 
 // row in the builder screen, and to contain the 'dropped' file info
+
+//This is a data carrier that is attached to each iteration on a 2-pane, 4-pane or 6-pane
+//screen.  Ideally it will have pointers to all the parts, removing the necessity to search 
+//thru the display objects for textfields, etc
+
 public class VideoFilePointer {
     private     NormsJPanel            videoFilePane = null;
     private     int                    index         = 0;
     private     JFileChooser           jfc           = null;
-    private     JFrame                 jflvfc        = null;
+    private     JFrame                 jfcFrame       = null;
     private     File                   videoFile     = null;
     protected   LinkedList<File>       fileQueue     = new LinkedList<File>();
     private     JLabel                 whatVideoFileLabel = new JLabel ("----------------------------------------------------------------what file?--------------------------------------------------------------------------------");
 	private     BatGUI                 bg_ = null;
+	private     JTextField             durationTextField = null;
+	private     JButton                openButton = null;  //aka the "vfyl" or "videoFile" button. (I think) 
     
-    public VideoFilePointer(BatGUI bg) {
+    public JButton getOpenButton() {
+		return openButton;
+	}
+	public void setOpenButton(JButton openButton) {
+		this.openButton = openButton;
+	}
+	public JTextField getDurationTextField() {
+		return durationTextField;
+	}
+	public void setDurationTextField(JTextField durationTextField) {
+		this.durationTextField = durationTextField;
+	}
+	public VideoFilePointer(BatGUI bg) {
 		// TODO Auto-generated constructor stub
     	bg_  = bg;
 	}
@@ -34,7 +54,7 @@ public class VideoFilePointer {
 	}
 	public void setWhatVideoFileLable(JLabel whatVideoFile) {
 		String  vfText = whatVideoFile.getText();
-		out ("in VideoFilePointer:setWhatVideoFile Setting vide file for path "+vfText);
+		out ("in VideoFilePointer:setWhatVideoFile Setting video file for path "+vfText);
 		this.whatVideoFileLabel = whatVideoFile;
 		File newvf = new File(vfText);
 		File lastDir = newvf.getParentFile();
@@ -54,11 +74,11 @@ public class VideoFilePointer {
 	public void setJfc(JFileChooser jfc) {
 		this.jfc = jfc;
 	}
-	public JFrame getJflvfc() {
-		return jflvfc;
+	public JFrame getJfcFrame() {
+		return jfcFrame;
 	}
-	public void setJflvfc(JFrame jflvfc) {
-		this.jflvfc = jflvfc;
+	public void setJfcFrame(JFrame jflvfc) {
+		this.jfcFrame = jflvfc;
 	}
 	public int getIndex() {
 		return index;

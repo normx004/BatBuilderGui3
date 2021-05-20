@@ -1,14 +1,24 @@
 package batboy;
-
+// This is an extension of a JPanel that contains a few additional data fields
+// that I need to carry with each "getfilebutton - durationTextField - FilenameDropTarget" 
+// item on the main page.
 import java.awt.LayoutManager;
 
 import javax.swing.JPanel;
 
 public class NormsJPanel extends JPanel {
-    private     int panelNumber = 0;
+    private     int              panelNumber = 0;
+    private     int              totalVideoSeconds = 0;
+    private     VideoFilePointer vidFilePtr = null;
     
-    private     int totalVideoSeconds = 0;
-    public int getTotalVideoSeconds() {
+    
+    public VideoFilePointer getVidFilePtr() {
+		return vidFilePtr;
+	}
+	public void setVidFilePtr(VideoFilePointer vidFilePtr) {
+		this.vidFilePtr = vidFilePtr;
+	}
+	public int getTotalVideoSeconds() {
 		return totalVideoSeconds;
 	}
 	public void setTotalVideoSeconds(int totalVideoSeconds) {

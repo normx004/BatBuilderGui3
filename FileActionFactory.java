@@ -14,7 +14,7 @@ public class FileActionFactory {
 	protected BatGUIHtml  batGuiH_ = null;
 	protected BatGUISlicer batGuiS_ = null;
 	
-	private void out(String x) { System.out.println(x);}	
+	private void out(String x) {  System.out.println("FAFactory: " + x);}	
 	
 	FileActionFactory (BatGUIHtml bg) {
 		batGuiH_ = bg;
@@ -103,26 +103,41 @@ public class FileActionFactory {
 		return thePath;
 	}
 	//--------------Build File Action Pane for HTML version-----------------------------
+    //--------------This routine is called once for each row on the main screen
+    //--------------Build File Action Pane for HTML version-----------------------------
 	public  void buildFileActionPane(VideoFilePointer vPtr) {
 		 vPtr.setVideoFilePane(new NormsJPanel());
 		 vPtr.getVideoFilePane().setPanelNumber(vPtr.getIndex());
+		 // now, adding a pointer to the VideoFilePointer for this iteration,
+		 // we have access to all the relevant data once we have the NormsJPanel
+		 vPtr.getVideoFilePane().setVidFilePtr(vPtr);
+		 
 		 out("in buildFAF, vPtr idx = "+vPtr.getIndex());
 	
 		 vPtr.setJfc(new JFileChooser(/*lastDir*/));
-	     vPtr.setJflvfc( new JFrame());
+	     vPtr.setJfcFrame( new JFrame());
 	     // this adds an 'action' object that is invoked when the button is clicked
 	     // jfl vfc is "jframe with visual file chooser"
-	     Action openAction    = new OpenFileAction(vPtr.getJflvfc(), vPtr.getJfc(), vPtr, batGuiH_);
-	     JButton openButton   = new JButton(openAction);
-	     
 	     out("setting up a BUTTON!!!!!");
-	     openButton.setText("vfyl");
-	     vPtr.getVideoFilePane().add(openButton);
+	     Action openAction    = new OpenFileAction(vPtr.getJfcFrame(), vPtr.getJfc(), vPtr, batGuiH_);
+	     JButton openButton   = new JButton(openAction);	    
+	     vPtr.setOpenButton(openButton);
+	     vPtr.getOpenButton().setName("vfylbutt");
+	     vPtr.getOpenButton().setText("vfyl");
+	     //openButton.setText("vfyl");
+	     // maybe here is where we skip adding the 'open' button to the jpanel
+	     // and add it to the mainscreen
+	     //                vPtr.getVideoFilePane().add(openButton);
 	     
 	     out("setting up a text field!!!!!");
 	     JTextField durationInfo   = new JTextField();
-	     durationInfo.setText("0");
-	     vPtr.getVideoFilePane().add(durationInfo);
+	     vPtr.setDurationTextField(durationInfo);
+	     vPtr.getDurationTextField().setText("0");
+	     // maybe here is where we skip adding the 'duration' text to the JPanel 
+	     // and send it to the mainscreen
+	     //                            vPtr.getVideoFilePane().add(durationInfo);
+	     
+	     
 	     // get WhatVideoFile returns a "JLabel" that is the drop target; text is "---what file?----"
 	     // or the file path if a file has been chosen for that slot
 	     vPtr.getVideoFilePane().add(vPtr.getWhatVideoFileLabel());
@@ -135,13 +150,16 @@ public class FileActionFactory {
 	     vPtr.getVideoFilePane().setDropTarget(new DropTarget() {
 	         public synchronized void drop(DropTargetDropEvent evt) {
 	        	 out("vptr.getVideoFilePane line 109 DROP DROP DROP EVENT!!!! "+ evt.toString());
-	        	 DropTargetContext ctx = evt.getDropTargetContext();
-	        	 Component comp        = ctx.getComponent();
-	        	 Class o               = comp.getClass();
-	        	 out("Component is "+o.getCanonicalName());
-	        	 NormsJPanel jp        = (NormsJPanel)comp;
-	        	 int vidFileIdx        = jp.getPanelNumber();
+	        	 DropTargetContext  ctx          = evt.getDropTargetContext();
+	        	 Component          comp         = ctx.getComponent();
+	        	 Class              o            = comp.getClass();
+	        	 NormsJPanel        jp           = (NormsJPanel)comp;
+	        	 int                vidFileIdx   = jp.getPanelNumber();
+	        	 VideoFilePointer   vPtr           = jp.getVidFilePtr();
+	        	 
+	        	 out("Component is "  +  o.getCanonicalName());
 	        	 out("FileActionFactory: dropTarget found vid index is "+vidFileIdx);
+	        	 
 	        	 try {
 	                 evt.acceptDrop(DnDConstants.ACTION_COPY);
 	                 //List<File> droppedFiles = (List<File>)
@@ -171,7 +189,7 @@ public class FileActionFactory {
 	                     } catch (IOException ioe) {
 	                    	 System.err.println("Uh oh, io exception looking at " + thePath);
 	                     } catch (mslinks.ShellLinkException sle) {
-	                    	 System.err.println("ok, looks like " + thePath + " is not a link");
+	                    	 System.out.println("ok, looks like " + thePath + " is not a link");
 	                     }
 	                     
 	                     if (finalPath != null ) {
@@ -186,10 +204,10 @@ public class FileActionFactory {
 	                     for (int ci = 0; ci < components.length; ci++) {
 	                    	component = components[ci];
 	                    	String cn = component.getClass().getName();
-	                        out("Component is a "+cn);
+	                        out("Component " + ci + " is a " + cn);
 	                        if (component instanceof JLabel) 
 	                        {   
-	                           //out("YES! its a JLabel");
+	                           out("YES! its a JLabel");
 	                           JLabel x =  ((JLabel)(component));
 	                           x.setText(thePath);
 	                           FetchVideoDetails fvd = new FetchVideoDetails(thePath);
@@ -205,33 +223,54 @@ public class FileActionFactory {
 	                           JFrame frame = batGuiH_.getFrame();
 	                           frame.invalidate();
 	                        } else {
-	                        	out ("maybe its a button!!!!");
-	                        	if (component instanceof JButton) {
-	                        		out("IT IS IT IS IT IS a button");
-	                        		JButton butter = ((JButton)(component));
-	                        		String tx = butter.getText();
-	                        		String tx1 = "videoFile" + batGuiH_.getVidFiles()[vidFileIdx].fileQueue.size();
-	                        		butter.setText(tx1);
+	                        	if (component instanceof JPanel) {
+	                        		JPanel jpx = (JPanel)component;
+	                        		Component[] xcomponents = jpx.getComponents();
+	                        		out("ok, found the jpanel with the grid of vfyl / duration stuff");
+	                        		
+	                        		 for (int bi = 0; bi < xcomponents.length; bi++) {
+	                        			 
+	                        		 
+	                        			out ("maybe its a button!!!!");
+	    	                        	if (component instanceof JButton) {
+	    	                        		out("IT IS IT IS IT IS a button");
+	    	                        		JButton butter = ((JButton)(component));
+	    	                        		String tx = butter.getText();
+	    	                        		String tx1 = "videoFile " + batGuiH_.getVidFiles()[vidFileIdx].fileQueue.size();
+	    	                        		butter.setName("vfylbutt");
+	    	                        		butter.setText(tx1);
+	    	                        	}
+	                        		} // end loop over componetns in jpanel that holds the grid
 	                        	}
-	                        }
-	                     }
+	                        	
+	                        } 
+	                     } // end loop over page components
 	                     
-	                 // try again but look for the NormsPanel    
-	                 components = jp.getComponents();       
-	                 for (int ci = 0; ci < components.length; ci++) { 
-	                	out ("second time thru, looking for NormsPanel");
-                        component = components[ci]; 
-                        String cn = component.getClass().getName();
-                        out("Component is a "+cn);
-	                    if (component instanceof JTextField) {
-	                           out("aaaaaaaaaaah got one");
-                               JTextField jtf = (JTextField)component;
+	                 // update the duration text field  
+	                 //components = jp.getComponents();       
+	                 //for (int ci = 0; ci < components.length; ci++) { 
+	                	//out ("second time thru, looking for NormsPanel");
+                        //component = components[ci]; 
+                        //String cn = component.getClass().getName();
+                        //out("Component is a "+cn);
+	                   // if (component instanceof JTextField) {
+	                    //       out("aaaaaaaaaaah got one");
+	                     
+                               JTextField jtf = vPtr.getDurationTextField();
                       		   Integer currentSeconds = Integer.parseInt(jtf.getText());
-                      		   out("FileActionFactory: old duration was "+ currentSeconds.intValue());
+                      		   out("old duration was "+ currentSeconds.intValue());
                       		   int newVal = currentSeconds.intValue() + addDuration;
                       		   jtf.setText(Integer.toString(newVal));
-                      	      }
-                            }
+                      		   
+                      		   JButton butter = vPtr.getOpenButton();
+                      		   String tx1 = "videoFile " + batGuiH_.getVidFiles()[vidFileIdx].fileQueue.size();
+                      		   out("New Button Text: "+tx1);
+                      		   
+                     		   butter.setText(tx1);   
+                      		   //vPtr.setOpenButton(butter);
+                      		   
+                      	//      }
+                        //    }
 	                    
 	                 
 	               }
