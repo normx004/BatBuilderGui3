@@ -211,7 +211,7 @@ public class FileActionFactory {
 	                           JLabel x =  ((JLabel)(component));
 	                           x.setText(thePath);
 	                           FetchVideoDetails fvd = new FetchVideoDetails(thePath);
-	                           addDuration = fvd.times();
+	                           addDuration = fvd.getDuration();
 	                           out("FileActionFactory: new file has duration "+addDuration);
 	                          
 	                           
@@ -222,7 +222,7 @@ public class FileActionFactory {
 	                   		   //here's a thought...how about modifying button to show how many files in this queue!!
 	                           JFrame frame = batGuiH_.getFrame();
 	                           frame.invalidate();
-	                        } else {
+	                        } /*else {
 	                        	if (component instanceof JPanel) {
 	                        		JPanel jpx = (JPanel)component;
 	                        		Component[] xcomponents = jpx.getComponents();
@@ -243,7 +243,7 @@ public class FileActionFactory {
 	                        		} // end loop over componetns in jpanel that holds the grid
 	                        	}
 	                        	
-	                        } 
+	                        }*/ 
 	                     } // end loop over page components
 	                     
 	                 // update the duration text field  

@@ -12,6 +12,10 @@ public class PageBuilder  {
     Integer x_=null;
     Integer y_=null;
     
+    int dur[] = null;
+    int low_ = 99999;
+	int high_ = 0;
+    
     boolean useHttpServer = false;
     
 	public PageBuilder(VideoFilePointer[] vp, BatGUI bg) {
@@ -22,11 +26,35 @@ public class PageBuilder  {
 		out("-------xxxx-------useHttpServer is set to "+useHttpServer+" ---------xxxxxxxxxx--------------");
 	}
 	public void out (String s) { System.out.println(s);}
-	@SuppressWarnings("deprecation")
+	//@SuppressWarnings("deprecation")
+	public int[] getDurations(VideoFilePointer vp[]) {
+		int[] dur = new int[vp.length];
+		int k = 0;
+		while (k < vp.length) {
+			String  theNum = vp[k].getDurationTextField().getText();
+			out("got the text field for this vfp: "+theNum);
+			dur[k] = Integer.parseInt(theNum);
+			k += 1;
+		}	
+		return dur;
+	}
 	//----------------GENERATE PAGE------------------------------
 	public String generatePage(){
 		out("PageBuilder: generatePage()");
 		StringBuffer page = new StringBuffer("");
+		int dur[]  = getDurations(vfp);
+		
+		int ix = 0;
+		while (ix < dur.length) {
+			if (dur[ix] < low_) {
+				low_ = dur[ix];
+			}
+			if (dur[ix] > high_) {
+				high_ = dur[ix];
+			}
+			ix += 1;
+		}
+	    out("low duration: "+low_+", high duration: "+high_);
 		// head() gets the page header including the HTML type and css pointers 
 		// 
 		page.append(this.head(vfp.length));
@@ -42,17 +70,17 @@ public class PageBuilder  {
 		// on the page...each window showing a video or a list of videos.
 		out("vfp.length is "+vfp.length);
 		if (vfp.length == 2) {
-			x = new Integer(System.getProperty("Dim2x"));
-			y = new Integer(System.getProperty("Dim2y"));
+			x = Integer.valueOf(System.getProperty("Dim2x"));
+			y =  Integer.valueOf(System.getProperty("Dim2y"));
 		} else if (vfp.length == 4) {
-			x = new Integer(System.getProperty("Dim4x"));
-			y = new Integer(System.getProperty("Dim4y"));
+			x =  Integer.valueOf(System.getProperty("Dim4x"));
+			y =  Integer.valueOf(System.getProperty("Dim4y"));
 		} else if (vfp.length == 6) {
-			x = new Integer(System.getProperty("Dim6x"));
-			y = new Integer(System.getProperty("Dim6y"));	
+			x =  Integer.valueOf(System.getProperty("Dim6x"));
+			y =  Integer.valueOf(System.getProperty("Dim6y"));	
 		} else 	if (vfp.length == 9) {
-			x = new Integer(System.getProperty("Dim9x"));
-			y = new Integer(System.getProperty("Dim9y"));	
+			x =  Integer.valueOf(System.getProperty("Dim9x"));
+			y =  Integer.valueOf(System.getProperty("Dim9y"));	
 		}
 		this.setX(x);
 		this.setY(y);
@@ -371,8 +399,14 @@ public class PageBuilder  {
 		"<meta http-equiv=\"content-type\" content=\"text/html; "+
 		"charset=iso-8859-15\" />  <meta http-equiv=\"content-language\" "+
 		"content=\"en\" /> \n "+
-		"<title>Multi-Video Demo</title>");
-				
+		
+		"<title>Multi-Video " 
+		// here's where we should add the min and max durations of the segments
+		// into the title for subsequent screen captures...(such as Multivideo 3m10s to 4m43s)
+		// old: "Demo</title>");
+		    + " lo: " + low_ 
+		    + " hi: " + high_
+		    +	"</title>");
 		String css = getCss(new String (""), this.getImgCount());
 
 		// add JavaScript to provide variable background...if a directory
