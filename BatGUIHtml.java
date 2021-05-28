@@ -35,9 +35,21 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
 	protected int fileCount               = 0;
 	//BatGUI bg_                            = null;
 	//protected String OS = null;
+	protected int lastVideoFilePointerIndex = -1;
+	
+	 //------------------------OUT------------------------------------
+	  protected void out(String s) {
+		  System.out.println("BatGUIHtml: " + s);
+	  }
 	
 	
-	
+	public int getLastVideoFilePointerIndex() {
+		return lastVideoFilePointerIndex;
+	}
+
+	public void setLastVideoFilePointerIndex(int lastVideoFilePointerIndex) {
+		this.lastVideoFilePointerIndex = lastVideoFilePointerIndex;
+	}
 	ArrayList theScreenElements = new ArrayList();
 	
 	public void addAScreenElementToList(Component c) {
@@ -58,7 +70,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     	super.init();
     	
     	
-    	String vsn = new String(" 2018-07-06");
+    	String vsn = new String(" 2021-05-26");
     	String title = new String("HtmlFilms");
     	title = new String(title + " "+vsn);
     	initWindowStart(title);
@@ -135,6 +147,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     		// in "file action factory" the Panel is associated with a drop target
     		// function that will handle the drop for that particular panel by setting
     		// the JLabel text to the new file name.
+    		
     		FileActionFactory faf            = new FileActionFactory(this);
     		NormsJPanel       manyFiles      = new NormsJPanel();
     		manyFiles.setPanelNumber(k);
@@ -158,7 +171,11 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     		addAScreenElementToList(manyFiles);
     	}
     	// define a new JFrame for this part and format it
-    	// with some kind of table layout...
+    	// with some kind of table layout...it will hold 
+    	// the 'pop a chooser' buttons, and the duration
+    	// textfiled that displays total time for all the
+    	// videos dropped so far on each of the 2, 4, 6 or 8
+    	// drop targets
     	int j = 0;
     	GridLayout experimentLayout = new GridLayout(0,2);
     	JPanel butts = new JPanel(experimentLayout);
@@ -194,10 +211,23 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     	}
     	
     	frame.add(butts);
+    	
+    	// try to establish an "undo" of the last added item
+    	JButton undoitButton = new JButton("Undo!");
+    	undoitButton.setBackground(Color.BLACK);
+    	undoitButton.setForeground(Color.RED);
+    	undoitButton.setActionCommand("undoit");	
+    	undoitButton.addActionListener(this);
+    	frame.add(undoitButton);
+    	addAScreenElementToList(undoitButton);
+    	
+    	
     	frame.setVisible(true);
     }
-  
+    //---------------------------ACTION PERFORMED------------------------------
+    //  (that is, "doit" or "undo" button was pressed)...
     public void actionPerformed(ActionEvent e) {
+    	//  "DOIT" button - time to make the html file
     	PageBuilder pb = new PageBuilder(vidFiles, this);
         if ("doit".equals(e.getActionCommand())) {
           String result = pb.generatePage();
@@ -224,6 +254,35 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
           addAScreenElementToList(k);
           
           frame.setVisible(true);
+        } 
+        //  "UNDO" button -- undrop the last file name dropped on one of the screen segments
+        if ("undoit".equals(e.getActionCommand())) {
+            out("whoa - UNDOIT button pressed!!!");
+            int ix = this.getLastVideoFilePointerIndex();
+            out ("last video file pointer index was "+ ix);
+            VideoFilePointer vpi = vidFiles[ix];
+            LinkedList queue = vpi.getFileQueue();
+            File lastFile = (File) (queue.getLast());
+            out("undo found the last file in the list was "+lastFile.getPath());
+            // must ALSO deduct the timing for this file from the total...
+            FetchVideoDetails fvd = new FetchVideoDetails(lastFile.getPath());
+            int  secs = fvd.getDuration();
+            out ("that file had a duration of "+secs);
+            String tDur = vpi.getDurationTextField().getText();
+            Integer totalDuration = Integer.parseUnsignedInt(tDur);
+            out ("old total duration was "+totalDuration);
+            int newSecs = totalDuration - secs;
+            out ("new total duration is " + newSecs);
+            Integer t = new Integer(newSecs);
+            vpi.getDurationTextField().setText(t.toString());
+            // now clean up the linked list
+            queue.removeLast();
+           
+            // and update the screen element
+            lastFile = (File) (queue.getLast());
+            String  vfText = lastFile.getPath();
+    		out ("in VideoFilePointer:setWhatVideoFile Setting video file for path "+vfText);
+    		vpi.getWhatVideoFileLabel().setText(vfText);
         } 
     }
     // test button gets hit when the page is built and can be thrown to a browser for a test

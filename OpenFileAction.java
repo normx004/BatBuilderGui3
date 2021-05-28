@@ -31,7 +31,7 @@ import javax.swing.JFrame;
             this.chooser = chooser;
             this.frame = frame;
         }
-        private void out(String s) { System.out.println(s);}
+        private void out(String s) { System.out.println("OpenFileAction: " + s);}
         public void actionPerformed(ActionEvent evt) {
             // Show dialog; this method does not return until dialog is closed
         	//     chooser.setCurrentDirectory(new File("C:\\Program Files (x86)\\VideoLAN"));

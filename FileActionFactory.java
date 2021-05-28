@@ -155,7 +155,9 @@ public class FileActionFactory {
 	        	 Class              o            = comp.getClass();
 	        	 NormsJPanel        jp           = (NormsJPanel)comp;
 	        	 int                vidFileIdx   = jp.getPanelNumber();
-	        	 VideoFilePointer   vPtr           = jp.getVidFilePtr();
+	        	 VideoFilePointer   vPtr         = jp.getVidFilePtr();
+	        	 // we'll use the "last video file pointer index" in case of the "undo" button being hit
+	        	 batGuiH_.setLastVideoFilePointerIndex(vidFileIdx);	  
 	        	 
 	        	 out("Component is "  +  o.getCanonicalName());
 	        	 out("FileActionFactory: dropTarget found vid index is "+vidFileIdx);
@@ -216,45 +218,13 @@ public class FileActionFactory {
 	                          
 	                           
 	                           String  vfText = thePath;
-	                   		   out ("in FileActionFactory:dropTarge Setting vid file " + vidFileIdx + " to path "+vfText);
+	                   		   out ("in FileActionFactory:dropTarget setting vid file " + vidFileIdx + " to path "+vfText);
 	                           batGuiH_.getVidFiles()[vidFileIdx].fileQueue.add(new File(vfText));
 	                   		   out ("in FileActionFactory:dropTarge file queue is "+batGuiH_.getVidFiles()[vidFileIdx].fileQueue.size());
 	                   		   //here's a thought...how about modifying button to show how many files in this queue!!
 	                           JFrame frame = batGuiH_.getFrame();
 	                           frame.invalidate();
-	                        } /*else {
-	                        	if (component instanceof JPanel) {
-	                        		JPanel jpx = (JPanel)component;
-	                        		Component[] xcomponents = jpx.getComponents();
-	                        		out("ok, found the jpanel with the grid of vfyl / duration stuff");
-	                        		
-	                        		 for (int bi = 0; bi < xcomponents.length; bi++) {
-	                        			 
-	                        		 
-	                        			out ("maybe its a button!!!!");
-	    	                        	if (component instanceof JButton) {
-	    	                        		out("IT IS IT IS IT IS a button");
-	    	                        		JButton butter = ((JButton)(component));
-	    	                        		String tx = butter.getText();
-	    	                        		String tx1 = "videoFile " + batGuiH_.getVidFiles()[vidFileIdx].fileQueue.size();
-	    	                        		butter.setName("vfylbutt");
-	    	                        		butter.setText(tx1);
-	    	                        	}
-	                        		} // end loop over componetns in jpanel that holds the grid
-	                        	}
-	                        	
-	                        }*/ 
-	                     } // end loop over page components
-	                     
-	                 // update the duration text field  
-	                 //components = jp.getComponents();       
-	                 //for (int ci = 0; ci < components.length; ci++) { 
-	                	//out ("second time thru, looking for NormsPanel");
-                        //component = components[ci]; 
-                        //String cn = component.getClass().getName();
-                        //out("Component is a "+cn);
-	                   // if (component instanceof JTextField) {
-	                    //       out("aaaaaaaaaaah got one");
+	                        } 
 	                     
                                JTextField jtf = vPtr.getDurationTextField();
                       		   Integer currentSeconds = Integer.parseInt(jtf.getText());
@@ -266,14 +236,9 @@ public class FileActionFactory {
                       		   String tx1 = "videoFile " + batGuiH_.getVidFiles()[vidFileIdx].fileQueue.size();
                       		   out("New Button Text: "+tx1);
                       		   
-                     		   butter.setText(tx1);   
-                      		   //vPtr.setOpenButton(butter);
-                      		   
-                      	//      }
-                        //    }
-	                    
-	                 
-	               }
+                     		   butter.setText(tx1);
+	                     } // end "for" loop over components in the panel
+	                 } // end "for" loop over list of dropped files
 	             } catch (Exception ex) {
 	                 ex.printStackTrace();
 	             }

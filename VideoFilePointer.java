@@ -57,8 +57,11 @@ public class VideoFilePointer {
 		out ("in VideoFilePointer:setWhatVideoFile Setting video file for path "+vfText);
 		this.whatVideoFileLabel = whatVideoFile;
 		File newvf = new File(vfText);
+		// in case we want to use the last directory hit to set
+		// the target for the next fileChooser we pop...
 		File lastDir = newvf.getParentFile();
 		bg_.setLastDirectory(lastDir);
+		// put the lastest File object in the queue...
 		this.fileQueue.add(newvf);
 		out ("in VideoFilePointer:setWhatVideoFile file queue is "+this.fileQueue.size());
 	}
