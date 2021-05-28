@@ -171,7 +171,7 @@ public class FileActionFactory {
 	                	 String thePath = file.getPath();
 	                	 // save the last-accessed directory for the button area to re-open a chooser in the right directory
 	                	 batGuiH_.setLastDirectory(new File(file.getParent()));             	 
-	                     System.out.println("DROPPED FILE ON BUTTON(FileName):"+thePath);
+	                     out("DROPPED FILE ON BUTTON(FileName):"+thePath);
 	                     int lastDot = file.getPath().lastIndexOf('.');
 	                     String whatzit = file.getPath().substring(lastDot, file.getPath().length());
 	                     out("OK, WHATZIT: "+whatzit);
