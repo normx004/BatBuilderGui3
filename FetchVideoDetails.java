@@ -51,7 +51,8 @@ public class FetchVideoDetails {
  public int getDuration() {
 	 out("OK, just entered method to get the video file's duration");
 	 out("....path is "+vidPath);
-	 String localPath = convertPath(vidPath);
+	 //String localPath = convertPath(vidPath);
+	 String localPath = vidPath;
 	 out("...after convertPath (not necessary?) the path is "+localPath);
      Process p;
      int resulto = 0;
@@ -73,9 +74,11 @@ public class FetchVideoDetails {
     	} else {
     		out("OS system prop found, it is "+os);
     	}
-    	if ( os == null) {
+    	int comp = os.compareTo("Linux");
+    	out("os comparfe result is "+comp);
+    	if ( os == null || os.compareTo("Linux")==0) {
     		// assume linux
-    		String[] xcmd = { "/usr/bin/bash", "/home/norm/bin/pager/checkVid.bash", localPath};
+    		String[] xcmd = { "/usr/bin/bash", "/home/norm/bin/pager/checkVid.bash", vidPath};
     		cmd = xcmd;
     	}
     	int k = 0;
