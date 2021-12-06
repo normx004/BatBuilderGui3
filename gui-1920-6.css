@@ -1,0 +1,37 @@
+ article, aside, figure, footer, header, hgroup,
+  menu, nav, section { display: block; }
+  #aboutimages{
+    text-align: center;
+    margin: 0 auto;
+    width: 100%;
+    margin-top: 10px;    }
+
+  #aboutimgleft {
+   display:inline-block;
+    float: left;
+    margin-left: 30px;
+  }
+
+#aboutimgleft video{
+   width:600px;
+    height:355px;
+}
+
+#aboutimgcenter {
+    display:inline-block;
+}
+
+#aboutimgcenter video{
+    width:600px;
+    height:355px;
+
+}
+#aboutimgright {
+    display:inline-block;
+    float: right;
+    margin-right: 30px;
+}
+#aboutimgright video{
+     width:600px;
+    height:355px;
+}

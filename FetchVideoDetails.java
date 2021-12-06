@@ -125,6 +125,7 @@ public class FetchVideoDetails {
     }
     return resulto;
     }
+ //parse
  
  public static void main(String[] args) {
      FetchVideoDetails r = new FetchVideoDetails(new String("/tmp/kg.mp4"));
