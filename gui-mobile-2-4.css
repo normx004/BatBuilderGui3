@@ -1,4 +1,4 @@
- article, aside, figure, footer, header, hgroup,
+  article, aside, figure, footer, header, hgroup,
   menu, nav, section { display: block; }
   #aboutimages{
     text-align: center;
@@ -13,8 +13,8 @@
   }
 
 #aboutimgleft video{
-   width:620px;
-    height:355px;
+   width:960px;
+    height:425px;
 }
 
 #aboutimgcenter {
@@ -22,9 +22,8 @@
 }
 
 #aboutimgcenter video{
-    width:620px;
-    height:355px;
-
+     width:960px;
+    height:425px;
 }
 #aboutimgright {
     display:inline-block;
@@ -32,6 +31,6 @@
     margin-right: 30px;
 }
 #aboutimgright video{
-     width:620px;
-    height:355px;
+     width:960px;
+    height:425px;
 }

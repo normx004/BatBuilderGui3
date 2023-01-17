@@ -104,7 +104,12 @@ public class CssGenerator {
 		   "         linky.setAttribute(\'href\', \'css/gui-1366-2-4.css\');    "+
 		   "      	console.log(\"Setting css to 1366\");    " +
 		   "};" +
-		   " document.head.appendChild(linky);  </script>");
+		   
+            "if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {  "+  
+            "    console.log(\"Setting css to MOBILE\");     "+
+            "    linky.setAttribute('href', 'css/gui-mobile-2-4.css');    	"+
+            "    console.log(\"Setting css to mobile\"); } "+
+		    " document.head.appendChild(linky);  </script>"); 
 		    
 		    
 		    
