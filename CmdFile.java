@@ -8,7 +8,7 @@ public class CmdFile {
 	   private   Stack<String> batFile = new Stack<String>();
 	   private   String vlcPathString = null;
 	   
-	   // Max Iter is how many times we want to try to make a unique filename
+	   // Max Iter is how many times we want to try to make a unique filename ok
 	   final int MAXITER = 4;
 	   
 	    public int getVectorLength () {

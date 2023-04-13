@@ -194,7 +194,7 @@ public class PageBuilder  {
 				"<Video id=" +
 				"\"myVideo" +  vidNum + "\"" + 
 				" width=\"" + this.getX().toString() + "\" height=\"" + this.getY().toString() + "\" \n" +
-				" autoPlay autoloop muted>\n" + 	
+				" autoPlay autoloop muted controls>\n" + 	
 			    "</Video>\n</div>\n" 
 			 	);
 		
@@ -257,18 +257,7 @@ public class PageBuilder  {
 		
 		// want to go with straight html5 which no longer allows video plugins...so...
 		// everything must be mp4 or webM
-		/*
-		boolean isMp4 = false;
-		if (type.compareToIgnoreCase(".mp4")==0) {
-			out ("MP4!!! Path: " + path);
-			isMp4 = true;
-		}
 		
-		// seems like plain mp4 is giving firefox hiccups, so...
-		if (bg_.isUseHttpServer()) {
-			isMp4 = false;
-		}
-		*/
 		boolean    isMp4 = true;
 		StringBuffer rtn = new StringBuffer("");
 		String     start = this.vidStart(isMp4,this.getX(), this.getY());
@@ -302,18 +291,7 @@ public class PageBuilder  {
     	String s = original;
     	CssGenerator c = new CssGenerator(count, bg_);
     	return(c.getCss(s));
-    	/*
-    	if ( count == 2) {
-    		s = c.getCss(s);
-    	} else if (count ==4) {
-    		s = c.getCss(s);
-    	} else if (count == 6) {
-    		s = c.getCss(s);
-    	} else if (count ==9 ) {
-    		s = c.getCss(s);
-    	}
-    	return s;
-    	*/
+    	
     }
 	private String setFileName() {
 		// we had enough files, so write the page to a file...
@@ -557,7 +535,7 @@ public class PageBuilder  {
 		String rtn = new String("");
 	
 		    //rtn  = new String(" <Video  autoplay autoloop>	<source src=\"file:///");
-		    rtn  = new String(" <Video  autoplay loop muted>	<source src=\"");
+		    rtn  = new String(" <Video  autoplay loop muted controls>	<source src=\"");
 		    return rtn;
 	
 	}
