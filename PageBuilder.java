@@ -15,6 +15,8 @@ public class PageBuilder  {
     int dur[] = null;
     int low_ = 99999;
 	int high_ = 0;
+	
+	int vfpLength_;
     
     boolean useHttpServer = false;
     
@@ -60,11 +62,13 @@ public class PageBuilder  {
 		page.append(this.head(vfp.length));
 		// error msg just in case
 		String status = new String("not enough files specified!");
-		File filez[] = new File[vfp.length];
+		File filez[]  = new File[vfp.length];
 		int j = 0;
 		int k = 0;
 		Integer x = null;
 		Integer y = null;
+		
+		vfpLength_ = vfp.length;
 		
 		// NOTE: vfp.length is the indicator of how many windows are to be put
 		// on the page...each window showing a video or a list of videos.
@@ -111,8 +115,10 @@ public class PageBuilder  {
 							page.append("</div>");
 						}
 						page.append("\n<div id=\"aboutimages\">\n<div id=\"aboutimgleft\">\n");
+						page.append("\n<div class=\"video-container\">\n");
 					} else { 
 						page.append("<div id=\"aboutimgright\">\n" );
+						page.append("<div class=\"video-container\">\n");
 					}
 					// here's where we actually build the <video ... /video> entries
 					String vEntry = null;
@@ -195,8 +201,12 @@ public class PageBuilder  {
 				"\"myVideo" +  vidNum + "\"" + 
 				" width=\"" + this.getX().toString() + "\" height=\"" + this.getY().toString() + "\" \n" +
 				" autoPlay autoloop muted controls>\n" + 	
-			    "</Video>\n</div>\n" 
+			    "</Video>\n" 
 			 	);
+		
+		v.append( // add the target for the clickable pathname display
+				  "<div   id=\"texxxt" + vidNum + "\" class=\"text\" style=\"display:none\"> <h2>Some text to display</h2> </div></div>\n \n "				
+				);
 		
 		/* like this:
 		 *  <Video id="myVideo1" width="900" height="500" 
@@ -390,42 +400,40 @@ public class PageBuilder  {
 		// add JavaScript to provide variable background...if a directory
 		// for the background files has been specified
 		StringBuffer scrpt = new StringBuffer("");
+		
+		// add in the video container css code that allows for text overlay....
+		  scrpt.append(
+					"<style> \n" +
+							".video-container { position: relative; z-index:0;}  \n" +
+							".video-container video { display: block; max-width: 100%; height: auto; }  \n" +
+							".video-container .text  {position: absolute; \n" +
+							"top: 50%; \n" +
+							"left: 50%;  \n" +
+							"z-index:1; \n" +
+							"transform: translate(-50%, -50%); \n" +
+							"text-align: center; \n" +
+							"background-color: rgba(255, 255, 255, 0.5);  /* sets the transparency */  \n" +
+							"padding: 20px;  \n" +
+							"} \n" +
+							"</style>\n"
+		            );
+				
+		
+		
+		
+		
 		if ( bg_.getBackGroundDirectory().length() > 0) {
 			out("Setting up BackGrounDirectory randomizer");
 			BackgroundRandomizer bgr = new BackgroundRandomizer();
-			scrpt = bgr.buildRandomizerLogic(bg_);
-			/*scrpt = new StringBuffer
-					(
-					"\n<script type=\"text/javascript\"> \n"+
-					"		function getsec() {\n"+
-					"	 var secx = new Date().getSeconds();\n"+
-					"	 return secx;\n"+
-					"	}\n"+
-							
-					"  function backSet(){  \n"+
-					"  	var i =getsec(); \n"+
-					"    setInterval(function() { \n"+
-					"    	var bodx = document.getElementsByTagName('body')[0];\n"+
-					"       var z = Math.floor((Math.random() * 100) + 1);\n"+
-					"       console.log(\"Random: \"+z);\n"+
-					"    	var imgString = \"url(file:///"); 
-			 Integer bgImgInt = bg_.getBackgroundImageInterval();
-			 scrpt.append(bg_.getBackGroundDirectory());
-			 scrpt.append(
-					"/img\" + z + \".jpg)\"; \n"+	
-					"    	if (i > 100) { \n"+
-					"    	   i = 1; \n"+
-					"    	}\n"+
-					"    	bodx.style.background=imgString; }, ");
-			 scrpt.append(bgImgInt.toString());
-			 scrpt.append(
-					//"  }, 7000); \n"+
-					" ); } \n");
-			 */
+			scrpt.append( bgr.buildRandomizerLogic(bg_));
+			
 			}
-			 
+		   
+		
+          
+		
 			 // now add the functions for multi-VLC entries
-			// scrpt.append("<script>\n// ------------------------------utility function--------------- \n" +	
+			
 		    int vLoopIdx = 0;
 		    
 		    while (vLoopIdx < numSubWin) {
@@ -453,6 +461,28 @@ public class PageBuilder  {
 			 "	document.getElementById(el).load();\n" +
 			 "	document.getElementById(el).play();\n" +
 		     "}");
+			 
+			 // now add the 'show text' function for this iteration
+			 scrpt.append("\n// ------------------------------utility text toggle  function--------------- \n" +	
+					 "function toggleTextVisibility" + vLoopIdx + "() {\n" +
+                     	"var   textElement = document.getElementById('texxxt" + vLoopIdx + "'); \n" +
+                     	"const atextstring = textElement.textContent;\n" +
+                     	" console.log(atextstring);\n" +
+
+                     	"var  theName  = document.getElementById('myVideo" + vLoopIdx + "');	\n" +
+                     	"var  vidName  = theName.getAttribute('src'); \n" +
+                     	"console.log(vidName);\n " +
+
+
+                     	" if (textElement.style.display === \"none\") \n " +
+                     	"   { \n" +
+                     	"    textElement.textContent =   vidName;\n " +
+                     	"    textElement.style.display = \"block\"; \n " +
+                     	"    }\n " +
+                     	"else \n " +
+                     	"    { textElement.style.display = \"none\"; }\n " +
+                     	"}	");  
+			 
 			 vLoopIdx += 1;
 		    } // end of "vloop" to make individual handlers for each subwindow
 			
@@ -519,22 +549,13 @@ public class PageBuilder  {
 		return t;
 		}
 		
-	//public String vidStart (Integer x, Integer y) {
-	//	String s   = new String(" <Video  width=\"");
-	//	String s1  = new String("\" height=\"");
-	//	String s2  = new String("\" autoplay loop>	<source src=\"file:///");
-	//	String rtn = new String(
-	//			s + x.toString() + s1 + y.toString() + s2);
 	
-	//String rtn  = new String(" <Video  autoplay loop>	<source src=\"file:///");
-	//	return rtn;
-	//}\
 	
 
 	public String vidStart (boolean isMp4, Integer x, Integer y) {
 		String rtn = new String("");
 	
-		    //rtn  = new String(" <Video  autoplay autoloop>	<source src=\"file:///");
+		   
 		    rtn  = new String(" <Video  autoplay loop muted controls>	<source src=\"");
 		    return rtn;
 	
@@ -544,14 +565,25 @@ public class PageBuilder  {
 	
 		  rtn = new String("\"	type='video/mp4;codecs=\"avc1.42E01E, mp4a.40.2\"'>  "+
 		  "\n             <h3> Your browser does not support html5 video! </h3> </Video>\n</div>");
-		  return rtn;
-		
-		
+		  return rtn;	
 	}
 	public String pageEnd() {
-		String s = null;
-		s = new String(" </body></html>");
-		return s;
+		StringBuffer s = new StringBuffer("");
+		// set up click-events for pathname toggle
+		int idx = vfpLength_;
+		int k = 0;
+		while (k < idx) {
+			s.append (
+					"<script> \n " + 
+					" var videoElement = document.querySelector('#myVideo" + k + "'); " +
+					"    videoElement.addEventListener(\"click\", toggleTextVisibility" + k + ");" +
+					" </script>"
+					);
+			k+=1;
+		}
+		
+		s.append(" </body></html>");
+		return s.toString();
 	}
 	
 	public static void main(String[] args) {
