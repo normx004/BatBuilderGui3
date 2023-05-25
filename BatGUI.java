@@ -26,6 +26,9 @@ public class BatGUI {
 	 protected String       backGroundDirectoryAlias = null;
 	 protected Integer      backgroundImageInterval = 5000; // 5 sec default...
 	 protected boolean      useHttpServer = false;
+	 protected String       checkVid=null;
+	 protected Boolean      gotProps = false;
+	 
 	
 	
 	File      lastDirectory = null;
@@ -53,38 +56,118 @@ public class BatGUI {
 	  }
 	  //--------------------GetPROPS------------------------------------
 	  protected void getProps(String ps){
-			 Properties p = new Properties();
+		     out("props file name-----------"+ps);
+		     
+		     if (getGotProps()) {
+		    	 return;
+		     } else {
+		    	 setGotProps(true);
+		     }
+		     
+		     
+		     
+		  // Load properties from the file
+		        Properties properties = new Properties();
+		        try (FileInputStream fileInputStream = new FileInputStream(ps)) {
+		            properties.load(fileInputStream);
+		        } catch (IOException e) {
+		            e.printStackTrace();
+		            return;
+		        }
+
+		        
+		        out("---------------------------------listing props from 'prperties'----------------------------------");	
+		        Enumeration<?> propertyNames = properties.propertyNames();
+		        while (propertyNames.hasMoreElements()) {
+		            String propName = (String) propertyNames.nextElement();
+		            String propValue = properties.getProperty(propName);
+		            out("NAME:" + propName + "------------VALUE:" + propValue);
+		            System.setProperty(propName, propValue);
+		        }
+
+		        // Test: Print system properties
+		        out("--------------------------------------SYSTEMPROPS------------------------------------");
+		        System.getProperties().list(System.out);
+		        out("--------------------------------------END of SYSTEMPROPS------------------------------------");
+		        
+		        
+		        /*
+		        
+		        // Set loaded properties as system properties
+		        properties.forEach((key, value) -> {
+		            String propName = key.toString();
+		            String propValue = value.toString();
+		            System.setProperty(propName, propValue);
+		        });
+
+		        // Test: Print system properties
+		        System.getProperties().forEach((key, value) -> {
+		            String propName = key.toString();
+		            String propValue = value.toString();
+		            System.out.println(propName + " = " + propValue);
+		        });
+			 */
+		     
+		     
+		     
+		     
+		     /*Properties p = new Properties();
 	    	 try {
 	    	      p.load(new FileInputStream(ps));
 	    	     } catch (IOException e) {
-	    	    	 System.err.println("Failed to read properties file " + ps + ", must quit!");
+	    	    	 System.err.println("*****************Failed to read properties file " + ps + ", must quit!");
 	    	         System.exit(1);
 	    	     }
 	         out("Putting all props to system props");
 	         Properties sysProps = System.getProperties();
 	         sysProps.putAll(p);
+	         */
+	         
+	         
+	         
+	         
+	         
+	         
+	         
+	         
+	         
+	         
 	         // background directory and alias
-	         String backGrounds = System.getProperty("BrowserBackgroundDirectory");
+	         //String backGrounds = System.getProperty("bgImgDir");
+	         String backGrounds = properties.getProperty("bgImgDir");
 	         if (backGrounds == null){
 	        	 backGrounds = new String("");
 	         }
-	         out ("Found background directory in props: "+backGrounds);
+	         out ("Found background img directory in props: "+backGrounds);
 	         setBackGroundDirectory(backGrounds);
-	         String backGroundsAlias = System.getProperty("BrowserBackgroundDirectoryAlias");
+	         //String backGroundsAlias = System.getProperty("BrowserBackgroundDirectoryAlias");
+	         String backGroundsAlias = properties.getProperty("BrowserBackgroundDirectoryAlias");
 	         if (backGroundsAlias == null){
 	        	 backGroundsAlias = new String("");
 	         }
-	         out ("Found background alias directory in props: "+backGroundsAlias);
-	         setBackGroundDirectoryAlias(backGroundsAlias);
+	         //out ("Found background alias directory in props: "+backGroundsAlias);
+	         //setBackGroundDirectoryAlias(backGroundsAlias);
 	         
-	         String bgInt = System.getProperty("BackgroundImageInterval");
+	         //String bgInt = System.getProperty("bgimgInt");
+	         String bgInt = properties.getProperty("bgimgInt");
 	         if (bgInt != null) {
 	        	 Integer bgi = new Integer (bgInt);
 	        	 this.setBackgroundImageInterval(bgi);
+	        	 out("img int: "+bgInt);
 	         }
-	         String uhs = System.getProperty("UseHttpServer");
+	         //String uhs = System.getProperty("UseHttpServer");
+	         String uhs = properties.getProperty("UseHttpServer");
 	     	 if (uhs != null) {
 	     		setUseHttpServer(true);
+	     		out("use http:"+uhs);
+	     	 }
+	         //checkVid = System.getProperty("checkVid");
+	         checkVid = properties.getProperty("checkVid");
+		     if (checkVid == null) {
+		     	checkVid =  "/c/temp/checkVid.bash";
+		     	out("no checkVid in props, set to: "+checkVid);
+	     	 } else {
+	     		 out("Got checkvid: "+checkVid);
 	     	 }
 	     	
 		 }
@@ -171,19 +254,21 @@ public class BatGUI {
 		   }
 		
 		  //-------------------------INIT-------------------------------------
-		  Boolean gotProps=new Boolean(false);
+		  //Boolean gotProps=new Boolean(false);
 		  public void init() {
 			  //this method must be overridden!
 			   
 			     System.out.println("starting BatGUI constructor. if props file supplied, s/b first arg or -Dprops=file");
 			     if ( myArgs.length > 0 && myArgs[0] != null) {
 			    	 out("props expected in "+myArgs[0]);
-			    	 getProps(myArgs[0]);
-			    	 gotProps=new Boolean(true);
+			    	 if (!getGotProps()) {
+			    	     getProps(myArgs[0]);
+			    	     gotProps=new Boolean(true);
+			    	 }
 			     }
 			     if ( myArgs.length == 0 ) {
 			    	 String prop = System.getProperties().getProperty("props");
-			    	 if (prop != null ) {
+			    	 if (prop != null && !getGotProps()) {
 			    		 getProps(prop);
 			    		 gotProps=new Boolean(true);
 			    	 }
@@ -320,12 +405,16 @@ public class BatGUI {
 		  BatGUISlicer.setDebug(true);
 		  BatGUIHtml.setDebug(true);
 		  
-		  System.out.println("java -jar <the jar> <propsfilepath> <slicer|html>");
+		  System.out.println("cmd line should be: 'java -jar <the jar> <propsfilepath> <slicer|html>'");
 		
 		  BatGUIFactory f  = new BatGUIFactory();
+		  System.out.println("=============================CONSTRUCTING BatGUI with BatGUIFactory.getBatGUI");
 		  BatGUI        sc = f.getBatGUI(args);
+		  System.out.println("=====================finishedCONSTRUCTING BatGUI with BatGUIFactory.getBatGUI");
 		  sc.init();
+		  System.out.println("=====================finished init()");
 		  sc.getProps(args[0]);
+		  System.out.println("=====================finished getProps()");
 		  sc.sleep(10000);
 	}
 		public JFrame getFrame() {
@@ -357,6 +446,18 @@ public class BatGUI {
 		}
 		public void setBackGroundDirectoryAlias(String backGroundDirectoryAlias) {
 			this.backGroundDirectoryAlias = backGroundDirectoryAlias;
+		}
+		public String getCheckVid() {
+			return checkVid;
+		}
+		public void setCheckVid(String checkVid) {
+			this.checkVid = checkVid;
+		}
+		public Boolean getGotProps() {
+			return gotProps;
+		}
+		public void setGotProps(Boolean gotProps) {
+			this.gotProps = gotProps;
 		}
 }
 

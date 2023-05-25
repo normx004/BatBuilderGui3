@@ -27,7 +27,11 @@ public class PageBuilder  {
 		useHttpServer = bg_.isUseHttpServer(); 
 		out("-------xxxx-------useHttpServer is set to "+useHttpServer+" ---------xxxxxxxxxx--------------");
 	}
-	public void out (String s) { System.out.println(s);}
+	public void out (String s) 
+	{
+		String s1 = "PageBuilder:"+s;
+		System.out.println(s1);
+	}
 	//@SuppressWarnings("deprecation")
 	public int[] getDurations(VideoFilePointer vp[]) {
 		int[] dur = new int[vp.length];
@@ -231,8 +235,8 @@ public class PageBuilder  {
 				out("MakeMulti-vidoeentryfile path is "+path);
 				int vidx = path.indexOf ("/vids");
 				out("MakeMulti-videoentryfile index of 'vids' is "+vidx);
-				if (vidx > 0) {
-				    path = path.substring(vidx);
+				if (vidx+1 > 1) {
+				    path = path.substring(vidx+1);
 				    out("MakeMulti-videoentryfile path after substring is "+path);
 				}
 				
@@ -282,8 +286,8 @@ public class PageBuilder  {
 		out("Makevidoeentryfile path is "+path);
 		int idx = path.indexOf ("/vids");
 		out("Makevideoentryfile index of 'vids' is "+idx);
-		if  (idx > -1) {
-			path = path.substring(idx);
+		if  (idx+1 > 0) {
+			path = path.substring(idx+1);
 		}
 		out("Makevideoentryfile path after substring is "+path);
 		
@@ -307,7 +311,7 @@ public class PageBuilder  {
 		// we had enough files, so write the page to a file...
 		String bar = new String("----------------------------------------------------");
 	
-		String fileBase = bg_.getFileBase();
+		String fileBase = bg_.getFileBase() + "/";
 		
 		out ("htm file base is "+fileBase);
 		Calendar now = Calendar.getInstance();
@@ -435,7 +439,7 @@ public class PageBuilder  {
 			 // now add the functions for multi-VLC entries
 			
 		    int vLoopIdx = 0;
-		    
+		    scrpt.append("\n<script>\n");
 		    while (vLoopIdx < numSubWin) {
 			scrpt.append("\n// ------------------------------utility function--------------- \n" +	
 			 "function myHandler" + vLoopIdx + "(elName, videoArray) {\n" +

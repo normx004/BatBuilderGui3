@@ -36,6 +36,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
 	//BatGUI bg_                            = null;
 	//protected String OS = null;
 	protected int lastVideoFilePointerIndex = -1;
+	protected BatGUI bg                     = null;
 	
 	 //------------------------OUT------------------------------------
 	  protected void out(String s) {
@@ -65,6 +66,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
 	
 	public BatGUIHtml(String[] args) {
 		// TODO Auto-generated constructor stub
+		
 	}
     public void init() {
     	super.init();
@@ -148,7 +150,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     		// function that will handle the drop for that particular panel by setting
     		// the JLabel text to the new file name.
     		
-    		FileActionFactory faf            = new FileActionFactory(this);
+    		FileActionFactory faf            = new FileActionFactory(this, bg);
     		NormsJPanel       manyFiles      = new NormsJPanel();
     		manyFiles.setPanelNumber(k);
     		Border            myBord         = BorderFactory.createRaisedBevelBorder();
@@ -265,7 +267,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
             File lastFile = (File) (queue.getLast());
             out("undo found the last file in the list was "+lastFile.getPath());
             // must ALSO deduct the timing for this file from the total...
-            FetchVideoDetails fvd = new FetchVideoDetails(lastFile.getPath());
+            FetchVideoDetails fvd = new FetchVideoDetails(lastFile.getPath(), bg);
             int  secs = fvd.getDuration();
             out ("that file had a duration of "+secs);
             String tDur = vpi.getDurationTextField().getText();

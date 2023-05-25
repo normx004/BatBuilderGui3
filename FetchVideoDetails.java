@@ -16,10 +16,13 @@ import java.io.InputStreamReader;
 // 
 public class FetchVideoDetails {
  private String vidPath = null;
+ private BatGUI bg= null;
  
- public       FetchVideoDetails( String vid) {
+ public       FetchVideoDetails( String vid, BatGUI _bg) {
 	 out("contructor got video path "+vid);
      vidPath = vid;
+     bg = _bg;
+     
  }
  private void out(String s){
      System.out.println("FetchVideoDetails: " + s);
@@ -67,9 +70,19 @@ public class FetchVideoDetails {
      	   */
     	
     	out("Derived path is "+localPath);
-    	String[] cmd = { "bash", "/c/temp/checkVid.bash",localPath};
+    	 // Test: Print system properties
+        out("--------------------------------------SYSTEMPROPS------------------------------------");
+        System.getProperties().list(System.out);
+        out("--------------------------------------END of SYSTEMPROPS------------------------------------");
+        
+    	out("now looking at checkVid path; bg is "+bg);
+    	//String cvid = bg.getCheckVid();
+    	
+    	String cVid = System.getProperty("checkVid");
+    	out("Got pointer to check video details:"+cVid);
+    	String[] cmd = { "bash", cVid,localPath};
     	String os = null;
-    	os = System.getProperty("OS");
+    	os = System.getProperty("os.name");
     	if (os == null) {
     		out("OS came up null, so i'm gonna assume 'WINDOWS'");
     		os = "Windows";
@@ -86,7 +99,8 @@ public class FetchVideoDetails {
     		// assume linux
     		drive = "";
     		temp = "tmp";
-    		String[] xcmd = { "/usr/bin/bash", "/home/norm/bin/pager/checkVid.bash", vidPath};
+    		//String cVid = bg.getCheckVid();
+    		String[] xcmd = { "/usr/bin/bash", cVid, vidPath};
     		cmd = xcmd;
     	}
     	int k = 0;
@@ -146,7 +160,8 @@ public class FetchVideoDetails {
  //parse
  
  public static void main(String[] args) {
-     FetchVideoDetails r = new FetchVideoDetails(new String("/tmp/kg.mp4"));
+	 BatGUI x = null;
+     FetchVideoDetails r = new FetchVideoDetails(new String("/tmp/kg.mp4"), x);
      System.out.println(r.getDuration());    
   }
 }

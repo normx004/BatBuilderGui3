@@ -13,14 +13,17 @@ import java.awt.datatransfer.*;
 public class FileActionFactory {
 	protected BatGUIHtml  batGuiH_ = null;
 	protected BatGUISlicer batGuiS_ = null;
+	protected BatGUI batG =  null;
 	
 	private void out(String x) {  System.out.println("FAFactory: " + x);}	
 	
-	FileActionFactory (BatGUIHtml bg) {
-		batGuiH_ = bg;
+	FileActionFactory (BatGUIHtml bghtml, BatGUI _bg) {
+		batGuiH_ = bghtml;
+		batG = _bg;
+		out("just got pointers to BatGUIHtml: "+bghtml+", and BatGUI: "+ _bg);
 	}
-	FileActionFactory (BatGUISlicer bg) {
-		batGuiS_ = bg;
+	FileActionFactory (BatGUISlicer bghtml) {
+		batGuiS_ = bghtml;
 	}
 	public JPanel buildFileActionPane(String type) {
 		JPanel bogus = null;
@@ -212,7 +215,7 @@ public class FileActionFactory {
 	                           out("YES! its a JLabel");
 	                           JLabel x =  ((JLabel)(component));
 	                           x.setText(thePath);
-	                           FetchVideoDetails fvd = new FetchVideoDetails(thePath);
+	                           FetchVideoDetails fvd = new FetchVideoDetails(thePath, batG);
 	                           addDuration = fvd.getDuration();
 	                           out("FileActionFactory: new file has duration "+addDuration);
 	                          
