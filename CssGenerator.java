@@ -90,6 +90,7 @@ public class CssGenerator {
 		        	css = css.replaceAll("margin-top: 200px;", "margin-top: 10px;");
 		        }
 			*/
+		    /*
 		    String css = new String( bodyStyle + 
 		   " var w = window.innerWidth;    "+
 		   " var linky = document.createElement(\'link\');   "+
@@ -110,6 +111,17 @@ public class CssGenerator {
             "    linky.setAttribute('href', 'css/gui-mobile-2-4.css');    	"+
             "    console.log(\"Setting css to mobile\"); } "+
 		    " document.head.appendChild(linky);  </script>"); 
+		    */
+		    String css = new String ( bodyStyle + "<script type=\"text/javascript\" src=\"js/NewCSSSelectCode.js\"></script>");
+		    
+		    /*  this was bad in first revision... 
+		     * String css1 = new String(css + "<script>");
+		     * css = css1
+		     */
+		    
+		    // now make sure the css-defining JS actually runs:
+		    
+		    String cssPlus = new String ("<script>  document.addEventListener(\"DOMContentLoaded\", function () { getCss(); });		</script>)");
 		    
 		    
 		    
@@ -117,7 +129,7 @@ public class CssGenerator {
 			if (count_ != 9 && count_ != 4) {
 			    head = new String("<h2>Very Hot Video</h2>");
 			}
-			cssString = css+head;
+			cssString = css+cssPlus+head;
 			return cssString;
 		}
 	
@@ -285,7 +297,7 @@ public class CssGenerator {
 			    		"     background-attachment: fixed;\n" +
 			    		"     background-size: cover;\n" +
 						"     background-repeat: no-repeat;\n" +
-						"</style><script>"
+						"</style>"
 				       );
 				String r = rtn + rtnPlus;
 				return r;

@@ -491,7 +491,7 @@ public class PageBuilder  {
 		    } // end of "vloop" to make individual handlers for each subwindow
 			
 			 
-		     scrpt.append( "\n</script>\n"); 
+		     scrpt.append( "\ngetCss();\n</script>\n"); 
 			 
 			 
 			 // I THINK THIS SECTION HAS TO BE REPEATED FOR EACH ARRAY, with the APPROPRIATE NAMING 
