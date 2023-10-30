@@ -6,13 +6,13 @@ import java.util.*;
 import java.lang.*;
 
 public class PageBuilder  {
-    VideoFilePointer vfp[] = null;
-    public int getImgCount() { return vfp.length;}
+    VideoFilePointer vfpArray[] = null;
+    public int getImgCount() { return vfpArray.length;}
     BatGUI bg_ = null;
     Integer x_=null;
     Integer y_=null;
     
-    int dur[] = null;
+    int dur_[] = null;
     int low_ = 99999;
 	int high_ = 0;
 	
@@ -22,7 +22,9 @@ public class PageBuilder  {
     
 	public PageBuilder(VideoFilePointer[] vp, BatGUI bg) {
 		// TODO Auto-generated constructor stub
-		vfp = vp;
+		vfpArray = vp;
+		vfpLength_ = vp.length;
+		out("vfpLength is "+vfpLength_);
 		bg_ = bg;
 		useHttpServer = bg_.isUseHttpServer(); 
 		out("-------xxxx-------useHttpServer is set to "+useHttpServer+" ---------xxxxxxxxxx--------------");
@@ -47,52 +49,161 @@ public class PageBuilder  {
 	//----------------GENERATE PAGE------------------------------
 	public String generatePage(){
 		out("PageBuilder: generatePage()");
+		// break it up!!!
+		int dur_[]     = getDurations(vfpArray);
+		//int vfpLength_ = vfpArray.length; 
+		
+		
+		out("================start page=============================");
+		String header = this.head(vfpArray.length);
+		
+		out("+++++++++++++++++video grid+++++++++++++++++++++++++++");
+		String theGrid = this.makeVideoGrid(vfpArray);
+		
+		out("---------------------file list and event listeners-------------------");
+		int z = 0;
+		StringBuffer theFilms = new StringBuffer("\n<script>\n");
+		while (z < vfpArray.length) {
+	    	theFilms.append( this.getFileListsAndEventListeners(vfpArray[z], z));
+	    	z += 1;
+		}
+		//theFilms.append("\n</script>\n");
+		
+		out("~~~~~~~~~~~~~~~~~~~~~~~~handlers and text toggles~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		//String finalScripts = this.getHandlersAndTextToggles();
+		
+		out("************************page end**********************************************");
+		String pageEnd = this.pageEnd();
+		
+		StringBuffer page = new StringBuffer(header + theGrid + theFilms +  pageEnd);
+		
+		// now create a file name, and write the new page to the file
+	    String fn = setFileName();		
+		File of = new File(fn);
+		this.writeFile(page, of);
+		// all done, successful!
+		String status = new String("OK, generating page!");
+		return status;
+		
+	}
+	
+	//-----------------------contstruct X blocks like:------------------------------
+	/*
+	 * 
+	 *  var vidsrc0 = ['vids/A.mp4', 'vids/B.mp4'];
+	 *  var currentVideo0 = 0;
+	 *  videoPlay(0, vidsrc0, "myVideo0");
+	 *  document.getElementById('myVideo0').addEventListener('ended', function() { myHandler0('myVideo0', vidsrc0) }, false);
+	 *  document.getElementById('myVideo0').addEventListener("click", toggleTextVisibility0);
+	 * 
+	 * private     LinkedList<File>       getVideoFilePointerFileList() {
+	 *	return fileQueue;
+	 */
+	String getFileListsAndEventListeners(VideoFilePointer iq, int vidNum) {
+		
+		//now make the scripts to reference the video-containers with filelists and event listeners
+		//clean up the filepaths - use fwd slash, for one thing...
+		
+		StringBuffer v = new StringBuffer("");
+		v.append("var vidsrc" + vidNum + " = [");
+		int q = iq.getVideoFilePointerFileList().size();
+		out("File list is " + q + " files long for video number "+vidNum);
+		LinkedList<File> qq = iq.getVideoFilePointerFileList();
+		int idx = 0;
+		while (idx < q) {
+			   
+				v.append("'");
+				String path   = new String(qq.get(idx).getPath());		
+				StringBuffer rtn = new StringBuffer("");
+				// path comes from the "drop" with windows separators...
+				// gotta change to unix-style for the browser
+				path = path.replaceAll("\\\\", "/");
+				out("MakeMulti-vidoeentry: file path is "+path);
+				int vidx = path.indexOf ("/vids");
+				out("MakeMulti-videoentry: file index of 'vids' is "+vidx);
+				if (vidx+1 > 1) {
+				    path = path.substring(vidx+1);
+				    out("MakeMulti-videoentryfile path after substring is "+path);
+				}
+				if (idx < qq.size()-1) {
+					v.append(path + "',");	
+				}
+				else 
+				{
+					v.append(path + "'];\n");
+				}
+				idx += 1;
+		
+		}
+	                       
+		// followed by document.getElement...
+		v.append("var currentVideo" + vidNum + "= -1;\n");
+		v.append("videoPlay(currentVideo" + vidNum + ", vidsrc" +  vidNum + ", \"myVideo" + vidNum +"\");\n");
+	    
+		v.append("document.getElementById(\'myVideo" + vidNum +
+		 "\').addEventListener('ended', function() { myHandler" + vidNum + "(\'" +
+		 "myVideo" + vidNum + "\', vidsrc" + vidNum + ")}, false);\n");
+		
+		v.append("document.getElementById(\'myVideo" + vidNum +
+		 "\').addEventListener('click', toggleTextVisibility" + vidNum + ");\n");
+		
+	
+	    	
+		
+		return v.toString();
+		
+	}
+		
+		
+	String startPage() {	
 		StringBuffer page = new StringBuffer("");
-		int dur[]  = getDurations(vfp);
+		
+		dur_  = getDurations(vfpArray);
 		
 		int ix = 0;
-		while (ix < dur.length) {
-			if (dur[ix] < low_) {
-				low_ = dur[ix];
+		while (ix < dur_.length) {
+			if (dur_[ix] < low_) {
+				low_ = dur_[ix];
 			}
-			if (dur[ix] > high_) {
-				high_ = dur[ix];
+			if (dur_[ix] > high_) {
+				high_ = dur_[ix];
 			}
 			ix += 1;
 		}
 	    out("low duration: "+low_+", high duration: "+high_);
 		// head() gets the page header including the HTML type and css pointers 
 		// 
-		page.append(this.head(vfp.length));
+		page.append(this.head(vfpArray.length));
+		out ("page.append completed");
 		// error msg just in case
 		String status = new String("not enough files specified!");
-		File filez[]  = new File[vfp.length];
+		File filez[]  = new File[vfpArray.length];
 		int j = 0;
 		int k = 0;
 		Integer x = null;
 		Integer y = null;
 		
-		vfpLength_ = vfp.length;
+		vfpLength_ = vfpArray.length;
 		
 		// NOTE: vfp.length is the indicator of how many windows are to be put
 		// on the page...each window showing a video or a list of videos.
-		out("vfp.length is "+vfp.length);
-		if (vfp.length == 2) {
+		out("vfpArray.length is "+vfpArray.length);
+		if (vfpArray.length == 2) {
 			x = Integer.valueOf(System.getProperty("Dim2x"));
 			y =  Integer.valueOf(System.getProperty("Dim2y"));
-		} else if (vfp.length == 4) {
+		} else if (vfpArray.length == 4) {
 			x =  Integer.valueOf(System.getProperty("Dim4x"));
 			y =  Integer.valueOf(System.getProperty("Dim4y"));
-		} else if (vfp.length == 6) {
+		} else if (vfpArray.length == 6) {
 			x =  Integer.valueOf(System.getProperty("Dim6x"));
 			y =  Integer.valueOf(System.getProperty("Dim6y"));	
-		} else 	if (vfp.length == 9) {
+		} else 	if (vfpArray.length == 9) {
 			x =  Integer.valueOf(System.getProperty("Dim9x"));
 			y =  Integer.valueOf(System.getProperty("Dim9y"));	
 		}
 		this.setX(x);
 		this.setY(y);
-		out ("Array: " + vfp.length+".  Height will be "+ y.toString() + ", width will be "+x.toString());
+		out ("Array: " + vfpArray.length+".  Height will be "+ y.toString() + ", width will be "+x.toString());
 		// NOTE: need an extra "</div>" after each row, either 2 or 3 column...
 		// could possibly clear these out (on a page refresh) with a variant of this JS:
 		/* 
@@ -104,69 +215,73 @@ public class PageBuilder  {
     			div = document.getElementById('xyz');
 			}
 		 */
-		if (vfp.length==2 || vfp.length == 4 )  {
-			while (j < vfp.length) {
+		if (vfpArray.length==2 || vfpArray.length == 4 )  {
+			while (j < vfpArray.length) {
 				boolean multiFile = false;
-				LinkedList q = vfp[j].getFileQueue();
+				LinkedList q = vfpArray[j].getFileQueue();
 				if (q.size() > 1) {
-					out ("MULTI FILES ON THIS VFP - new embed logic needed!!!!");
+					out ("MULTI FILES ON THIS VFP - new embed logic needed!!!! 2, 4 or 6");
 					multiFile = true;
 				}
-				filez[j] = vfp[j].getVideoFile();
+				filez[j] = vfpArray[j].getVideoFile();
 				if (filez[j] != null ) {
 					if ( j ==0 || j == 2 || j ==4 || j == 6) {
 						if ( j == 2) {
 							page.append("</div>");
 						}
-						page.append("\n<div id=\"aboutimages\">\n<div id=\"aboutimgleft\">\n");
-						page.append("\n<div class=\"video-container\">\n");
+						//page.append("\n<div id=\"aboutimages\">\n<div id=\"aboutimgleft\">\n");
+						//page.append("\n<div class=\"video-container\">\n");
 					} else { 
-						page.append("<div id=\"aboutimgright\">\n" );
-						page.append("<div class=\"video-container\">\n");
+						//page.append("<div id=\"aboutimgright\">\n" );
+						//page.append("<div class=\"video-container\">\n");
 					}
 					// here's where we actually build the <video ... /video> entries
 					String vEntry = null;
 					out("checking multifile for lenght=2 or 4");
 					if ( multiFile) {
-						out("         ----yes, multifile");
+						out("         ----yes, multifile A");
 						vEntry = this.makeMultiVideoEntry(q, j);
 					} else {
 						vEntry = this.makeVideoEntry(filez[j]);
 					}
 					
 					page.append(vEntry);
-					page.append("</div>\n");
+					//page.append("</div>\n");
 					k += 1;
 				}
 				j += 1;
 			}
-			page.append("</div>");
+			//page.append("</div>");
 		}
-		if (vfp.length==6 || vfp.length == 9 )  {
-			while (j < vfp.length) {
+		// NOTEN NOTE NOTE this code for 6 and 9 is probably bad, neeeds rework
+		String vEntry = null;
+		if (vfpArray.length==6 || vfpArray.length == 9 )  {
+			while (j < vfpArray.length) {
 				boolean multiFile = false;
-				LinkedList q = vfp[j].getFileQueue();
+				LinkedList<File> q = vfpArray[j].getFileQueue();
 				if (q.size() > 1) {
-					out ("MULTI FILES ON THIS VFP - new embed logic needed!!!!");
+					out ("MULTI FILES ON THIS VFP 6 or 9 - new embed logic needed!!!!");
 					multiFile = true;
 				}
-				filez[j] = vfp[j].getVideoFile();
+				filez[j] = vfpArray[j].getVideoFile();
 				if (filez[j] != null ) {
 					if ( j ==0 || j == 3  || j == 6) {
 						if ( j == 3 || j == 6 ) {
 							page.append("</div>");
 						}
-						page.append("\n<div id=\"aboutimages\">\n<div id=\"aboutimgleft\">\n");
+						//page.append("\n<div id=\"aboutimages\">\n<div id=\"aboutimgleft\">\n");
 					} else if (j==1 || j == 4 || j == 7){ 
-						page.append("<div id=\"aboutimgcenter\">\n" );
+						//page.append("<div id=\"aboutimgcenter\">\n" );
 					} else if (j ==2 || j == 5 || j == 8) {
-						page.append("<div id=\"aboutimgright\">\n" );						
+						//page.append("<div id=\"aboutimgright\">\n" );						
 					}
 					
-					String vEntry = null;
+					 vEntry = null;
 					out("-----checking multifile for 6 or 9");
 					if ( multiFile) {
-						out("         yes, multifile");
+						out("         yes, multifile B");
+						// generate the scrips that reference the video-containers... with
+						// the list of files to show and the ended/click event listeners
 						vEntry = this.makeMultiVideoEntry(q, j);
 					} else {
 						vEntry = this.makeVideoEntry(filez[j]);
@@ -177,87 +292,101 @@ public class PageBuilder  {
 				}
 				j += 1;
 			}
-			page.append("</div>");
+			//page.append("</div>");
 		}
 		
+		return vEntry;
+		//page.append(this.pageEnd());
+		//if (k < vfp.length) {
+		//	out("uh oh, returning status, k is "+k);
+		//	return status;
+		//}
 		
-		page.append(this.pageEnd());
-		if (k < vfp.length) {
-			return status;
-		}
-		// now create a file name, and write the new page to the file
-	    String fn = setFileName();		
-		File of = new File(fn);
-		this.writeFile(page, of);
-		// all done, successful!
-		status = new String("OK, generating page!");
-		return status;
 	}
 	
 	// -------------------------Multi now used for all multis-not just MP4----------------------------------------
 	protected String makeMultiVideoEntry(LinkedList <File> q, int vidNum) {
 		out("^^^^^^^^^entered make multi video entry^^^^^^^^^^^^^^^");
+		// the list of files to show and the ended/click event listeners
 		
 		StringBuffer v = new StringBuffer("");
+		
+		int jdx = 0;
+		out ("Q.size is "+q.size());
+		
+		// first, output the video-containers
+		while (jdx < q.size()) {
+		
+			v.append("       <div class=\"video-container\">\n");
 	
-		v.append( // do i need width/height here? YES!
-				"<Video id=" +
+			v.append( // do i need width/height here? No!
+				"          <Video id=" +
 				"\"myVideo" +  vidNum + "\"" + 
-				" width=\"" + this.getX().toString() + "\" height=\"" + this.getY().toString() + "\" \n" +
-				" autoPlay autoloop muted controls>\n" + 	
-			    "</Video>\n" 
+				" autoPlay autoloop muted controls></video>\n"	
+			   
 			 	);
 		
-		v.append( // add the target for the clickable pathname display
-				  "<div   id=\"texxxt" + vidNum + "\" class=\"text\" style=\"display:none\"> <h2>Some text to display</h2> </div></div>\n \n "				
+			v.append( // add the target for the clickable pathname display
+				"          <div   id=\"texxxt" + vidNum + "\" class=\"text\" "+
+				//" style=\"display:none\""+
+				">" + 
+				"<h2>Some text to display</h2> </div></div>\n "				
 				);
+			v.append("</div>\n");
+			jdx += 1;
+		}
 		
-		/* like this:
-		 *  <Video id="myVideo1" width="900" height="500" 
- 		*	autoPlay autoloop >
-		*	</Video>
-		*	</div>
-		 */
 		
-		String func = new String(		
-				"<script>\n var vidsrc" + vidNum + " = new Array();\n");
-		v.append(func);
 		
+		
+		
+		//noew make the scripts to reference the video-containers 
 		//clean up the filepaths - use fwd slash, for one thing...
 		int idx = 0;
+		v = new StringBuffer("");
+		v.append("<script>\n");
 		while (idx < q.size()) {
-				v.append("vidsrc" + vidNum + "["+idx+"]='");
+			   
+				v.append("'");
 				String path   = new String(q.get(idx).getPath());		
 				StringBuffer rtn = new StringBuffer("");
 				// path comes from the "drop" with windows separators...
 				// gotta change to unix-style for the browser
 				path = path.replaceAll("\\\\", "/");
-				out("MakeMulti-vidoeentryfile path is "+path);
+				out("MakeMulti-vidoeentry: file path is "+path);
 				int vidx = path.indexOf ("/vids");
-				out("MakeMulti-videoentryfile index of 'vids' is "+vidx);
+				out("MakeMulti-videoentry: file index of 'vids' is "+vidx);
 				if (vidx+1 > 1) {
 				    path = path.substring(vidx+1);
 				    out("MakeMulti-videoentryfile path after substring is "+path);
 				}
-				
-				v.append(path + "';\n");
+				if (idx < q.size()-1) {
+					v.append(path + "',");	
+				}
+				else 
+				{
+					v.append(path + "'];\n");
+				}
 				idx += 1;
-		 }
 		
-		// here goes var H3 = new make the handler etc
-		///String vfnc = new String ("var H" + vidNum +" = new makeTheMultiHandlerObject('vlcplayer"+
-		//                           vidNum+"', vidsrc"+vidNum+", 0);\n");
-		//v.append(vfnc);
-		                           
+		
+	     
 		                           
 		// followed by document.getElement...
-	    v.append("videoPlay(0, vidsrc" +  vidNum + ", \"myVideo" + vidNum +"\");\n");
+		v.append("var currentVideo" + vidNum + "= -1;\n");
+	    v.append("videoPlay(currentVideo" + vidNum + ", vidsrc" +  vidNum + ", \"myVideo" + vidNum +"\");\n");
 	    
 		v.append("document.getElementById(\'myVideo" + vidNum +
 				 "\').addEventListener('ended', function() { myHandler" + vidNum + "(\'" +
 				 "myVideo" + vidNum + "\', vidsrc" + vidNum + ")}, false);\n");
 		
-		v.append("</script>\n");
+		v.append("document.getElementById(\'myVideo" + vidNum +
+				 "\').addEventListener('click', toggleTextVisibility" + vidNum + ");\n");
+		
+	
+	    }	
+		
+		//v.append("</script>\n");
 		out("\n---------------make multi video entry returned:");
 		out (v.toString());
 		out("\n\n");
@@ -364,6 +493,7 @@ public class PageBuilder  {
 	}
     protected void writeFile(StringBuffer sb, File of) {
 	  	  FileOutputStream os = null;
+	  	  
 	  	  out ("writing htm file "+of.getPath());
 	  	  try {
 	  		os = new FileOutputStream(of);
@@ -371,9 +501,21 @@ public class PageBuilder  {
 	  		byte b[]  = st.getBytes();
 	  		//out(st);
 	  		os.write(b);
-	    	    os.close();
+	    	os.close();
 	  	  } catch (IOException ioe) {
-	  		System.err.println("io error dealing with bat file to write: " + ioe.getMessage());
+	  		System.err.println("PageBuilder 376: io error dealing with bat file to write: " + ioe.getMessage());
+	  		// must be windows?
+	  		try {
+	  		File tof = new File("c:\\temp\\MultiVideo.TEST.htm");
+	  		FileOutputStream tos = new FileOutputStream(tof);
+	  		String st = new String(sb);
+	  		byte b[]  = st.getBytes();
+	  		//out(st);
+	  		tos.write(b);
+	    	tos.close();
+	  	      } catch (IOException ioex) {
+	  		    System.err.println("PageBuilder 388: io error dealing with bat file to write: " + ioex.getMessage());
+	  	      }
 	  	  }
 	  }
 	
@@ -384,112 +526,48 @@ public class PageBuilder  {
     
 	public String head (int numSubWin) {
 
-		out ("##################pagebuilder head##############");
-		String s=null;
-		s=new String("<!DOCTYPE HTML >\n"+
+		StringBuffer s=null;
+		s=new StringBuffer("<!DOCTYPE HTML >\n"+
+		"<html>\n" +
 		"<head> \n "+
 		"<meta http-equiv=\"content-type\" content=\"text/html; "+
 		"charset=iso-8859-15\" />  <meta http-equiv=\"content-language\" "+
-		"content=\"en\" /> \n "+
-		
+		"content=\"en\" /> \n "+		
 		"<title>Multi-Video " 
 		// here's where we should add the min and max durations of the segments
 		// into the title for subsequent screen captures...(such as Multivideo 3m10s to 4m43s)
 		// old: "Demo</title>");
 		    + " lo: " + low_ 
 		    + " hi: " + high_
-		    +	"</title>");
-		String css = getCss(new String (""), this.getImgCount());
-
+		// the rest of the header   
+		    +	"</title>\n "
+		    +	"<script type=\"text/javascript\" src=\"js/CssSelector.js\"></script> \n "
+		    +	"<script type=\"text/javascript\" src=\"js/MultiVideo.subs.js\"></script> \n "
+		    +	"<script>document.addEventListener(\"DOMContentLoaded\", function () { getCss()}); </script>\n"
+		    );
+                                   
+		s.append("</script>\n");
+		String t = s.toString();
+		out("header:"+t);
+		return t;
+		
+	}
+	
+	
+	public String makeVideoGridNot() { 
+	
 		// add JavaScript to provide variable background...if a directory
 		// for the background files has been specified
 		StringBuffer scrpt = new StringBuffer("");
 		
 		// add in the video container css code that allows for text overlay....
-		  scrpt.append(
-					"<style> \n" +
-							".video-container { position: relative; z-index:0;}  \n" +
-							".video-container video { display: block; max-width: 100%; height: auto; }  \n" +
-							".video-container .text  {position: absolute; \n" +
-							"top: 50%; \n" +
-							"left: 50%;  \n" +
-							"z-index:1; \n" +
-							"transform: translate(-50%, -50%); \n" +
-							"text-align: center; \n" +
-							"background-color: rgba(255, 255, 255, 0.5);  /* sets the transparency */  \n" +
-							"padding: 20px;  \n" +
-							"} \n" +
-							"</style>\n"
-		            );
-				
 		
-		
-		
-		
-		if ( bg_.getBackGroundDirectory().length() > 0) {
-			out("Setting up BackGrounDirectory randomizer");
-			BackgroundRandomizer bgr = new BackgroundRandomizer();
-			scrpt.append( bgr.buildRandomizerLogic(bg_));
-			
-			}
-		   
-		
-          
 		
 			 // now add the functions for multi-VLC entries
 			
 		    int vLoopIdx = 0;
 		    scrpt.append("\n<script>\n");
-		    while (vLoopIdx < numSubWin) {
-			scrpt.append("\n// ------------------------------utility function--------------- \n" +	
-			 "function myHandler" + vLoopIdx + "(elName, videoArray) {\n" +
-			 "if (typeof i"+vLoopIdx+" === 'undefined'){                                         \n" + 
-			 "		i"+vLoopIdx+" = 1;                                                           \n" +
-			 "	} else {                                                             \n " +
-			 "		i"+vLoopIdx+" += 1;                                                         \n " +
-			 "	}                                                                    \n " +
-			 "	if ( i"+vLoopIdx+" === videoArray.length) {                                      \n " +
-			 "		i"+vLoopIdx+" = 0;                                                          \n " +
-			 "	}                                                                     \n" +
-			 "	videoPlay(i"+vLoopIdx+", videoArray, elName);                                    \n " +
-			 "	}                                                                    \n " +
-			 " \n") ;//+
 		    
-			// "</script> \n" 
-			
-			 scrpt.append("	  function videoPlay ( videoNum, videoSource, el) { \n");
-			 scrpt.append(
-			 "	//-- create a play function that will get a page segment, set its 'videoPlay' target to the first array element-->:\n" +
-			 "	//-- Note: the setAttribute should be in a function maybe with arguments of page segment and video-array-first-element-->\n" +
-			 "	document.getElementById(el).setAttribute(\"src\",videoSource[videoNum]);\n" +
-			 "	document.getElementById(el).load();\n" +
-			 "	document.getElementById(el).play();\n" +
-		     "}");
-			 
-			 // now add the 'show text' function for this iteration
-			 scrpt.append("\n// ------------------------------utility text toggle  function--------------- \n" +	
-					 "function toggleTextVisibility" + vLoopIdx + "() {\n" +
-                     	"var   textElement = document.getElementById('texxxt" + vLoopIdx + "'); \n" +
-                     	"const atextstring = textElement.textContent;\n" +
-                     	" console.log(atextstring);\n" +
-
-                     	"var  theName  = document.getElementById('myVideo" + vLoopIdx + "');	\n" +
-                     	"var  vidName  = theName.getAttribute('src'); \n" +
-                     	"console.log(vidName);\n " +
-
-
-                     	" if (textElement.style.display === \"none\") \n " +
-                     	"   { \n" +
-                     	"    textElement.textContent =   vidName;\n " +
-                     	"    textElement.style.display = \"block\"; \n " +
-                     	"    }\n " +
-                     	"else \n " +
-                     	"    { textElement.style.display = \"none\"; }\n " +
-                     	"}	");  
-			 
-			 vLoopIdx += 1;
-		    } // end of "vloop" to make individual handlers for each subwindow
-			
 			 
 		     scrpt.append( "\ngetCss();\n</script>\n"); 
 			 
@@ -536,25 +614,44 @@ public class PageBuilder  {
 				 
 				 scrpt.append(theInitialBackground);
 			 }
-			
-		
-		String s1 = null;
-		if (bg_.isUseHttpServer()) {
-		    s1= new String( "\n</script></head>\n<body onload=\"start();\" ");
-		} else {
-			s1= new String( "\n</script></head>\n<body style=\"background-color:black;\" ");
-		}
-		
-		String temp = s+css+scrpt+s1;
-		s = temp;
-		
-		
-		String t = new String(s+">");
-		return t;
-		}
-		
+			return scrpt.toString();
+	}
 	
 	
+	//-------------------------------MAKE VIDEO GRID (1st block after header)------------------------------
+	public String makeVideoGrid(VideoFilePointer[] vfp) {
+		
+		StringBuffer pagex = new StringBuffer("");
+		String s           = new String("");
+				
+		s= new String( "\n</head>\n<body style=\"background-color:black;\";>\n");
+				
+		pagex.append(s);
+		pagex.append("\n <div class=\"video-grid\">\n");
+		
+		int j =0;
+		
+		
+		while (j < vfp.length) {
+				boolean multiFile = false;
+				pagex.append("  <div class=\"video-container\">\n");
+				StringBuffer vEntry = new StringBuffer("");
+				pagex.append(
+					"     <video id=\"myVideo" + j + "\"  autoplay  muted controls></video>\n"
+				   +"     <div id=\"texxxt" + j +"\" class=\"text\">Some text to display</div>\n"
+				   +"</div>\n");	
+				
+				pagex.append(vEntry);
+				j += 1;	
+		}
+				
+		
+			pagex.append("</div>");
+		
+		 return pagex.toString();
+		}
+		
+
 
 	public String vidStart (boolean isMp4, Integer x, Integer y) {
 		String rtn = new String("");
@@ -575,18 +672,34 @@ public class PageBuilder  {
 		StringBuffer s = new StringBuffer("");
 		// set up click-events for pathname toggle
 		int idx = vfpLength_;
+		out("...pageEnd, loop counter is "+vfpLength_);
 		int k = 0;
+		//s.append("<script>\n");
 		while (k < idx) {
-			s.append (
-					"<script> \n " + 
-					" var videoElement = document.querySelector('#myVideo" + k + "'); " +
-					"    videoElement.addEventListener(\"click\", toggleTextVisibility" + k + ");" +
-					" </script>"
-					);
-			k+=1;
+			
+			s.append( 
+	        "function myHandler" + k + "(elName, videoArray) {\n"
+	        +"   	currentVideo" + k + " = (currentVideo" + k + " + 1) % videoArray.length;\n"
+	    	+"	videoPlay(currentVideo" + k + ", videoArray, elName);\n"
+	        +"}	\n\n"
+			
+	    	
+	    	);
+		 k = k+1;
+		}
+		k = 0;
+        while (k < idx) {
+			
+			s.append(         
+	    	 "function toggleTextVisibility" + k + "() {\n"
+	    	+ "    var textElement = document.getElementById('texxxt" + k + "');\n"
+	    	+ "    showVidName('myVideo" + k + "', textElement);\n"
+	    	+"}\n"
+	    	);
+		 k = k+1;
 		}
 		
-		s.append(" </body></html>");
+		s.append(" </script></body>\n</html>\n");
 		return s.toString();
 	}
 	
