@@ -32,7 +32,11 @@ public class VideoFilePointer {
 	private     BatGUI                 bg_ = null;
 	private     JTextField             durationTextField = null;
 	private     JButton                openButton = null;  //aka the "vfyl" or "videoFile" button. (I think) 
-    
+
+	public LinkedList<File>       getVideoFilePointerFileList() {
+		return fileQueue;
+	}
+	
     public JButton getOpenButton() {
 		return openButton;
 	}

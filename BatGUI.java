@@ -89,48 +89,7 @@ public class BatGUI {
 		        out("--------------------------------------SYSTEMPROPS------------------------------------");
 		        System.getProperties().list(System.out);
 		        out("--------------------------------------END of SYSTEMPROPS------------------------------------");
-		        
-		        
-		        /*
-		        
-		        // Set loaded properties as system properties
-		        properties.forEach((key, value) -> {
-		            String propName = key.toString();
-		            String propValue = value.toString();
-		            System.setProperty(propName, propValue);
-		        });
-
-		        // Test: Print system properties
-		        System.getProperties().forEach((key, value) -> {
-		            String propName = key.toString();
-		            String propValue = value.toString();
-		            System.out.println(propName + " = " + propValue);
-		        });
-			 */
-		     
-		     
-		     
-		     
-		     /*Properties p = new Properties();
-	    	 try {
-	    	      p.load(new FileInputStream(ps));
-	    	     } catch (IOException e) {
-	    	    	 System.err.println("*****************Failed to read properties file " + ps + ", must quit!");
-	    	         System.exit(1);
-	    	     }
-	         out("Putting all props to system props");
-	         Properties sysProps = System.getProperties();
-	         sysProps.putAll(p);
-	         */
-	         
-	         
-	         
-	         
-	         
-	         
-	         
-	         
-	         
+		      
 	         
 	         // background directory and alias
 	         //String backGrounds = System.getProperty("bgImgDir");

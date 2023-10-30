@@ -176,7 +176,7 @@ public class CmdFile {
 		  out("CMDFILE: line 176: closing output file "+of.getPath()); 
 		  os.close();
 		} catch (IOException ioe) {
-			System.err.println("io error dealing with bat file to write: " + ioe.getMessage());
+			System.err.println("Cmdfile: 179: io error dealing with bat file to write: " + ioe.getMessage());
 		}
 		
      }
@@ -223,7 +223,7 @@ public class CmdFile {
 		
 		    os.close();
 		} catch (IOException ioe) {
-			System.err.println("io error dealing with bat file to write: " + ioe.getMessage());
+			System.err.println("CmdFile 226: io error dealing with bat file to write: " + ioe.getMessage());
 		}
 		
      }
@@ -260,7 +260,7 @@ public class CmdFile {
 			}
 		}
 		if (count > MAXITER-2 && !ovw) {
-			System.err.println("too many bat file iterations already exist, go delete some");
+			System.err.println("CmdFile 263: too many bat file iterations already exist, go delete some");
 			return null;
 		}
 		return of;
@@ -399,7 +399,7 @@ public class CmdFile {
 			 os.write(endit.getBytes());
 			 os.close();
 		} catch (IOException ioe) {
-			System.err.println("io error dealing with bat file to write: " + ioe.getMessage());
+			System.err.println("CmdFile 402: io error dealing with bat file to write: " + ioe.getMessage());
 		}
 		
      }

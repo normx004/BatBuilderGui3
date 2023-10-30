@@ -126,7 +126,7 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     	int k = 0;
     	int howMany           = this.getFileCount();
     	out("build Multi File Action Panel. howMany is "+howMany);
-    	//--------------------DOIT button------------------------
+    	//--------------------Make Page button------------------------
     	JButton doitButton = new JButton("Make Page");
     	doitButton.setActionCommand("doit");	
     	doitButton.addActionListener(this);
@@ -231,8 +231,11 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     public void actionPerformed(ActionEvent e) {
     	//  "DOIT" button - time to make the html file
     	PageBuilder pb = new PageBuilder(vidFiles, this);
+    	out("pagebuild HAS BEEN CONSTRUCTED, action command was "+e.getActionCommand());
         if ("doit".equals(e.getActionCommand())) {
+          out("ACTION COMMAND is 'doit'");
           String result = pb.generatePage();
+          out("came back from 'generate page' in PageBuilder");
           //show result of page generation
           if (j != null) {
         	  frame.getContentPane().remove(j);
