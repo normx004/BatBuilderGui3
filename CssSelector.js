@@ -2,7 +2,7 @@ function getCss() {
      var w = window.innerWidth;
      var linky = document.createElement('link');
      linky.setAttribute('rel', 'stylesheet');
-	      
+	 /*     
 	if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) 
 		{
 		 console.log("Setting css to MOBILE");
@@ -31,5 +31,10 @@ function getCss() {
 			     	console.log("have set css to 1366");							
        		    	}
 	}
+	*/
+	 console.log("Setting css to 3840"); 
+		  linky.setAttribute('href', 'css/gui-3824-2-4.css');
+	   	  console.log("hjave set css to 3840");
+	
    document.head.appendChild(linky); 									   
 }
