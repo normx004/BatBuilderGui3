@@ -34,7 +34,7 @@ public class CssGenerator {
 			//cssString = new String("	<style> 	div.floatL {  float: left;  }\n  div.floatR {  float: right;  }  \n.columnRight {	width: 48%;	float: right;	padding: 10px;	margin-bottom: 20px;	}\n.columnLeft {	width: 48%;	float: left;	padding: 10px;	margin-bottom: 20px;}\n.columnMain {	width: 2%;	float: left;	padding: 10px;	margin-bottom: 20px;}\nh2 {  text-align: center;  color: pink;  background: grey;}  </style>\n");
 		    String bodyStyle = this.genInitialBackground();
 		   
-		    String css = new String ( bodyStyle + "<script type=\"text/javascript\" src=\"js/NewCSSSelectCode.js\"></script>");
+		    String css = new String ( bodyStyle + "<script type=\"text/javascript\" src=\"js/CssSelector.js\"></script>");
 		    
 		    /*  this was bad in first revision... 
 		     * String css1 = new String(css + "<script>");
