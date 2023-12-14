@@ -175,13 +175,17 @@ public class BatGUIHtml extends BatGUI implements ActionListener, FocusListener{
     	// define a new JFrame for this part and format it
     	// with some kind of table layout...it will hold 
     	// the 'pop a chooser' buttons, and the duration
-    	// textfiled that displays total time for all the
+    	// textfields that display total time for all the
     	// videos dropped so far on each of the 2, 4, 6 or 8
     	// drop targets
     	int j = 0;
     	GridLayout experimentLayout = new GridLayout(0,2);
     	JPanel butts = new JPanel(experimentLayout);
+    	if (howMany < 6) {
     	butts.setPreferredSize(new Dimension(600, 75));
+    	} else {
+    		butts.setPreferredSize(new Dimension(600, 150));
+    	}
     	butts.setMaximumSize(butts.getPreferredSize()); 
     	butts.setMinimumSize(butts.getPreferredSize());
     	//example
