@@ -543,8 +543,10 @@ public class PageBuilder  {
 		    +	"</title>\n "
 		    +	"<script type=\"text/javascript\" src=\"js/CssSelector.js\"></script> \n "
 		    +	"<script type=\"text/javascript\" src=\"js/MultiVideo.subs.js\"></script> \n "
-		    +	"<script>document.addEventListener(\"DOMContentLoaded\", function () { getCss()}); </script>\n"
-		    );
+		    +	"<script>document.addEventListener(\"DOMContentLoaded\", function () { getCss(");
+		s.append(vfpLength_);
+		s.append(")}); </script>\n");
+		    
                                    
 		s.append("</script>\n");
 		String t = s.toString();
